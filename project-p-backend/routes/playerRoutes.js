@@ -158,6 +158,28 @@ router.post("/:username/quest/complete", async (req, res) => {
   }
 });
 
+// POST /player/:username/quest/cancel
+router.post("/:username/quest/cancel", async (req, res) => {
+  const { username } = req.params;
+
+  try {
+    const player = await Player.findOne({ username });
+    if (!player) return res.status(404).json({ error: "Player not found" });
+
+    if (!player.activeQuest) {
+      return res.status(400).json({ error: "No active quest" });
+    }
+
+    player.activeQuest = null;
+    await player.save();
+
+    res.json(player);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 // POST /player/:username/energy
 router.post("/:username/energy", async (req, res) => {
   const { username } = req.params;

@@ -43,4 +43,14 @@ export const getQuestStatus = async (username) => {
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Failed to get quest status");
   return data;
+
+};
+
+export const cancelQuest = async (username) => {
+  const res = await fetch(`http://localhost:4000/player/${username}/quest/cancel`, {
+    method: "POST",
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Failed to cancel quest");
+  return data;
 };

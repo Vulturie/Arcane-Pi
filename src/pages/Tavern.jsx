@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getQuestStatus } from "../services/playerService";
+import { getQuestStatus, cancelQuest } from "../services/playerService";
 
 const QUESTS = [
   { id: 1, name: "Chase a chicken", duration: 10, xp: 5, gold: 10, energyCost: 10 },
@@ -50,6 +50,18 @@ function Tavern({ player, refreshPlayer }) {
     }
   };
 
+    const handleCancelQuest = async () => {
+        try {
+          await cancelQuest(player.username);
+          setActiveQuest(null);
+          setTimeLeft(0);
+          refreshPlayer();
+        } catch (err) {
+          console.error("Failed to cancel quest:", err);
+          alert("Server error cancelling quest.");
+        }
+      };
+
   useEffect(() => {
     const interval = setInterval(async () => {
       try {
@@ -95,6 +107,7 @@ function Tavern({ player, refreshPlayer }) {
           <p><strong>Quest in progress:</strong> {activeQuest.name}</p>
           <p>⏳ Time left: {timeLeft}s</p>
           <p>You can leave and return later to complete it.</p>
+          <button onClick={handleCancelQuest}>Cancel Quest</button>
         </div>
       ) : (
         <>
