@@ -4,6 +4,9 @@ const Character = require("../models/Character");
 const { generateEnemy } = require("../utils/enemyGenerator");
 const { getStatsForClass, simulateCombat } = require("../utils/combat");
 
+// Limit history stored per character to avoid unbounded growth
+const MAX_HISTORY_ENTRIES = 100;
+
 const getXpForNextLevel = (level) => 100 + (level - 1) * 50;
 
 function logHistory(char, quest, combatResult) {
@@ -17,7 +20,8 @@ function logHistory(char, quest, combatResult) {
   };
   if (!char.history) char.history = [];
   char.history.push(entry);
-  if (char.history.length > 20) char.history.shift();
+  // Remove the oldest entry when exceeding the cap
+  if (char.history.length > MAX_HISTORY_ENTRIES) char.history.shift();
 }
 
 // GET /account/:owner/characters
