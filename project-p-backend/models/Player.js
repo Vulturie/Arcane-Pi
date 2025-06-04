@@ -14,10 +14,10 @@ const playerSchema = new mongoose.Schema({
   inventory: {
     type: [
       {
-        id: Number,
+        id: String,
         name: String,
         type: String,
-        classRestriction: String,
+        classRestriction: [String],
         statBonus: mongoose.Schema.Types.Mixed,
       },
     ],
