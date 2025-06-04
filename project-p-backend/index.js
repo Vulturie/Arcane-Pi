@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const playerRoutes = require("./routes/playerRoutes");
 const characterRoutes = require("./routes/characterRoutes");
+const itemRoutes = require("./routes/itemRoutes");
 
 const app = express();
 app.use(cors());
@@ -24,6 +25,7 @@ app.get("/", (req, res) => {
 const PORT = process.env.PORT || 4000;
 app.use("/player", playerRoutes);
 app.use("/api", characterRoutes);
+app.use("/items", itemRoutes);
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });

@@ -125,13 +125,31 @@ export const deleteCharacter = async (id) => {
    return data;
  };
 
- export const updateInventory = async (username, inventory) => {
-   const res = await fetch(`http://localhost:4000/player/${username}/inventory`, {
-     method: "POST",
-     headers: { "Content-Type": "application/json" },
-     body: JSON.stringify({ inventory }),
-   });
-   const data = await res.json();
-   if (!res.ok) throw new Error(data.error || "Failed to update inventory");
-   return data;
+export const updateInventory = async (username, inventory) => {
+  const res = await fetch(`http://localhost:4000/player/${username}/inventory`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ inventory }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Failed to update inventory");
+  return data;
+};
+
+export const getItems = async () => {
+  const res = await fetch("http://localhost:4000/items");
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Failed to load items");
+  return data;
+};
+
+export const addItemToInventory = async (username, itemId) => {
+  const res = await fetch(`http://localhost:4000/player/${username}/inventory/add`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ itemId }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Failed to add item");
+  return data;
 };

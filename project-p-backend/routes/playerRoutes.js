@@ -266,4 +266,27 @@ router.post("/:username/inventory", async (req, res) => {
   }
 });
 
+// POST /player/:username/inventory/add
+router.post("/:username/inventory/add", async (req, res) => {
+  const { username } = req.params;
+  const { itemId } = req.body;
+
+  try {
+    const player = await Player.findOne({ username });
+    if (!player) return res.status(404).json({ error: "Player not found" });
+
+    const ITEMS = require("../data/items");
+    const item = ITEMS.find((it) => it.id === itemId);
+    if (!item) return res.status(400).json({ error: "Invalid item" });
+
+    player.inventory.push(item);
+    await player.save();
+
+    res.json(player.inventory);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 module.exports = router;
