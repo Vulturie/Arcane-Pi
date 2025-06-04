@@ -24,16 +24,17 @@ router.post("/account/:owner/characters", async (req, res) => {
     const count = await Character.countDocuments({ owner });
     if (count >= 4) return res.status(400).json({ error: "Character limit reached" });
 
-    if (!name || name.length < 3 || name.length > 15) {
+    const trimmed = name ? name.trim() : "";
+    if (!trimmed || trimmed.length < 3 || trimmed.length > 15) {
       return res.status(400).json({ error: "Name must be between 3 and 15 characters" });
     }
 
-    const existing = await Character.findOne({ name });
+    const existing = await Character.findOne({ name: new RegExp(`^${trimmed}$`, "i") });
     if (existing) {
       return res.status(400).json({ error: "Name already taken" });
     }
 
-    const character = await Character.create({ owner, name, class: className });
+    const character = await Character.create({ owner, name: trimmed, class: className });
     res.json(character);
   } catch (err) {
     console.error(err);

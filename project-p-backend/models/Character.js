@@ -8,7 +8,8 @@ const characterSchema = new mongoose.Schema({
     unique: true,
     minlength: 3,
     maxlength: 15,
-  },  // character name
+  trim: true,
+  }, // character name
   class: { type: String, default: "Novice" },
   level: { type: Number, default: 1 },
   xp: { type: Number, default: 0 },
