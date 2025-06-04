@@ -180,6 +180,38 @@ router.post("/:username/quest/cancel", async (req, res) => {
   }
 });
 
+// POST /player/:username/class
+router.post("/:username/class", async (req, res) => {
+  const { username } = req.params;
+  const { className } = req.body;
+
+  try {
+    const player = await Player.findOne({ username });
+    if (!player) return res.status(404).json({ error: "Player not found" });
+
+    player.class = className;
+    await player.save();
+
+    res.json(player);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// DELETE /player/:username
+router.delete("/:username", async (req, res) => {
+  const { username } = req.params;
+
+  try {
+    await Player.deleteOne({ username });
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 // POST /player/:username/energy
 router.post("/:username/energy", async (req, res) => {
   const { username } = req.params;

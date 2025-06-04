@@ -60,6 +60,11 @@ function App() {
         />
 
         <Route
+                  path="/character"
+                  element={<Character player={player} refreshPlayer={refreshPlayer} />}
+                />
+
+        <Route
           path="/"
           element={
             <GameHub
