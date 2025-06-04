@@ -172,13 +172,20 @@ export const addItemToInventory = async (username, itemId) => {
    return data;
  };
 
- export const unequipItem = async (username, slot) => {
-   const res = await fetch(`http://localhost:4000/player/${username}/unequip`, {
-     method: "POST",
-     headers: { "Content-Type": "application/json" },
-     body: JSON.stringify({ slot }),
-   });
-   const data = await res.json();
-   if (!res.ok) throw new Error(data.error || "Failed to unequip item");
-   return data;
+export const unequipItem = async (username, slot) => {
+  const res = await fetch(`http://localhost:4000/player/${username}/unequip`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ slot }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Failed to unequip item");
+  return data;
+};
+
+export const getHistory = async (id) => {
+  const res = await fetch(`http://localhost:4000/api/characters/${id}/history`);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Failed to load history");
+  return data;
 };

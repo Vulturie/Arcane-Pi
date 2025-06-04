@@ -37,6 +37,20 @@ const characterSchema = new mongoose.Schema({
     },
     default: undefined,
   },
+  // Log of completed quests and combat outcomes
+  history: {
+    type: [
+      {
+        questName: String,
+        result: String,
+        playerHP: Number,
+        enemyHP: Number,
+        enemyName: String,
+        timestamp: { type: Date, default: Date.now },
+      },
+    ],
+    default: [],
+  },
 });
 
 module.exports = mongoose.model("Character", characterSchema);

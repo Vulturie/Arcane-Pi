@@ -10,6 +10,7 @@ import Character from "./pages/Character";
 import CharacterSelect from "./pages/CharacterSelect";
 import Tavern from "./pages/Tavern";
 import Inventory from "./pages/Inventory";
+import History from "./pages/History";
 
 function App() {
   const [username, setUsername] = useState("");
@@ -71,6 +72,10 @@ function App() {
         <Route
           path="/inventory"
           element={<Inventory username={username} />}
+        />
+        <Route
+          path="/history"
+          element={<History character={activeChar} />}
         />
         <Route
           path="/"

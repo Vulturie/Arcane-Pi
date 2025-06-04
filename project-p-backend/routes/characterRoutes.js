@@ -6,6 +6,20 @@ const { getStatsForClass, simulateCombat } = require("../utils/combat");
 
 const getXpForNextLevel = (level) => 100 + (level - 1) * 50;
 
+function logHistory(char, quest, combatResult) {
+  const entry = {
+    questName: quest.name,
+    result: combatResult ? combatResult.result : "completed",
+    playerHP: combatResult ? combatResult.playerHP : undefined,
+    enemyHP: combatResult ? combatResult.enemyHP : undefined,
+    enemyName: combatResult ? quest.enemy.name : undefined,
+    timestamp: new Date(),
+  };
+  if (!char.history) char.history = [];
+  char.history.push(entry);
+  if (char.history.length > 20) char.history.shift();
+}
+
 // GET /account/:owner/characters
 router.get("/account/:owner/characters", async (req, res) => {
   const { owner } = req.params;
@@ -142,6 +156,7 @@ router.get("/characters/:id/quest/status", loadCharacter, async (req, res) => {
       char.level += 1;
       xpToLevel = getXpForNextLevel(char.level);
     }
+    logHistory(char, quest, combatResult);
     char.activeQuest = null;
     await char.save();
     return res.json({ completed: true, character: char, combat: combatResult });
@@ -205,6 +220,7 @@ router.post("/characters/:id/quest/complete", loadCharacter, async (req, res) =>
     char.level += 1;
     xpToLevel = getXpForNextLevel(char.level);
   }
+  logHistory(char, quest, combatResult);
   char.activeQuest = null;
   await char.save();
   res.json(combatResult ? { character: char, combat: combatResult } : char);
@@ -219,6 +235,11 @@ router.post("/characters/:id/quest/cancel", loadCharacter, async (req, res) => {
   char.activeQuest = null;
   await char.save();
   res.json(char);
+});
+
+// GET /characters/:id/history
+router.get("/characters/:id/history", loadCharacter, (req, res) => {
+  res.json(req.character.history || []);
 });
 
 module.exports = router;
