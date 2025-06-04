@@ -19,6 +19,7 @@ function Tavern({ character, refreshCharacter }) {
   const [activeQuest, setActiveQuest] = useState(null);
   const [timeLeft, setTimeLeft] = useState(0);
   const [loadingQuestStatus, setLoadingQuestStatus] = useState(true);
+  const [combatResult, setCombatResult] = useState(null);
 
   const startQuest = async (quest) => {
     if (character.energy < quest.energyCost) {
@@ -79,6 +80,7 @@ function Tavern({ character, refreshCharacter }) {
           setActiveQuest(null);
           setTimeLeft(0);
           refreshCharacter();
+          if (result.combat) setCombatResult(result.combat);
         } else if (result.quest) {
           setActiveQuest(result.quest);
           setTimeLeft(result.timeLeft);
@@ -142,6 +144,24 @@ function Tavern({ character, refreshCharacter }) {
             ))}
           </ul>
         </>
+      )}
+      {combatResult && (
+        <div className="modal" onClick={() => setCombatResult(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h3>
+              {combatResult.result === "win" ? "Victory!" : "Defeat"}
+            </h3>
+            <p>Player HP: {combatResult.playerHP}</p>
+            <p>Enemy HP: {combatResult.enemyHP}</p>
+            <h4>Turn Log</h4>
+            <ul>
+              {combatResult.log.map((line, idx) => (
+                <li key={idx}>{line}</li>
+              ))}
+            </ul>
+            <button onClick={() => setCombatResult(null)}>Close</button>
+          </div>
+        </div>
       )}
     </div>
   );

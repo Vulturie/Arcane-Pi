@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const Character = require("../models/Character");
+const { generateEnemy } = require("../utils/enemyGenerator");
+const { getStatsForClass, simulateCombat } = require("../utils/combat");
 
 const getXpForNextLevel = (level) => 100 + (level - 1) * 50;
 
@@ -122,8 +124,18 @@ router.get("/characters/:id/quest/status", loadCharacter, async (req, res) => {
   const startedAt = new Date(quest.startedAt);
   const elapsed = (now - startedAt) / 1000;
   if (elapsed >= quest.duration) {
-    char.gold += quest.gold;
-    char.xp += quest.xp;
+    let combatResult = null;
+    if (quest.isCombat) {
+      const playerStats = getStatsForClass(char.class, char.level);
+      combatResult = simulateCombat(playerStats, quest.enemy);
+      if (combatResult.result === "win") {
+        char.gold += quest.gold;
+        char.xp += quest.xp;
+      }
+    } else {
+      char.gold += quest.gold;
+      char.xp += quest.xp;
+    }
     let xpToLevel = getXpForNextLevel(char.level);
     while (char.xp >= xpToLevel) {
       char.xp -= xpToLevel;
@@ -132,7 +144,7 @@ router.get("/characters/:id/quest/status", loadCharacter, async (req, res) => {
     }
     char.activeQuest = null;
     await char.save();
-    return res.json({ completed: true, character: char });
+    return res.json({ completed: true, character: char, combat: combatResult });
   } else {
     const timeLeft = Math.ceil(quest.duration - elapsed);
     return res.json({ completed: false, timeLeft, quest });
@@ -157,6 +169,7 @@ router.post("/characters/:id/quest/start", loadCharacter, async (req, res) => {
     xp,
     gold,
     isCombat: !!isCombat,
+    enemy: isCombat ? generateEnemy(char) : undefined,
     startedAt: new Date(),
   };
   await char.save();
@@ -174,8 +187,18 @@ router.post("/characters/:id/quest/complete", loadCharacter, async (req, res) =>
   if (timeElapsed < quest.duration) {
     return res.status(400).json({ error: "Quest is still in progress" });
   }
-  char.gold += quest.gold;
-  char.xp += quest.xp;
+  let combatResult = null;
+  if (quest.isCombat) {
+    const playerStats = getStatsForClass(char.class, char.level);
+    combatResult = simulateCombat(playerStats, quest.enemy);
+    if (combatResult.result === "win") {
+      char.gold += quest.gold;
+      char.xp += quest.xp;
+    }
+  } else {
+    char.gold += quest.gold;
+    char.xp += quest.xp;
+  }
   let xpToLevel = getXpForNextLevel(char.level);
   while (char.xp >= xpToLevel) {
     char.xp -= xpToLevel;
@@ -184,7 +207,7 @@ router.post("/characters/:id/quest/complete", loadCharacter, async (req, res) =>
   }
   char.activeQuest = null;
   await char.save();
-  res.json(char);
+  res.json(combatResult ? { character: char, combat: combatResult } : char);
 });
 
 // POST /characters/:id/quest/cancel

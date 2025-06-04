@@ -25,6 +25,14 @@ const characterSchema = new mongoose.Schema({
       gold: Number,
       // Indicates whether the quest should trigger combat upon completion
       isCombat: { type: Boolean, default: false },
+      enemy: {
+          name: String,
+          level: Number,
+          STR: Number,
+          AGI: Number,
+          INT: Number,
+          VIT: Number,
+        },
       startedAt: Date,
     },
     default: undefined,
