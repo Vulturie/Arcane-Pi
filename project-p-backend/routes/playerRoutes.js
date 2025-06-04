@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Player = require("../models/Player");
+const { generateEnemy } = require("../utils/enemyGenerator");
 const getXpForNextLevel = (level) => {
   return 100 + (level - 1) * 50;
 };
@@ -100,15 +101,21 @@ router.post("/:username/quest/start", async (req, res) => {
 
     // Deduct energy and set active quest
     player.energy -= energyCost;
-    player.activeQuest = {
+    const questData = {
       id,
       name,
       duration,
       xp,
       gold,
       isCombat: !!isCombat,
-      startedAt: new Date()
+      startedAt: new Date(),
     };
+
+    if (isCombat) {
+      questData.enemy = generateEnemy(player);
+    }
+
+    player.activeQuest = questData;
 
     await player.save();
     console.log("✅ Quest saved to player:", player);
