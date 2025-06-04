@@ -2,7 +2,13 @@ const mongoose = require("mongoose");
 
 const characterSchema = new mongoose.Schema({
   owner: { type: String, required: true }, // Pi account username
-  name: { type: String, required: true },  // character name
+  name: {
+    type: String,
+    required: true,
+    unique: true,
+    minlength: 3,
+    maxlength: 15,
+  },  // character name
   class: { type: String, default: "Novice" },
   level: { type: Number, default: 1 },
   xp: { type: Number, default: 0 },
