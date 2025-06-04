@@ -66,7 +66,7 @@ function App() {
         />
         <Route
           path="/character"
-          element={<Character character={activeChar} refreshCharacter={refreshActiveCharacter} />}
+          element={<Character character={activeChar} refreshCharacter={refreshActiveCharacter} username={username} />}
         />
         <Route
           path="/inventory"

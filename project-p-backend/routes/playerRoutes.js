@@ -289,4 +289,73 @@ router.post("/:username/inventory/add", async (req, res) => {
   }
 });
 
+// GET /player/:username/equipment
+router.get("/:username/equipment", async (req, res) => {
+  const { username } = req.params;
+
+  try {
+    const player = await Player.findOne({ username });
+    if (!player) return res.status(404).json({ error: "Player not found" });
+
+    res.json(player.equippedItems || {});
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// POST /player/:username/equip
+router.post("/:username/equip", async (req, res) => {
+  const { username } = req.params;
+  const { itemId } = req.body;
+
+  try {
+    const player = await Player.findOne({ username });
+    if (!player) return res.status(404).json({ error: "Player not found" });
+
+    const idx = player.inventory.findIndex((it) => it.id === itemId);
+    if (idx === -1) return res.status(404).json({ error: "Item not in inventory" });
+    const item = player.inventory[idx];
+    const slot = item.type;
+
+    // Unequip existing item in slot
+    if (player.equippedItems && player.equippedItems[slot]) {
+      player.inventory.push(player.equippedItems[slot]);
+    }
+
+    // Remove from inventory and equip
+    player.inventory.splice(idx, 1);
+    player.equippedItems[slot] = item;
+    await player.save();
+
+    res.json({ inventory: player.inventory, equippedItems: player.equippedItems });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// POST /player/:username/unequip
+router.post("/:username/unequip", async (req, res) => {
+  const { username } = req.params;
+  const { slot } = req.body;
+
+  try {
+    const player = await Player.findOne({ username });
+    if (!player) return res.status(404).json({ error: "Player not found" });
+
+    const item = player.equippedItems && player.equippedItems[slot];
+    if (item) {
+      player.inventory.push(item);
+      player.equippedItems[slot] = null;
+      await player.save();
+    }
+
+    res.json({ inventory: player.inventory, equippedItems: player.equippedItems });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 module.exports = router;

@@ -152,4 +152,33 @@ export const addItemToInventory = async (username, itemId) => {
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Failed to add item");
   return data;
+ };
+
+ export const getEquipment = async (username) => {
+   const res = await fetch(`http://localhost:4000/player/${username}/equipment`);
+   const data = await res.json();
+   if (!res.ok) throw new Error(data.error || "Failed to load equipment");
+   return data;
+ };
+
+ export const equipItem = async (username, itemId) => {
+   const res = await fetch(`http://localhost:4000/player/${username}/equip`, {
+     method: "POST",
+     headers: { "Content-Type": "application/json" },
+     body: JSON.stringify({ itemId }),
+   });
+   const data = await res.json();
+   if (!res.ok) throw new Error(data.error || "Failed to equip item");
+   return data;
+ };
+
+ export const unequipItem = async (username, slot) => {
+   const res = await fetch(`http://localhost:4000/player/${username}/unequip`, {
+     method: "POST",
+     headers: { "Content-Type": "application/json" },
+     body: JSON.stringify({ slot }),
+   });
+   const data = await res.json();
+   if (!res.ok) throw new Error(data.error || "Failed to unequip item");
+   return data;
 };

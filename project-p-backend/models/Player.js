@@ -31,6 +31,13 @@ const playerSchema = new mongoose.Schema({
     default: [],
   },
 
+// Currently equipped items
+  equippedItems: {
+    weapon: { type: inventoryItemSchema, default: null },
+    armor: { type: inventoryItemSchema, default: null },
+    accessory: { type: inventoryItemSchema, default: null },
+  },
+
   activeQuest: {
     type: {
       id: Number,

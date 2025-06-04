@@ -1,13 +1,28 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   CLASS_BASE_STATS,
   getStatsForClass,
+  getEquipment,
   setPlayerClass,
   deleteCharacter,
 } from "../services/playerService";
 
-function Character({ character, refreshCharacter }) {
+function Character({ character, refreshCharacter, username }) {
   const [chosenClass, setChosenClass] = useState("Warrior");
+  const [equipped, setEquipped] = useState({});
+
+    useEffect(() => {
+      if (!username) return;
+      const load = async () => {
+        try {
+          const data = await getEquipment(username);
+          setEquipped(data);
+        } catch (err) {
+          console.error("Failed to load equipment", err);
+        }
+      };
+      load();
+    }, [username]);
 
   const handleChoose = async () => {
     try {
@@ -30,6 +45,15 @@ function Character({ character, refreshCharacter }) {
   };
 
   const stats = getStatsForClass(character.class, character.level);
+  if (stats && equipped) {
+      Object.values(equipped).forEach((item) => {
+        if (item && item.statBonus) {
+          Object.entries(item.statBonus).forEach(([k, v]) => {
+            stats[k] = (stats[k] || 0) + v;
+          });
+        }
+      });
+    }
 
   return (
     <div>
