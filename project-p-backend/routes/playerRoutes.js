@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Player = require("../models/Player");
+const Character = require("../models/Character");
 const { generateEnemy } = require("../utils/enemyGenerator");
 const { getPlayerStats, simulateCombat } = require("../utils/combat");
 const getXpForNextLevel = (level) => {
@@ -303,6 +304,39 @@ router.post("/:username/inventory/add", async (req, res) => {
     await player.save();
 
     res.json(player.inventory);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// POST /player/:username/buy
+router.post("/:username/buy", async (req, res) => {
+  const { username } = req.params;
+  const { itemId, characterId } = req.body;
+
+  try {
+    const player = await Player.findOne({ username });
+    if (!player) return res.status(404).json({ error: "Player not found" });
+
+    const character = await Character.findById(characterId);
+    if (!character) return res.status(404).json({ error: "Character not found" });
+
+    const ITEMS = require("../data/items");
+    const item = ITEMS.find((it) => it.id === itemId);
+    if (!item) return res.status(400).json({ error: "Invalid item" });
+
+    if (character.gold < item.cost) {
+      return res.status(400).json({ error: "Not enough gold" });
+    }
+
+    character.gold -= item.cost;
+    player.inventory.push(item);
+
+    await character.save();
+    await player.save();
+
+    res.json({ gold: character.gold, inventory: player.inventory });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });

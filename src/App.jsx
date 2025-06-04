@@ -11,6 +11,7 @@ import CharacterSelect from "./pages/CharacterSelect";
 import Tavern from "./pages/Tavern";
 import Inventory from "./pages/Inventory";
 import History from "./pages/History";
+import Shop from "./pages/Shop";
 
 function App() {
   const [username, setUsername] = useState("");
@@ -72,6 +73,10 @@ function App() {
         <Route
           path="/inventory"
           element={<Inventory username={username} />}
+        />
+        <Route
+          path="/shop"
+          element={<Shop username={username} character={activeChar} refreshCharacter={refreshActiveCharacter} />}
         />
         <Route
           path="/history"
