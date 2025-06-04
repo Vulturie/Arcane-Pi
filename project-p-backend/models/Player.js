@@ -10,6 +10,20 @@ const playerSchema = new mongoose.Schema({
   energy: { type: Number, default: 100 },
   lastEnergyUpdate: { type: Date, default: Date.now },
 
+// Array of items in the player's inventory
+  inventory: {
+    type: [
+      {
+        id: Number,
+        name: String,
+        type: String,
+        classRestriction: String,
+        statBonus: mongoose.Schema.Types.Mixed,
+      },
+    ],
+    default: [],
+  },
+
   activeQuest: {
     type: {
       id: Number,

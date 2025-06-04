@@ -232,4 +232,38 @@ router.post("/:username/energy", async (req, res) => {
   }
 });
 
+// GET /player/:username/inventory
+router.get("/:username/inventory", async (req, res) => {
+  const { username } = req.params;
+
+  try {
+    const player = await Player.findOne({ username });
+    if (!player) return res.status(404).json({ error: "Player not found" });
+
+    res.json(player.inventory);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// POST /player/:username/inventory
+router.post("/:username/inventory", async (req, res) => {
+  const { username } = req.params;
+  const { inventory } = req.body;
+
+  try {
+    const player = await Player.findOne({ username });
+    if (!player) return res.status(404).json({ error: "Player not found" });
+
+    player.inventory = inventory;
+    await player.save();
+
+    res.json(player.inventory);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 module.exports = router;

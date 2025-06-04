@@ -9,6 +9,7 @@ import GameHub from "./components/GameHub";
 import Character from "./pages/Character";
 import CharacterSelect from "./pages/CharacterSelect";
 import Tavern from "./pages/Tavern";
+import Inventory from "./pages/Inventory";
 
 function App() {
   const [username, setUsername] = useState("");
@@ -68,8 +69,12 @@ function App() {
           element={<Character character={activeChar} refreshCharacter={refreshActiveCharacter} />}
         />
         <Route
+          path="/inventory"
+          element={<Inventory username={username} />}
+        />
+        <Route
           path="/"
-          element={<GameHub character={activeChar} refreshCharacter={refreshActiveCharacter} />}
+          element={<GameHub character={activeChar} refreshCharacter={refreshActiveCharacter} username={username} />}
         />
       </Routes>
     </Router>

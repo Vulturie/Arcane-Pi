@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import React, { useEffect } from "react";
 import { getXpForNextLevel } from "../services/playerService";
 
-function GameHub({ character, refreshCharacter }) {
+function GameHub({ character, refreshCharacter, username }) {
   useEffect(() => {
     const interval = setInterval(() => {
       refreshCharacter(); // Pull latest data
