@@ -82,7 +82,7 @@ router.get("/:username/quest/status", async (req, res) => {
 // POST /player/:username/quest/start
 router.post("/:username/quest/start", async (req, res) => {
   const { username } = req.params;
-  const { id, name, duration, xp, gold, energyCost } = req.body;
+  const { id, name, duration, xp, gold, energyCost, isCombat } = req.body;
 
   console.log("Received quest start request:", req.body);
 
@@ -106,6 +106,7 @@ router.post("/:username/quest/start", async (req, res) => {
       duration,
       xp,
       gold,
+      isCombat: !!isCombat,
       startedAt: new Date()
     };
 

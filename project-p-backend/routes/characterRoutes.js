@@ -141,7 +141,7 @@ router.get("/characters/:id/quest/status", loadCharacter, async (req, res) => {
 
 // POST /characters/:id/quest/start
 router.post("/characters/:id/quest/start", loadCharacter, async (req, res) => {
-  const { id, name, duration, xp, gold, energyCost } = req.body;
+  const { id, name, duration, xp, gold, energyCost, isCombat } = req.body;
   const char = req.character;
   if (char.energy < energyCost) {
     return res.status(400).json({ error: "Not enough energy" });
@@ -156,6 +156,7 @@ router.post("/characters/:id/quest/start", loadCharacter, async (req, res) => {
     duration,
     xp,
     gold,
+    isCombat: !!isCombat,
     startedAt: new Date(),
   };
   await char.save();

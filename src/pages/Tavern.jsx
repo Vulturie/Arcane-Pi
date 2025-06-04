@@ -1,10 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { getQuestStatus, cancelQuest } from "../services/playerService";
 
-const QUESTS = [
-  { id: 1, name: "Chase a chicken", duration: 10, xp: 5, gold: 10, energyCost: 10 },
-  { id: 2, name: "Clear the rats from the basement", duration: 20, xp: 10, gold: 20, energyCost: 20 },
-  { id: 3, name: "Guard the town gate", duration: 30, xp: 15, gold: 30, energyCost: 30 },
+// Standard quests that simply reward XP and gold
+const SAFE_QUESTS = [
+  { id: 1, name: "Chase a chicken", duration: 10, xp: 5, gold: 10, energyCost: 10, isCombat: false },
+  { id: 2, name: "Clear the rats from the basement", duration: 20, xp: 10, gold: 20, energyCost: 20, isCombat: false },
+  { id: 3, name: "Guard the town gate", duration: 30, xp: 15, gold: 30, energyCost: 30, isCombat: false },
+];
+
+// Risky quests which will later trigger combat when completed
+const RISKY_QUESTS = [
+  { id: 101, name: "Ambush the Bandits", duration: 20, xp: 10, gold: 15, energyCost: 15, isCombat: true },
+  { id: 102, name: "Enter the Spider Cave", duration: 30, xp: 15, gold: 25, energyCost: 20, isCombat: true },
+  { id: 103, name: "Hunt the Forest Beast", duration: 40, xp: 20, gold: 30, energyCost: 25, isCombat: true },
 ];
 
 function Tavern({ character, refreshCharacter }) {
@@ -37,6 +45,7 @@ function Tavern({ character, refreshCharacter }) {
           duration: quest.duration,
           xp: quest.xp,
           gold: quest.gold,
+          isCombat: quest.isCombat,
           startedAt,
         });
         setTimeLeft(quest.duration); // start countdown immediately
@@ -112,8 +121,19 @@ function Tavern({ character, refreshCharacter }) {
       ) : (
         <>
           <p>Your energy: {character.energy}</p>
+          <h3>Standard Quests</h3>
+            <ul>
+              {SAFE_QUESTS.map((quest) => (
+                <li key={quest.id}>
+                  <strong>{quest.name}</strong> — {quest.duration}s, {quest.xp} XP, {quest.gold} Gold, ⚡ {quest.energyCost} Energy
+                  <br />
+                  <button onClick={() => startQuest(quest)}>Start Quest</button>
+                </li>
+              ))}
+            </ul>
+          <h3>Risky Quests</h3>
           <ul>
-            {QUESTS.map((quest) => (
+            {RISKY_QUESTS.map((quest) => (
               <li key={quest.id}>
                 <strong>{quest.name}</strong> — {quest.duration}s, {quest.xp} XP, {quest.gold} Gold, ⚡ {quest.energyCost} Energy
                 <br />
