@@ -2,10 +2,10 @@ import { Link } from "react-router-dom";
 import React, { useEffect } from "react";
 import { getXpForNextLevel } from "../services/playerService";
 
-function GameHub({ player, refreshPlayer }) {
+function GameHub({ character, refreshCharacter }) {
   useEffect(() => {
     const interval = setInterval(() => {
-      refreshPlayer(); // Pull latest data (timestamp-based)
+      refreshCharacter(); // Pull latest data
     }, 5000); // Every 5 seconds
 
     return () => clearInterval(interval); // Cleanup on unmount
@@ -13,7 +13,7 @@ function GameHub({ player, refreshPlayer }) {
 
   const completeQuest = async () => {
     try {
-      const res = await fetch(`http://localhost:4000/player/${player.username}/quest/complete`, {
+      const res = await fetch(`http://localhost:4000/api/characters/${character._id}/quest/complete`, {
         method: "POST",
       });
 
@@ -21,7 +21,7 @@ function GameHub({ player, refreshPlayer }) {
 
       if (res.ok) {
         console.log("✅ Quest completed:", data);
-        refreshPlayer(); // Pull updated player data from server
+        refreshCharacter();
       } else {
         alert(data.error); // e.g., "Quest is still in progress"
       }
@@ -33,12 +33,12 @@ function GameHub({ player, refreshPlayer }) {
   return (
     <div className="game-hub">
       <h2>Game Hub</h2>
-      <p><strong>Username:</strong> {player.username}</p>
-      <p><strong>Class:</strong> {player.class}</p>
-      <p><strong>Level:</strong> {player.level}</p>
-      <p><strong>XP:</strong> {player.xp} / {getXpForNextLevel(player.level)}</p>
-      <p><strong>Gold:</strong> {player.gold}</p>
-      <p><strong>Energy:</strong> {player.energy}</p>
+      <p><strong>Name:</strong> {character.name}</p>
+      <p><strong>Class:</strong> {character.class}</p>
+      <p><strong>Level:</strong> {character.level}</p>
+      <p><strong>XP:</strong> {character.xp} / {getXpForNextLevel(character.level)}</p>
+      <p><strong>Gold:</strong> {character.gold}</p>
+      <p><strong>Energy:</strong> {character.energy}</p>
 
       <div className="menu">
         <Link to="/character"><button>🏰 Character</button></Link>

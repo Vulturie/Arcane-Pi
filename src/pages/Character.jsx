@@ -3,16 +3,16 @@ import {
   CLASS_BASE_STATS,
   getStatsForClass,
   setPlayerClass,
-  deletePlayer,
+  deleteCharacter,
 } from "../services/playerService";
 
-function Character({ player, refreshPlayer }) {
+function Character({ character, refreshCharacter }) {
   const [chosenClass, setChosenClass] = useState("Warrior");
 
   const handleChoose = async () => {
     try {
-      await setPlayerClass(player.username, chosenClass);
-      await refreshPlayer();
+      await setPlayerClass(character._id, chosenClass);
+      await refreshCharacter();
     } catch (err) {
       console.error(err);
       alert("Failed to set class");
@@ -21,7 +21,7 @@ function Character({ player, refreshPlayer }) {
 
   const handleDelete = async () => {
     try {
-      await deletePlayer(player.username);
+      await deleteCharacter(character._id);
       window.location.reload();
     } catch (err) {
       console.error(err);
@@ -29,15 +29,15 @@ function Character({ player, refreshPlayer }) {
     }
   };
 
-  const stats = getStatsForClass(player.class, player.level);
+  const stats = getStatsForClass(character.class, character.level);
 
   return (
     <div>
       <h2>Character Info</h2>
-      <p>Name: {player.username}</p>
-      <p>Class: {player.class}</p>
-      <p>Level: {player.level}</p>
-      {player.class === "Novice" ? (
+      <p>Name: {character.name}</p>
+            <p>Class: {character.class}</p>
+            <p>Level: {character.level}</p>
+            {character.class === "Novice" ? (
               <div>
                 <h3>Select Class</h3>
                 <select value={chosenClass} onChange={(e) => setChosenClass(e.target.value)}>
@@ -62,7 +62,7 @@ function Character({ player, refreshPlayer }) {
                 )}
               </div>
             )}
-            <button onClick={handleDelete}>Delete Profile</button>
+            <button onClick={handleDelete}>Delete Character</button>
     </div>
   );
 }

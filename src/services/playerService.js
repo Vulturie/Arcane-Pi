@@ -28,16 +28,33 @@ export function getStatsForClass(className, level) {
   };
 }
 
-export const getPlayerData = async (username) => {
-  const res = await fetch(`http://localhost:4000/player/${username}`);
+export const getCharacters = async (owner) => {
+  const res = await fetch(`http://localhost:4000/api/account/${owner}/characters`);
   const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Failed to load characters");
+    return data;
+  };
 
-  if (!res.ok) throw new Error(data.error || "Failed to load player");
+  export const createCharacter = async (owner, name, className) => {
+    const res = await fetch(`http://localhost:4000/api/account/${owner}/characters`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, className }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Failed to create character");
+    return data;
+  };
+
+export const getCharacter = async (id) => {
+  const res = await fetch(`http://localhost:4000/api/characters/${id}`);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Failed to load character");
   return data;
 };
 
-export const rewardPlayer = async (username, reward) => {
-  const res = await fetch(`http://localhost:4000/player/${username}/quest/complete`, {
+export const rewardPlayer = async (id, reward) => {
+  const res = await fetch(`http://localhost:4000/api/characters/${id}/quest/complete`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -50,8 +67,8 @@ export const rewardPlayer = async (username, reward) => {
   return data;
 };
 
-export const updateEnergy = async (username, newEnergy) => {
-  const res = await fetch(`http://localhost:4000/player/${username}/energy`, {
+export const updateEnergy = async (id, newEnergy) => {
+  const res = await fetch(`http://localhost:4000/api/characters/${id}/energy`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -64,16 +81,16 @@ export const updateEnergy = async (username, newEnergy) => {
   return data;
 };
 
-export const getQuestStatus = async (username) => {
-  const res = await fetch(`http://localhost:4000/player/${username}/quest/status`);
+export const getQuestStatus = async (id) => {
+  const res = await fetch(`http://localhost:4000/api/characters/${id}/quest/status`);
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Failed to get quest status");
   return data;
 
 };
 
-export const cancelQuest = async (username) => {
-  const res = await fetch(`http://localhost:4000/player/${username}/quest/cancel`, {
+export const cancelQuest = async (id) => {
+  const res = await fetch(`http://localhost:4000/api/characters/${id}/quest/cancel`, {
     method: "POST",
   });
   const data = await res.json();
@@ -81,8 +98,8 @@ export const cancelQuest = async (username) => {
   return data;
 };
 
-export const setPlayerClass = async (username, className) => {
-  const res = await fetch(`http://localhost:4000/player/${username}/class`, {
+export const setPlayerClass = async (id, className) => {
+  const res = await fetch(`http://localhost:4000/api/characters/${id}/class`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ className }),
@@ -92,8 +109,8 @@ export const setPlayerClass = async (username, className) => {
   return data;
 };
 
-export const deletePlayer = async (username) => {
-  const res = await fetch(`http://localhost:4000/player/${username}`, {
+export const deleteCharacter = async (id) => {
+  const res = await fetch(`http://localhost:4000/api/characters/${id}`, {
     method: "DELETE",
   });
   const data = await res.json();

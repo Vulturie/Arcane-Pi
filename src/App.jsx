@@ -1,80 +1,76 @@
 import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Pi from "./piSdk";
-import { getPlayerData } from "./services/playerService";
+import {
+  getCharacters,
+  getCharacter,
+} from "./services/playerService";
 import GameHub from "./components/GameHub";
 import Character from "./pages/Character";
+import CharacterSelect from "./pages/CharacterSelect";
 import Tavern from "./pages/Tavern";
-// Placeholder pages
-// Add Arena, Shop, Inventory, Stats when ready
 
 function App() {
   const [username, setUsername] = useState("");
-  const [player, setPlayer] = useState(null);
+  const [characters, setCharacters] = useState([]);
+  const [activeChar, setActiveChar] = useState(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
     Pi.authenticate({
       onReady: ({ user }) => {
         setUsername(user.username);
-        loadPlayer(user.username);
+        loadCharacters(user.username);
       },
-      onError: (err) => setError("Login failed"),
+      onError: () => setError("Login failed"),
     });
   }, []);
 
-  const loadPlayer = async (username) => {
+  const loadCharacters = async (owner) => {
     try {
-      const data = await getPlayerData(username);
-      setPlayer(data);
+      const data = await getCharacters(owner);
+      setCharacters(data);;
     } catch (err) {
-      setError(err);
+      setError(err.message);
     }
   };
 
-  const refreshPlayer = async () => {
+  const refreshActiveCharacter = async () => {
+    if (!activeChar) return;
     try {
-      const data = await getPlayerData(username);
-      setPlayer(data);
+      const data = await getCharacter(activeChar._id);
+      setActiveChar(data);
     } catch (err) {
-      console.error("Failed to refresh player data");
+      console.error("Failed to refresh character");
     }
   };
 
   if (!username) return <p>Logging in...</p>;
-  if (!player) return <p>Loading player data...</p>;
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
+  if (!activeChar)
+      return (
+        <CharacterSelect
+          owner={username}
+          characters={characters}
+          onSelect={(c) => setActiveChar(c)}
+          refresh={() => loadCharacters(username)}
+        />
+      );
 
   return (
     <Router>
       <Routes>
         <Route
           path="/tavern"
-          element={
-            <Tavern
-              player={player}
-              setPlayer={setPlayer}
-              refreshPlayer={refreshPlayer}
-            />
-          }
+          element={<Tavern character={activeChar} refreshCharacter={refreshActiveCharacter} />}
         />
-
         <Route
-                  path="/character"
-                  element={<Character player={player} refreshPlayer={refreshPlayer} />}
-                />
-
+          path="/character"
+          element={<Character character={activeChar} refreshCharacter={refreshActiveCharacter} />}
+        />
         <Route
           path="/"
-          element={
-            <GameHub
-              player={player}
-              refreshPlayer={refreshPlayer}
-              setPlayer={setPlayer}
-            />
-          }
+          element={<GameHub character={activeChar} refreshCharacter={refreshActiveCharacter} />}
         />
-        {/* Add more routes later */}
       </Routes>
     </Router>
   );

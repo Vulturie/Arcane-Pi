@@ -7,19 +7,19 @@ const QUESTS = [
   { id: 3, name: "Guard the town gate", duration: 30, xp: 15, gold: 30, energyCost: 30 },
 ];
 
-function Tavern({ player, refreshPlayer }) {
+function Tavern({ character, refreshCharacter }) {
   const [activeQuest, setActiveQuest] = useState(null);
   const [timeLeft, setTimeLeft] = useState(0);
   const [loadingQuestStatus, setLoadingQuestStatus] = useState(true);
 
   const startQuest = async (quest) => {
-    if (player.energy < quest.energyCost) {
-      alert(`Not enough energy! You need ${quest.energyCost}, but have ${player.energy}.`);
+    if (character.energy < quest.energyCost) {
+      alert(`Not enough energy! You need ${quest.energyCost}, but have ${character.energy}.`);
       return;
     }
 
     try {
-      const res = await fetch(`http://localhost:4000/player/${player.username}/quest/start`, {
+      const res = await fetch(`http://localhost:4000/api/characters/${character._id}/quest/start`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -40,7 +40,7 @@ function Tavern({ player, refreshPlayer }) {
           startedAt,
         });
         setTimeLeft(quest.duration); // start countdown immediately
-        refreshPlayer(); // still update backend state just in case
+        refreshCharacter();
       } else {
         alert(`❌ ${data.error}`);
       }
@@ -52,10 +52,10 @@ function Tavern({ player, refreshPlayer }) {
 
     const handleCancelQuest = async () => {
         try {
-          await cancelQuest(player.username);
+          await cancelQuest(character._id);
           setActiveQuest(null);
           setTimeLeft(0);
-          refreshPlayer();
+          refreshCharacter();
         } catch (err) {
           console.error("Failed to cancel quest:", err);
           alert("Server error cancelling quest.");
@@ -65,11 +65,11 @@ function Tavern({ player, refreshPlayer }) {
   useEffect(() => {
     const interval = setInterval(async () => {
       try {
-        const result = await getQuestStatus(player.username);
+        const result = await getQuestStatus(character._id);
         if (result.completed) {
           setActiveQuest(null);
           setTimeLeft(0);
-          refreshPlayer();
+          refreshCharacter();
         } else if (result.quest) {
           setActiveQuest(result.quest);
           setTimeLeft(result.timeLeft);
@@ -84,7 +84,7 @@ function Tavern({ player, refreshPlayer }) {
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [player.username, refreshPlayer]);
+  }, [character._id, refreshCharacter]);
 
   useEffect(() => {
     if (!activeQuest) return;
@@ -111,7 +111,7 @@ function Tavern({ player, refreshPlayer }) {
         </div>
       ) : (
         <>
-          <p>Your energy: {player.energy}</p>
+          <p>Your energy: {character.energy}</p>
           <ul>
             {QUESTS.map((quest) => (
               <li key={quest.id}>
