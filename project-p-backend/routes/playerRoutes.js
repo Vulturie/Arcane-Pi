@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Player = require("../models/Player");
 const { generateEnemy } = require("../utils/enemyGenerator");
+const { getPlayerStats, simulateCombat } = require("../utils/combat");
 const getXpForNextLevel = (level) => {
   return 100 + (level - 1) * 50;
 };
@@ -145,9 +146,20 @@ router.post("/:username/quest/complete", async (req, res) => {
       return res.status(400).json({ error: "Quest is still in progress" });
     }
 
-    // Level-up logic
-    player.gold += quest.gold;
-    player.xp += quest.xp;
+    let combatResult = null;
+
+    if (quest.isCombat) {
+      const playerStats = getPlayerStats(player);
+      combatResult = simulateCombat(playerStats, quest.enemy);
+
+      if (combatResult.result === "win") {
+        player.gold += quest.gold;
+        player.xp += quest.xp;
+      }
+    } else {
+      player.gold += quest.gold;
+      player.xp += quest.xp;
+    }
 
     let xpToLevel = getXpForNextLevel(player.level);
     while (player.xp >= xpToLevel) {
@@ -159,7 +171,7 @@ router.post("/:username/quest/complete", async (req, res) => {
     player.activeQuest = null;
 
     await player.save();
-    res.json(player);
+    res.json(combatResult ? { player, combat: combatResult } : player);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });
