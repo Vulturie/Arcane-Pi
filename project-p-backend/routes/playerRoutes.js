@@ -4,9 +4,24 @@ const Player = require("../models/Player");
 const Character = require("../models/Character");
 const { generateEnemy } = require("../utils/enemyGenerator");
 const { getPlayerStats, simulateCombat } = require("../utils/combat");
+const ITEMS = require("../data/items");
 const getXpForNextLevel = (level) => {
   return 100 + (level - 1) * 50;
 };
+
+async function grantLoot(username, isRare) {
+  const chance = isRare ? 0.9 : 0.5;
+  if (Math.random() < chance) {
+    const player = await Player.findOne({ username });
+    if (player && player.inventory.length < player.maxInventorySlots) {
+      const item = ITEMS[Math.floor(Math.random() * ITEMS.length)];
+      player.inventory.push(item);
+      await player.save();
+      return item;
+    }
+  }
+  return null;
+}
 
 // GET /player/:username
 router.get("/:username", async (req, res) => {
@@ -57,9 +72,20 @@ router.get("/:username/quest/status", async (req, res) => {
     const elapsed = (now - startedAt) / 1000;
 
     if (elapsed >= quest.duration) {
-      // Finish quest and give reward
-      player.gold += quest.gold;
-      player.xp += quest.xp;
+      let combatResult = null;
+      let loot = null;
+      if (quest.isCombat) {
+        const playerStats = getPlayerStats(player);
+        combatResult = simulateCombat(playerStats, quest.enemy);
+        if (combatResult.result === "win") {
+          player.gold += quest.gold;
+          player.xp += quest.xp;
+          loot = await grantLoot(username, quest.rare);
+        }
+      } else {
+        player.gold += quest.gold;
+        player.xp += quest.xp;
+      }
 
       let xpToLevel = getXpForNextLevel(player.level);
       while (player.xp >= xpToLevel) {
@@ -71,7 +97,7 @@ router.get("/:username/quest/status", async (req, res) => {
       player.activeQuest = null;
       await player.save();
 
-      return res.json({ completed: true, player });
+      return res.json({ completed: true, player, combat: combatResult, loot });
     } else {
       const timeLeft = Math.ceil(quest.duration - elapsed);
       return res.json({ completed: false, timeLeft, quest });
@@ -85,7 +111,7 @@ router.get("/:username/quest/status", async (req, res) => {
 // POST /player/:username/quest/start
 router.post("/:username/quest/start", async (req, res) => {
   const { username } = req.params;
-  const { id, name, duration, xp, gold, energyCost, isCombat } = req.body;
+  const { id, name, duration, xp, gold, energyCost, isCombat, rare } = req.body;
 
   console.log("Received quest start request:", req.body);
 
@@ -109,6 +135,7 @@ router.post("/:username/quest/start", async (req, res) => {
       duration,
       xp,
       gold,
+      rare: !!rare,
       isCombat: !!isCombat,
       startedAt: new Date(),
     };
@@ -147,7 +174,8 @@ router.post("/:username/quest/complete", async (req, res) => {
       return res.status(400).json({ error: "Quest is still in progress" });
     }
 
-    let combatResult = null;
+  let combatResult = null;
+  let loot = null;
 
     if (quest.isCombat) {
       const playerStats = getPlayerStats(player);
@@ -156,6 +184,7 @@ router.post("/:username/quest/complete", async (req, res) => {
       if (combatResult.result === "win") {
         player.gold += quest.gold;
         player.xp += quest.xp;
+        loot = await grantLoot(username, quest.rare);
       }
     } else {
       player.gold += quest.gold;
@@ -172,7 +201,7 @@ router.post("/:username/quest/complete", async (req, res) => {
     player.activeQuest = null;
 
     await player.save();
-    res.json(combatResult ? { player, combat: combatResult } : player);
+    res.json(combatResult ? { player, combat: combatResult, loot } : player);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });

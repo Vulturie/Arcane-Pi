@@ -3,6 +3,8 @@ const router = express.Router();
 const Character = require("../models/Character");
 const { generateEnemy } = require("../utils/enemyGenerator");
 const { getStatsForClass, simulateCombat } = require("../utils/combat");
+const Player = require("../models/Player");
+const ITEMS = require("../data/items");
 
 // Limit history stored per character to avoid unbounded growth
 const MAX_HISTORY_ENTRIES = 100;
@@ -22,6 +24,20 @@ function logHistory(char, quest, combatResult) {
   char.history.push(entry);
   // Remove the oldest entry when exceeding the cap
   if (char.history.length > MAX_HISTORY_ENTRIES) char.history.shift();
+}
+
+async function grantLoot(owner, isRare) {
+  const chance = isRare ? 0.9 : 0.5;
+  if (Math.random() < chance) {
+    const player = await Player.findOne({ username: owner });
+    if (player && player.inventory.length < player.maxInventorySlots) {
+      const item = ITEMS[Math.floor(Math.random() * ITEMS.length)];
+      player.inventory.push(item);
+      await player.save();
+      return item;
+    }
+  }
+  return null;
 }
 
 // GET /account/:owner/characters
@@ -143,12 +159,14 @@ router.get("/characters/:id/quest/status", loadCharacter, async (req, res) => {
   const elapsed = (now - startedAt) / 1000;
   if (elapsed >= quest.duration) {
     let combatResult = null;
+    let loot = null;
     if (quest.isCombat) {
       const playerStats = getStatsForClass(char.class, char.level);
       combatResult = simulateCombat(playerStats, quest.enemy);
       if (combatResult.result === "win") {
         char.gold += quest.gold;
         char.xp += quest.xp;
+        loot = await grantLoot(char.owner, quest.rare);
       }
     } else {
       char.gold += quest.gold;
@@ -163,7 +181,7 @@ router.get("/characters/:id/quest/status", loadCharacter, async (req, res) => {
     logHistory(char, quest, combatResult);
     char.activeQuest = null;
     await char.save();
-    return res.json({ completed: true, character: char, combat: combatResult });
+    return res.json({ completed: true, character: char, combat: combatResult, loot });
   } else {
     const timeLeft = Math.ceil(quest.duration - elapsed);
     return res.json({ completed: false, timeLeft, quest });
@@ -172,7 +190,7 @@ router.get("/characters/:id/quest/status", loadCharacter, async (req, res) => {
 
 // POST /characters/:id/quest/start
 router.post("/characters/:id/quest/start", loadCharacter, async (req, res) => {
-  const { id, name, duration, xp, gold, energyCost, isCombat } = req.body;
+  const { id, name, duration, xp, gold, energyCost, isCombat, rare } = req.body;
   const char = req.character;
   if (char.energy < energyCost) {
     return res.status(400).json({ error: "Not enough energy" });
@@ -187,6 +205,7 @@ router.post("/characters/:id/quest/start", loadCharacter, async (req, res) => {
     duration,
     xp,
     gold,
+    rare: !!rare,
     isCombat: !!isCombat,
     enemy: isCombat ? generateEnemy(char) : undefined,
     startedAt: new Date(),
@@ -207,12 +226,14 @@ router.post("/characters/:id/quest/complete", loadCharacter, async (req, res) =>
     return res.status(400).json({ error: "Quest is still in progress" });
   }
   let combatResult = null;
+  let loot = null;
   if (quest.isCombat) {
     const playerStats = getStatsForClass(char.class, char.level);
     combatResult = simulateCombat(playerStats, quest.enemy);
     if (combatResult.result === "win") {
       char.gold += quest.gold;
       char.xp += quest.xp;
+      loot = await grantLoot(char.owner, quest.rare);
     }
   } else {
     char.gold += quest.gold;
@@ -227,7 +248,7 @@ router.post("/characters/:id/quest/complete", loadCharacter, async (req, res) =>
   logHistory(char, quest, combatResult);
   char.activeQuest = null;
   await char.save();
-  res.json(combatResult ? { character: char, combat: combatResult } : char);
+  res.json(combatResult ? { character: char, combat: combatResult, loot } : char);
 });
 
 // POST /characters/:id/quest/cancel

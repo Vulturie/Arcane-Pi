@@ -53,6 +53,7 @@ const playerSchema = new mongoose.Schema({
       duration: Number,
       xp: Number,
       gold: Number,
+      rare: { type: Boolean, default: false },
       // Indicates whether the quest should trigger combat upon completion
       isCombat: { type: Boolean, default: false },
       enemy: {
