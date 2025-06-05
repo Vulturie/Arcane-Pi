@@ -18,8 +18,12 @@ const characterSchema = new mongoose.Schema({
   lastEnergyUpdate: { type: Date, default: Date.now },
   // Timestamp of when quest pools were last refreshed
   lastQuestRefresh: { type: Date, default: Date.now },
+  // Timestamp of when the shop inventory was last refreshed
+  lastShopRefresh: { type: Date, default: Date.now },
   safeQuestPool: { type: [mongoose.Schema.Types.Mixed], default: [] },
   riskyQuestPool: { type: [mongoose.Schema.Types.Mixed], default: [] },
+  // Items currently offered in the shop for this character
+  shopPool: { type: [mongoose.Schema.Types.Mixed], default: [] },
   activeQuest: {
     type: {
       id: Number,

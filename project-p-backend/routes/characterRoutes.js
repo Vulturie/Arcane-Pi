@@ -19,6 +19,16 @@ function initQuestPools(char) {
   char.lastQuestRefresh = new Date();
 }
 
+function initShopPool(char) {
+  const shuffled = [...ITEMS].sort(() => 0.5 - Math.random());
+  char.shopPool = shuffled.slice(0, Math.min(8, ITEMS.length));
+  char.lastShopRefresh = new Date();
+}
+
+function refreshShopPool(char) {
+  initShopPool(char);
+}
+
 function replaceQuest(char, type, tierIndex) {
   const quest = randomQuest(
     type === "safe" ? SAFE_QUEST_TIERS : RISKY_QUEST_TIERS,
@@ -102,6 +112,7 @@ router.post("/account/:owner/characters", async (req, res) => {
 
     const character = await Character.create({ owner, name: trimmed, class: className });
     initQuestPools(character);
+    initShopPool(character);
     await character.save();
     res.json(character);
   } catch (err) {
@@ -151,8 +162,18 @@ async function loadCharacter(req, res, next) {
       updated = true;
     }
 
+    if (!char.lastShopRefresh || char.lastShopRefresh < todayUTC) {
+      refreshShopPool(char);
+      updated = true;
+    }
+
     if (!char.safeQuestPool || char.safeQuestPool.length === 0) {
       initQuestPools(char);
+      updated = true;
+    }
+
+    if (!char.shopPool || char.shopPool.length === 0) {
+      initShopPool(char);
       updated = true;
     }
 

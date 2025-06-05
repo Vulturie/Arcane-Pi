@@ -1,34 +1,19 @@
 import React, { useState, useEffect } from "react";
-import ITEMS from "../itemData";
 import { buyItem } from "../services/playerService";
-
-function getDailyItems() {
-  const today = new Date().toISOString().split("T")[0];
-  const stored = JSON.parse(localStorage.getItem("shopData") || "{}");
-
-  if (stored.date === today && Array.isArray(stored.items)) {
-    const items = stored.items
-      .map((id) => ITEMS.find((it) => it.id === id))
-      .filter(Boolean);
-    if (items.length === stored.items.length) return items;
-  }
-
-  const shuffled = [...ITEMS].sort(() => 0.5 - Math.random());
-  const selected = shuffled.slice(0, Math.min(8, ITEMS.length));
-  localStorage.setItem(
-    "shopData",
-    JSON.stringify({ date: today, items: selected.map((it) => it.id) })
-  );
-  return selected;
-}
 
 function Shop({ username, character, refreshCharacter }) {
   const [preview, setPreview] = useState(null);
   const [shopItems, setShopItems] = useState([]);
 
   useEffect(() => {
-    setShopItems(getDailyItems());
+    refreshCharacter();
   }, []);
+
+  useEffect(() => {
+    if (character && character.shopPool) {
+      setShopItems(character.shopPool);
+    }
+  }, [character]);
 
   const handleBuy = async (item) => {
     try {
