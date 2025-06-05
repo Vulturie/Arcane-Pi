@@ -8,7 +8,7 @@ const characterSchema = new mongoose.Schema({
     unique: true,
     minlength: 3,
     maxlength: 15,
-  trim: true,
+    trim: true,
   }, // character name
   class: { type: String, default: "Novice" },
   level: { type: Number, default: 1 },
@@ -16,6 +16,8 @@ const characterSchema = new mongoose.Schema({
   gold: { type: Number, default: 0 },
   energy: { type: Number, default: 100 },
   lastEnergyUpdate: { type: Date, default: Date.now },
+  safeQuestPool: { type: [mongoose.Schema.Types.Mixed], default: [] },
+  riskyQuestPool: { type: [mongoose.Schema.Types.Mixed], default: [] },
   activeQuest: {
     type: {
       id: Number,
@@ -23,6 +25,8 @@ const characterSchema = new mongoose.Schema({
       duration: Number,
       xp: Number,
       gold: Number,
+      tier: Number,
+      path: String,
       rare: { type: Boolean, default: false },
       // Indicates whether the quest should trigger combat upon completion
       isCombat: { type: Boolean, default: false },

@@ -5,6 +5,28 @@ const { generateEnemy } = require("../utils/enemyGenerator");
 const { getStatsForClass, simulateCombat } = require("../utils/combat");
 const Player = require("../models/Player");
 const ITEMS = require("../data/items");
+const { SAFE_QUEST_TIERS, RISKY_QUEST_TIERS } = require("../data/quests");
+
+function randomQuest(tiers, tierIndex, path) {
+  const quests = tiers[tierIndex];
+  const q = quests[Math.floor(Math.random() * quests.length)];
+  return { ...q, tier: tierIndex + 1, path };
+}
+
+function initQuestPools(char) {
+  char.safeQuestPool = [0, 1, 2].map((i) => randomQuest(SAFE_QUEST_TIERS, i, "safe"));
+  char.riskyQuestPool = [0, 1, 2].map((i) => randomQuest(RISKY_QUEST_TIERS, i, "risky"));
+}
+
+function replaceQuest(char, type, tierIndex) {
+  const quest = randomQuest(
+    type === "safe" ? SAFE_QUEST_TIERS : RISKY_QUEST_TIERS,
+    tierIndex,
+    type
+  );
+  if (type === "safe") char.safeQuestPool[tierIndex] = quest;
+  else char.riskyQuestPool[tierIndex] = quest;
+}
 
 // Limit history stored per character to avoid unbounded growth
 const MAX_HISTORY_ENTRIES = 100;
@@ -71,6 +93,8 @@ router.post("/account/:owner/characters", async (req, res) => {
     }
 
     const character = await Character.create({ owner, name: trimmed, class: className });
+    initQuestPools(character);
+    await character.save();
     res.json(character);
   } catch (err) {
     console.error(err);
@@ -107,6 +131,10 @@ async function loadCharacter(req, res, next) {
     if (energyToAdd > 0 && char.energy < MAX_ENERGY) {
       char.energy = Math.min(char.energy + energyToAdd, MAX_ENERGY);
       char.lastEnergyUpdate = new Date(now - (elapsed % ENERGY_REGEN_INTERVAL) * 1000);
+      await char.save();
+    }
+    if (!char.safeQuestPool || char.safeQuestPool.length === 0) {
+      initQuestPools(char);
       await char.save();
     }
     req.character = char;
@@ -180,6 +208,7 @@ router.get("/characters/:id/quest/status", loadCharacter, async (req, res) => {
     }
     logHistory(char, quest, combatResult);
     char.activeQuest = null;
+    replaceQuest(char, quest.path || (quest.isCombat ? "risky" : "safe"), quest.tier - 1);
     await char.save();
     return res.json({ completed: true, character: char, combat: combatResult, loot });
   } else {
@@ -190,7 +219,7 @@ router.get("/characters/:id/quest/status", loadCharacter, async (req, res) => {
 
 // POST /characters/:id/quest/start
 router.post("/characters/:id/quest/start", loadCharacter, async (req, res) => {
-  const { id, name, duration, xp, gold, energyCost, isCombat, rare } = req.body;
+  const { id, name, duration, xp, gold, energyCost, isCombat, rare, tier, path } = req.body;
   const char = req.character;
   if (char.energy < energyCost) {
     return res.status(400).json({ error: "Not enough energy" });
@@ -205,6 +234,8 @@ router.post("/characters/:id/quest/start", loadCharacter, async (req, res) => {
     duration,
     xp,
     gold,
+    tier,
+    path,
     rare: !!rare,
     isCombat: !!isCombat,
     enemy: isCombat ? generateEnemy(char) : undefined,
@@ -247,6 +278,7 @@ router.post("/characters/:id/quest/complete", loadCharacter, async (req, res) =>
   }
   logHistory(char, quest, combatResult);
   char.activeQuest = null;
+  replaceQuest(char, quest.path || (quest.isCombat ? "risky" : "safe"), quest.tier - 1);
   await char.save();
   res.json(combatResult ? { character: char, combat: combatResult, loot } : char);
 });
