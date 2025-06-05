@@ -55,8 +55,8 @@ function logHistory(char, quest, combatResult) {
   if (char.history.length > MAX_HISTORY_ENTRIES) char.history.shift();
 }
 
-async function grantLoot(owner, isRare) {
-  const chance = isRare ? 0.9 : 0.5;
+async function grantLoot(owner, isRisky) {
+  const chance = isRisky ? 0.5 : 0.05;
   if (Math.random() < chance) {
     const player = await Player.findOne({ username: owner });
     if (player && player.inventory.length < player.maxInventorySlots) {
@@ -201,7 +201,7 @@ router.get("/characters/:id/quest/status", loadCharacter, async (req, res) => {
       if (combatResult.result === "win") {
         char.gold += quest.gold;
         char.xp += quest.xp;
-        loot = await grantLoot(char.owner, quest.rare);
+        loot = await grantLoot(char.owner, quest.path === "risky");
       }
     } else {
       char.gold += quest.gold;
@@ -227,7 +227,7 @@ router.get("/characters/:id/quest/status", loadCharacter, async (req, res) => {
 
 // POST /characters/:id/quest/start
 router.post("/characters/:id/quest/start", loadCharacter, async (req, res) => {
-  const { id, name, duration, xp, gold, energyCost, isCombat, rare, tier, path } = req.body;
+  const { id, name, duration, xp, gold, energyCost, isCombat, rare, tier, path, force } = req.body;
   const char = req.character;
   if (char.energy < energyCost) {
     return res.status(400).json({ error: "Not enough energy" });
@@ -235,6 +235,17 @@ router.post("/characters/:id/quest/start", loadCharacter, async (req, res) => {
   if (char.activeQuest && Object.keys(char.activeQuest).length > 0) {
     return res.status(400).json({ error: "Quest already in progress" });
   }
+
+  try {
+    const player = await Player.findOne({ username: char.owner });
+    if (player && player.inventory.length >= player.maxInventorySlots && !force) {
+      return res.status(400).json({ error: "Inventory full", inventoryFull: true });
+    }
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Server error" });
+  }
+
   char.energy -= energyCost;
   char.activeQuest = {
     id,
@@ -272,7 +283,7 @@ router.post("/characters/:id/quest/complete", loadCharacter, async (req, res) =>
     if (combatResult.result === "win") {
       char.gold += quest.gold;
       char.xp += quest.xp;
-      loot = await grantLoot(char.owner, quest.rare);
+      loot = await grantLoot(char.owner, quest.path === "risky");
     }
   } else {
     char.gold += quest.gold;

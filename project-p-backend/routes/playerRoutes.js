@@ -9,8 +9,8 @@ const getXpForNextLevel = (level) => {
   return 100 + (level - 1) * 50;
 };
 
-async function grantLoot(username, isRare) {
-  const chance = isRare ? 0.9 : 0.5;
+async function grantLoot(username, isRisky) {
+  const chance = isRisky ? 0.5 : 0.05;
   if (Math.random() < chance) {
     const player = await Player.findOne({ username });
     if (player && player.inventory.length < player.maxInventorySlots) {
@@ -80,7 +80,7 @@ router.get("/:username/quest/status", async (req, res) => {
         if (combatResult.result === "win") {
           player.gold += quest.gold;
           player.xp += quest.xp;
-          loot = await grantLoot(username, quest.rare);
+          loot = await grantLoot(username, quest.isCombat);
         }
       } else {
         player.gold += quest.gold;
@@ -111,7 +111,7 @@ router.get("/:username/quest/status", async (req, res) => {
 // POST /player/:username/quest/start
 router.post("/:username/quest/start", async (req, res) => {
   const { username } = req.params;
-  const { id, name, duration, xp, gold, energyCost, isCombat, rare } = req.body;
+  const { id, name, duration, xp, gold, energyCost, isCombat, rare, force } = req.body;
 
   console.log("Received quest start request:", req.body);
 
@@ -125,6 +125,10 @@ router.post("/:username/quest/start", async (req, res) => {
 
     if (player.activeQuest && Object.keys(player.activeQuest).length > 0) {
       return res.status(400).json({ error: "Quest already in progress" });
+    }
+
+    if (player.inventory.length >= player.maxInventorySlots && !force) {
+      return res.status(400).json({ error: "Inventory full", inventoryFull: true });
     }
 
     // Deduct energy and set active quest
@@ -184,7 +188,7 @@ router.post("/:username/quest/complete", async (req, res) => {
       if (combatResult.result === "win") {
         player.gold += quest.gold;
         player.xp += quest.xp;
-        loot = await grantLoot(username, quest.rare);
+        loot = await grantLoot(username, quest.isCombat);
       }
     } else {
       player.gold += quest.gold;

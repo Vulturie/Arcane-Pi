@@ -7,7 +7,7 @@ function Tavern({ character, refreshCharacter }) {
   const [loadingQuestStatus, setLoadingQuestStatus] = useState(true);
   const [combatResult, setCombatResult] = useState(null);
 
-  const startQuest = async (quest) => {
+  const startQuest = async (quest, force = false) => {
     if (character.energy < quest.energyCost) {
       alert(`Not enough energy! You need ${quest.energyCost}, but have ${character.energy}.`);
       return;
@@ -19,7 +19,7 @@ function Tavern({ character, refreshCharacter }) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(quest),
+        body: JSON.stringify({ ...quest, force }),
       });
 
       const data = await res.json();
@@ -37,6 +37,10 @@ function Tavern({ character, refreshCharacter }) {
         });
         setTimeLeft(quest.duration); // start countdown immediately
         refreshCharacter();
+      } else if (data.inventoryFull && !force) {
+        if (window.confirm("Inventory is full. Start quest anyway?")) {
+          startQuest(quest, true);
+        }
       } else {
         alert(`❌ ${data.error}`);
       }
