@@ -471,6 +471,16 @@ router.post("/:username/equip", async (req, res) => {
     const idx = player.inventory.findIndex((it) => it.id === itemId);
     if (idx === -1) return res.status(404).json({ error: "Item not in inventory" });
     const item = player.inventory[idx];
+
+    if (
+      item.classRestriction &&
+      !item.classRestriction.includes(player.class)
+    ) {
+      return res
+        .status(400)
+        .json({ error: "Class cannot equip this item" });
+    }
+
     const slot = item.type;
 
     // Unequip existing item in slot

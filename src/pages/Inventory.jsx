@@ -59,6 +59,7 @@ function Inventory({ username, character, refreshCharacter }) {
       loadEquipment();
     } catch (err) {
       console.error("Failed to equip item", err);
+      alert(err.message);
     }
   };
 
