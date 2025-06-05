@@ -129,19 +129,24 @@ export const deleteCharacter = async (id) => {
   return data;
  };
 
- export const getInventory = async (username) => {
-   const res = await fetch(`http://localhost:4000/player/${username}/inventory`);
-   const data = await res.json();
-   if (!res.ok) throw new Error(data.error || "Failed to load inventory");
-   return data;
- };
+export const getInventory = async (characterId) => {
+  const res = await fetch(
+    `http://localhost:4000/api/characters/${characterId}/inventory`
+  );
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Failed to load inventory");
+  return data;
+};
 
-export const updateInventory = async (username, inventory) => {
-  const res = await fetch(`http://localhost:4000/player/${username}/inventory`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ inventory }),
-  });
+export const updateInventory = async (characterId, inventory) => {
+  const res = await fetch(
+    `http://localhost:4000/api/characters/${characterId}/inventory`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ inventory }),
+    }
+  );
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Failed to update inventory");
   return data;
@@ -154,59 +159,64 @@ export const getItems = async () => {
   return data;
 };
 
-export const addItemToInventory = async (username, itemId) => {
-  const res = await fetch(`http://localhost:4000/player/${username}/inventory/add`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ itemId }),
-  });
+export const addItemToInventory = async (characterId, itemId) => {
+  const res = await fetch(
+    `http://localhost:4000/api/characters/${characterId}/inventory/add`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ itemId }),
+    }
+  );
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Failed to add item");
   return data;
  };
 
-export const buyItem = async (username, characterId, itemId) => {
-  const res = await fetch(`http://localhost:4000/player/${username}/buy`, {
+export const buyItem = async (characterId, itemId) => {
+  const res = await fetch(`http://localhost:4000/api/characters/${characterId}/buy`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ itemId, characterId }),
+    body: JSON.stringify({ itemId }),
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Failed to buy item");
   return data;
 };
 
-export const sellItem = async (username, characterId, itemId) => {
-  const res = await fetch(`http://localhost:4000/player/${username}/sell`, {
+export const sellItem = async (characterId, itemId) => {
+  const res = await fetch(`http://localhost:4000/api/characters/${characterId}/sell`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ itemId, characterId }),
+    body: JSON.stringify({ itemId }),
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Failed to sell item");
   return data;
 };
 
- export const getEquipment = async (username) => {
-   const res = await fetch(`http://localhost:4000/player/${username}/equipment`);
-   const data = await res.json();
-   if (!res.ok) throw new Error(data.error || "Failed to load equipment");
-   return data;
+export const getEquipment = async (characterId) => {
+  const res = await fetch(
+    `http://localhost:4000/api/characters/${characterId}/equipment`
+  );
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Failed to load equipment");
+  return data;
+};
+
+export const equipItem = async (characterId, itemId) => {
+  const res = await fetch(`http://localhost:4000/api/characters/${characterId}/equip`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ itemId }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Failed to equip item");
+  return data;
  };
 
- export const equipItem = async (username, itemId) => {
-   const res = await fetch(`http://localhost:4000/player/${username}/equip`, {
-     method: "POST",
-     headers: { "Content-Type": "application/json" },
-     body: JSON.stringify({ itemId }),
-   });
-   const data = await res.json();
-   if (!res.ok) throw new Error(data.error || "Failed to equip item");
-   return data;
- };
-
-export const unequipItem = async (username, slot) => {
-  const res = await fetch(`http://localhost:4000/player/${username}/unequip`, {
+export const unequipItem = async (characterId, slot) => {
+  const res = await fetch(`http://localhost:4000/api/characters/${characterId}/unequip`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ slot }),

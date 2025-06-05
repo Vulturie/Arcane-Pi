@@ -1,5 +1,20 @@
 const mongoose = require("mongoose");
 
+// Schema describing an item stored in the character's inventory.
+// The field name `type` conflicts with Mongoose's usage of `type`
+// for schema definitions. To ensure it is treated as a normal
+// property we wrap it in its own object.
+const inventoryItemSchema = new mongoose.Schema(
+  {
+    id: String,
+    name: String,
+    type: { type: String },
+    classRestriction: [String],
+    statBonus: mongoose.Schema.Types.Mixed,
+  },
+  { _id: false }
+);
+
 const characterSchema = new mongoose.Schema({
   owner: { type: String, required: true }, // Pi account username
   name: {
@@ -16,6 +31,22 @@ const characterSchema = new mongoose.Schema({
   gold: { type: Number, default: 0 },
   energy: { type: Number, default: 100 },
   lastEnergyUpdate: { type: Date, default: Date.now },
+  // Maximum number of items that can be stored in the inventory
+  maxInventorySlots: { type: Number, default: 10 },
+  // Array of items in the character's inventory
+  inventory: { type: [inventoryItemSchema], default: [] },
+  // Currently equipped items
+  equippedItems: {
+    weapon: { type: inventoryItemSchema, default: null },
+    headpiece: { type: inventoryItemSchema, default: null },
+    chestplate: { type: inventoryItemSchema, default: null },
+    gloves: { type: inventoryItemSchema, default: null },
+    footwear: { type: inventoryItemSchema, default: null },
+    necklace: { type: inventoryItemSchema, default: null },
+    belt: { type: inventoryItemSchema, default: null },
+    ring: { type: inventoryItemSchema, default: null },
+    artifact: { type: inventoryItemSchema, default: null },
+  },
   // Timestamp of when quest pools were last refreshed
   lastQuestRefresh: { type: Date, default: Date.now },
   // Timestamp of when the shop inventory was last refreshed

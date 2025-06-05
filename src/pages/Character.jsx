@@ -13,17 +13,17 @@ function Character({ character, refreshCharacter, username }) {
   const [equipped, setEquipped] = useState({});
 
     useEffect(() => {
-      if (!username) return;
+      if (!character) return;
       const load = async () => {
         try {
-          const data = await getEquipment(username);
+          const data = await getEquipment(character._id);
           setEquipped(data);
         } catch (err) {
           console.error("Failed to load equipment", err);
         }
       };
       load();
-    }, [username]);
+    }, [character]);
 
   const handleChoose = async () => {
     try {

@@ -3,7 +3,6 @@ const router = express.Router();
 const Character = require("../models/Character");
 const { generateEnemy } = require("../utils/enemyGenerator");
 const { getStatsForClass, simulateCombat } = require("../utils/combat");
-const Player = require("../models/Player");
 const ITEMS = require("../data/items");
 const { SAFE_QUEST_TIERS, RISKY_QUEST_TIERS } = require("../data/quests");
 
@@ -66,14 +65,13 @@ function logHistory(char, quest, combatResult) {
   if (char.history.length > MAX_HISTORY_ENTRIES) char.history.shift();
 }
 
-async function grantLoot(owner, isRisky) {
+async function grantLoot(char, isRisky) {
   const chance = isRisky ? 0.5 : 0.05;
   if (Math.random() < chance) {
-    const player = await Player.findOne({ username: owner });
-    if (player && player.inventory.length < player.maxInventorySlots) {
+    if (char.inventory.length < char.maxInventorySlots) {
       const item = ITEMS[Math.floor(Math.random() * ITEMS.length)];
-      player.inventory.push(item);
-      await player.save();
+      char.inventory.push(item);
+      await char.save();
       return item;
     }
   }
@@ -235,7 +233,7 @@ router.get("/characters/:id/quest/status", loadCharacter, async (req, res) => {
       if (combatResult.result === "win") {
         char.gold += quest.gold;
         char.xp += quest.xp;
-        loot = await grantLoot(char.owner, quest.path === "risky");
+        loot = await grantLoot(char, quest.path === "risky");
       }
     } else {
       char.gold += quest.gold;
@@ -270,14 +268,8 @@ router.post("/characters/:id/quest/start", loadCharacter, async (req, res) => {
     return res.status(400).json({ error: "Quest already in progress" });
   }
 
-  try {
-    const player = await Player.findOne({ username: char.owner });
-    if (player && player.inventory.length >= player.maxInventorySlots && !force) {
-      return res.status(400).json({ error: "Inventory full", inventoryFull: true });
-    }
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: "Server error" });
+  if (char.inventory.length >= char.maxInventorySlots && !force) {
+    return res.status(400).json({ error: "Inventory full", inventoryFull: true });
   }
 
   char.energy -= energyCost;
@@ -317,7 +309,7 @@ router.post("/characters/:id/quest/complete", loadCharacter, async (req, res) =>
     if (combatResult.result === "win") {
       char.gold += quest.gold;
       char.xp += quest.xp;
-      loot = await grantLoot(char.owner, quest.path === "risky");
+      loot = await grantLoot(char, quest.path === "risky");
     }
   } else {
     char.gold += quest.gold;
@@ -351,6 +343,147 @@ router.post("/characters/:id/quest/cancel", loadCharacter, async (req, res) => {
 // GET /characters/:id/history
 router.get("/characters/:id/history", loadCharacter, (req, res) => {
   res.json(req.character.history || []);
+});
+
+// ---------------- Inventory & Equipment -----------------
+
+// GET /characters/:id/inventory
+router.get("/characters/:id/inventory", loadCharacter, (req, res) => {
+  const char = req.character;
+  res.json({
+    inventory: char.inventory,
+    slots: char.inventory.length,
+    maxSlots: char.maxInventorySlots,
+  });
+});
+
+// POST /characters/:id/inventory
+router.post("/characters/:id/inventory", loadCharacter, async (req, res) => {
+  const { inventory } = req.body;
+  const char = req.character;
+  if (inventory.length > char.maxInventorySlots) {
+    return res.status(400).json({ error: "Inventory exceeds capacity" });
+  }
+  char.inventory = inventory;
+  await char.save();
+  res.json({
+    inventory: char.inventory,
+    slots: char.inventory.length,
+    maxSlots: char.maxInventorySlots,
+  });
+});
+
+// POST /characters/:id/inventory/add
+router.post("/characters/:id/inventory/add", loadCharacter, async (req, res) => {
+  const { itemId } = req.body;
+  const char = req.character;
+  const item = ITEMS.find((it) => it.id === itemId);
+  if (!item) return res.status(400).json({ error: "Invalid item" });
+  if (char.inventory.length >= char.maxInventorySlots) {
+    return res.status(400).json({ error: "Inventory full" });
+  }
+  char.inventory.push(item);
+  await char.save();
+  res.json({
+    inventory: char.inventory,
+    slots: char.inventory.length,
+    maxSlots: char.maxInventorySlots,
+  });
+});
+
+// POST /characters/:id/buy
+router.post("/characters/:id/buy", loadCharacter, async (req, res) => {
+  const { itemId } = req.body;
+  const char = req.character;
+  const item = ITEMS.find((it) => it.id === itemId);
+  if (!item) return res.status(400).json({ error: "Invalid item" });
+  if (char.gold < item.cost) return res.status(400).json({ error: "Not enough gold" });
+  if (char.inventory.length >= char.maxInventorySlots) {
+    return res.status(400).json({ error: "Inventory full" });
+  }
+  char.gold -= item.cost;
+  char.inventory.push(item);
+  await char.save();
+  res.json({
+    gold: char.gold,
+    inventory: char.inventory,
+    slots: char.inventory.length,
+    maxSlots: char.maxInventorySlots,
+  });
+});
+
+// POST /characters/:id/sell
+router.post("/characters/:id/sell", loadCharacter, async (req, res) => {
+  const { itemId } = req.body;
+  const char = req.character;
+  const idx = char.inventory.findIndex((it) => it.id === itemId);
+  if (idx === -1) return res.status(404).json({ error: "Item not in inventory" });
+  const item = char.inventory[idx];
+  const itemData = ITEMS.find((it) => it.id === itemId);
+  const sellPrice = itemData ? Math.floor(itemData.cost * 0.5) : 0;
+  char.inventory.splice(idx, 1);
+  char.gold += sellPrice;
+  await char.save();
+  res.json({
+    gold: char.gold,
+    inventory: char.inventory,
+    slots: char.inventory.length,
+    maxSlots: char.maxInventorySlots,
+  });
+});
+
+// GET /characters/:id/equipment
+router.get("/characters/:id/equipment", loadCharacter, (req, res) => {
+  res.json(req.character.equippedItems || {});
+});
+
+// POST /characters/:id/equip
+router.post("/characters/:id/equip", loadCharacter, async (req, res) => {
+  const { itemId } = req.body;
+  const char = req.character;
+  const idx = char.inventory.findIndex((it) => it.id === itemId);
+  if (idx === -1) return res.status(404).json({ error: "Item not in inventory" });
+  const item = char.inventory[idx];
+  if (item.classRestriction && !item.classRestriction.includes(char.class)) {
+    return res.status(400).json({ error: "Class cannot equip this item" });
+  }
+  const slot = item.type;
+  if (char.equippedItems && char.equippedItems[slot]) {
+    if (char.inventory.length >= char.maxInventorySlots) {
+      return res.status(400).json({ error: "Inventory full" });
+    }
+    char.inventory.push(char.equippedItems[slot]);
+  }
+  char.inventory.splice(idx, 1);
+  char.equippedItems[slot] = item;
+  await char.save();
+  res.json({
+    inventory: char.inventory,
+    equippedItems: char.equippedItems,
+    slots: char.inventory.length,
+    maxSlots: char.maxInventorySlots,
+  });
+});
+
+// POST /characters/:id/unequip
+router.post("/characters/:id/unequip", loadCharacter, async (req, res) => {
+  const { slot } = req.body;
+  const char = req.character;
+  const item = char.equippedItems && char.equippedItems[slot];
+  if (item) {
+    if (char.inventory.length >= char.maxInventorySlots) {
+      return res.status(400).json({ error: "Inventory full" });
+    }
+    char.inventory.push(item);
+    char.equippedItems[slot] = null;
+    await char.save();
+  }
+  res.json({
+    inventory: char.inventory,
+    equippedItems: char.equippedItems,
+    slots: char.inventory.length,
+    maxSlots: char.maxInventorySlots,
+  });
 });
 
 module.exports = router;

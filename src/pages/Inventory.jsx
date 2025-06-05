@@ -8,7 +8,7 @@ import {
   sellItem,
 } from "../services/playerService";
 
-function Inventory({ username, character, refreshCharacter }) {
+function Inventory({ character, refreshCharacter }) {
   const [items, setItems] = useState([]);
   const [equipped, setEquipped] = useState({});
   const [slots, setSlots] = useState(0);
@@ -16,9 +16,9 @@ function Inventory({ username, character, refreshCharacter }) {
   const [preview, setPreview] = useState(null);
 
   const loadInventory = async () => {
-      if (!username) return;
+      if (!character) return;
       try {
-        const data = await getInventory(username);
+        const data = await getInventory(character._id);
         setItems(data.inventory);
         setSlots(data.slots);
         setMaxSlots(data.maxSlots);
@@ -28,9 +28,9 @@ function Inventory({ username, character, refreshCharacter }) {
     };
 
     const loadEquipment = async () => {
-        if (!username) return;
+        if (!character) return;
         try {
-          const data = await getEquipment(username);
+          const data = await getEquipment(character._id);
           setEquipped(data);
         } catch (err) {
           console.error("Failed to load equipment", err);
@@ -40,11 +40,11 @@ function Inventory({ username, character, refreshCharacter }) {
   useEffect(() => {
     loadInventory();
     loadEquipment();
-  }, [username]);
+  }, [character]);
 
     const giveTestItem = async () => {
         try {
-          await addItemToInventory(username, "sword_iron");
+          await addItemToInventory(character._id, "sword_iron");
           loadInventory();
           loadEquipment();
         } catch (err) {
@@ -54,7 +54,7 @@ function Inventory({ username, character, refreshCharacter }) {
 
   const handleEquip = async (id) => {
     try {
-      await equipItem(username, id);
+      await equipItem(character._id, id);
       loadInventory();
       loadEquipment();
     } catch (err) {
@@ -70,7 +70,7 @@ function Inventory({ username, character, refreshCharacter }) {
 
   const handleUnequip = async (slot) => {
     try {
-      await unequipItem(username, slot);
+      await unequipItem(character._id, slot);
       loadInventory();
       loadEquipment();
     } catch (err) {
@@ -81,7 +81,7 @@ function Inventory({ username, character, refreshCharacter }) {
   const handleSell = async (id) => {
     if (!character) return;
     try {
-      await sellItem(username, character._id, id);
+      await sellItem(character._id, id);
       loadInventory();
       loadEquipment();
       if (refreshCharacter) refreshCharacter();

@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { buyItem, getEquipment } from "../services/playerService";
 
-function Shop({ username, character, refreshCharacter }) {
+function Shop({ character, refreshCharacter }) {
   const [preview, setPreview] = useState(null);
   const [shopItems, setShopItems] = useState([]);
   const [equipped, setEquipped] = useState({});
 
   const loadEquipment = async () => {
-    if (!username) return;
+    if (!character) return;
     try {
-      const data = await getEquipment(username);
+      const data = await getEquipment(character._id);
       setEquipped(data);
     } catch (err) {
       console.error("Failed to load equipment", err);
@@ -23,7 +23,7 @@ function Shop({ username, character, refreshCharacter }) {
 
   useEffect(() => {
     loadEquipment();
-  }, [username]);
+  }, [character]);
 
   useEffect(() => {
     if (character && character.shopPool) {
@@ -33,7 +33,7 @@ function Shop({ username, character, refreshCharacter }) {
 
   const handleBuy = async (item) => {
     try {
-      await buyItem(username, character._id, item.id);
+      await buyItem(character._id, item.id);
       refreshCharacter();
       alert(`Bought ${item.name}`);
     } catch (err) {

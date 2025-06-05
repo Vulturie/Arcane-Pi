@@ -74,7 +74,6 @@ function App() {
           path="/inventory"
           element={
             <Inventory
-              username={username}
               character={activeChar}
               refreshCharacter={refreshActiveCharacter}
             />
@@ -82,7 +81,7 @@ function App() {
         />
         <Route
           path="/shop"
-          element={<Shop username={username} character={activeChar} refreshCharacter={refreshActiveCharacter} />}
+          element={<Shop character={activeChar} refreshCharacter={refreshActiveCharacter} />}
         />
         <Route
           path="/history"
