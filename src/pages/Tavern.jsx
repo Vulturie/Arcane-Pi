@@ -96,6 +96,15 @@ function Tavern({ character, refreshCharacter }) {
     return () => clearInterval(interval);
   }, [character._id]);
 
+// Keep character state (energy, gold, etc.) up-to-date while in the Tavern
+  useEffect(() => {
+    refreshCharacter();
+    const interval = setInterval(() => {
+      refreshCharacter();
+    }, 5000); // match GameHub refresh rate
+    return () => clearInterval(interval);
+  }, []);
+
   useEffect(() => {
     if (!activeQuest) return;
 
