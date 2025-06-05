@@ -46,6 +46,28 @@ function getPlayerStats(player) {
   return stats;
 }
 
+// Sum up stat bonuses provided by equipped items
+function getEquipmentStatTotals(player) {
+  const totals = { STR: 0, AGI: 0, INT: 0, VIT: 0 };
+  if (player.equippedItems) {
+    Object.values(player.equippedItems).forEach((item) => {
+      if (item && item.statBonus) {
+        Object.entries(item.statBonus).forEach(([k, v]) => {
+          totals[k] = (totals[k] || 0) + v;
+        });
+      }
+    });
+  }
+  return totals;
+}
+
+// Calculate a simple combat score used for scaling enemies
+function calculateCombatScore(level, baseStats, equipStats) {
+  const baseTotal = Object.values(baseStats).reduce((a, b) => a + b, 0);
+  const equipTotal = Object.values(equipStats).reduce((a, b) => a + b, 0);
+  return Math.round(level * 2 + baseTotal + equipTotal);
+}
+
 function calculateDamage(attacker, defender) {
   const baseDamage = attacker.STR * 2;
   const mitigation = defender.VIT * 0.5;
@@ -97,6 +119,8 @@ module.exports = {
   CLASS_GROWTH,
   getStatsForClass,
   getPlayerStats,
+  getEquipmentStatTotals,
+  calculateCombatScore,
   calculateDamage,
   simulateCombat,
 };

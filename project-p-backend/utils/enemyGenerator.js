@@ -1,5 +1,15 @@
-function generateEnemy(player) {
-  const base = Math.floor(player.level * 0.8 + Math.random() * player.level * 0.4);
+const { getStatsForClass, getEquipmentStatTotals, calculateCombatScore } = require("./combat");
+
+function generateEnemy(player, difficulty = 1) {
+  const baseStats = getStatsForClass(player.class, player.level);
+  const equipStats = getEquipmentStatTotals(player);
+  const combatScore = calculateCombatScore(player.level, baseStats, equipStats);
+
+  // Random factor to keep encounters varied
+  const randomness = 0.9 + Math.random() * 0.2; // 0.9 - 1.1
+  const scale = difficulty * randomness;
+
+  const base = Math.max(1, Math.round((combatScore / 10) * scale));
   return {
     name: "Goblin Raider",
     level: player.level,

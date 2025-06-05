@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Character = require("../models/Character");
 const { generateEnemy } = require("../utils/enemyGenerator");
-const { getStatsForClass, simulateCombat } = require("../utils/combat");
+const { getPlayerStats, simulateCombat } = require("../utils/combat");
 const ITEMS = require("../data/items");
 const { SAFE_QUEST_TIERS, RISKY_QUEST_TIERS } = require("../data/quests");
 
@@ -228,7 +228,7 @@ router.get("/characters/:id/quest/status", loadCharacter, async (req, res) => {
     let combatResult = null;
     let loot = null;
     if (quest.isCombat) {
-      const playerStats = getStatsForClass(char.class, char.level);
+      const playerStats = getPlayerStats(char);
       combatResult = simulateCombat(playerStats, quest.enemy);
       if (combatResult.result === "win") {
         char.gold += quest.gold;
@@ -283,7 +283,9 @@ router.post("/characters/:id/quest/start", loadCharacter, async (req, res) => {
     path,
     rare: !!rare,
     isCombat: !!isCombat,
-    enemy: isCombat ? generateEnemy(char) : undefined,
+    enemy: isCombat
+      ? generateEnemy(char, 1 + (tier - 1) * 0.25)
+      : undefined,
     startedAt: new Date(),
   };
   await char.save();
@@ -304,7 +306,7 @@ router.post("/characters/:id/quest/complete", loadCharacter, async (req, res) =>
   let combatResult = null;
   let loot = null;
   if (quest.isCombat) {
-    const playerStats = getStatsForClass(char.class, char.level);
+    const playerStats = getPlayerStats(char);
     combatResult = simulateCombat(playerStats, quest.enemy);
     if (combatResult.result === "win") {
       char.gold += quest.gold;
