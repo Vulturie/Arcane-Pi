@@ -36,8 +36,14 @@ const playerSchema = new mongoose.Schema({
 // Currently equipped items
   equippedItems: {
     weapon: { type: inventoryItemSchema, default: null },
-    armor: { type: inventoryItemSchema, default: null },
-    accessory: { type: inventoryItemSchema, default: null },
+    headpiece: { type: inventoryItemSchema, default: null },
+    chestplate: { type: inventoryItemSchema, default: null },
+    gloves: { type: inventoryItemSchema, default: null },
+    footwear: { type: inventoryItemSchema, default: null },
+    necklace: { type: inventoryItemSchema, default: null },
+    belt: { type: inventoryItemSchema, default: null },
+    ring: { type: inventoryItemSchema, default: null },
+    artifact: { type: inventoryItemSchema, default: null },
   },
 
   activeQuest: {

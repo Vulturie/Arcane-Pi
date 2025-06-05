@@ -87,7 +87,7 @@ function Inventory({ username, character, refreshCharacter }) {
     <div>
       <h2>Equipped Items</h2>
       <ul>
-        {['weapon', 'armor', 'accessory'].map((slot) => (
+        {['weapon', 'headpiece', 'chestplate', 'gloves', 'footwear', 'necklace', 'belt', 'ring', 'artifact'].map((slot) => (
           <li key={slot}>
             {slot}: {equipped && equipped[slot] ? `${equipped[slot].name}` : 'None'}
             {equipped && equipped[slot] && (
