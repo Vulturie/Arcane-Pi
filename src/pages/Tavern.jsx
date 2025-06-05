@@ -6,6 +6,7 @@ function Tavern({ character, refreshCharacter }) {
   const [timeLeft, setTimeLeft] = useState(0);
   const [loadingQuestStatus, setLoadingQuestStatus] = useState(true);
   const [combatResult, setCombatResult] = useState(null);
+  const [questResult, setQuestResult] = useState(null);
 
   const startQuest = async (quest, force = false) => {
     if (character.energy < quest.energyCost) {
@@ -63,30 +64,37 @@ function Tavern({ character, refreshCharacter }) {
     }
   };
 
-  useEffect(() => {
-    const interval = setInterval(async () => {
-      try {
-        const result = await getQuestStatus(character._id);
-        if (result.completed) {
-          setActiveQuest(null);
-          setTimeLeft(0);
-          refreshCharacter();
-          if (result.combat) setCombatResult({ ...result.combat, loot: result.loot });
-        } else if (result.quest) {
-          setActiveQuest(result.quest);
-          setTimeLeft(result.timeLeft);
-        } else {
-          setActiveQuest(null);
-          setTimeLeft(0);
+  const checkQuestStatus = async () => {
+    try {
+      const result = await getQuestStatus(character._id);
+      if (result.completed) {
+        const info = activeQuest;
+        setActiveQuest(null);
+        setTimeLeft(0);
+        refreshCharacter();
+        if (result.combat) {
+          setCombatResult({ ...result.combat, loot: result.loot });
+        } else if (info) {
+          setQuestResult({ name: info.name, xp: info.xp, gold: info.gold });
         }
-        setLoadingQuestStatus(false); // ✅ finished checking
-      } catch (err) {
-        console.error("Quest status check failed", err);
+      } else if (result.quest) {
+        setActiveQuest(result.quest);
+        setTimeLeft(result.timeLeft);
+      } else {
+        setActiveQuest(null);
+        setTimeLeft(0);
       }
-    }, 3000);
+      setLoadingQuestStatus(false);
+    } catch (err) {
+      console.error("Quest status check failed", err);
+    }
+  };
 
+  useEffect(() => {
+    checkQuestStatus();
+    const interval = setInterval(checkQuestStatus, 3000);
     return () => clearInterval(interval);
-  }, [character._id, refreshCharacter]);
+  }, [character._id]);
 
   useEffect(() => {
     if (!activeQuest) return;
@@ -154,6 +162,15 @@ function Tavern({ character, refreshCharacter }) {
               <p>You obtained: {combatResult.loot.name}</p>
             )}
             <button onClick={() => setCombatResult(null)}>Close</button>
+          </div>
+        </div>
+      )}
+      {questResult && (
+        <div className="modal" onClick={() => setQuestResult(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h3>Quest Completed!</h3>
+            <p>You earned {questResult.xp} XP and {questResult.gold} Gold.</p>
+            <button onClick={() => setQuestResult(null)}>Close</button>
           </div>
         </div>
       )}

@@ -248,7 +248,9 @@ router.get("/characters/:id/quest/status", loadCharacter, async (req, res) => {
     logHistory(char, quest, combatResult);
     char.activeQuest = null;
     const qType = quest.path || (quest.isCombat ? "risky" : "safe");
-    refreshQuestPool(char, qType);
+    if (!quest.isCombat || combatResult.result === "win") {
+      refreshQuestPool(char, qType);
+    }
     await char.save();
     return res.json({ completed: true, character: char, combat: combatResult, loot });
   } else {
@@ -326,7 +328,9 @@ router.post("/characters/:id/quest/complete", loadCharacter, async (req, res) =>
   logHistory(char, quest, combatResult);
   char.activeQuest = null;
   const qType = quest.path || (quest.isCombat ? "risky" : "safe");
-  refreshQuestPool(char, qType);
+  if (!quest.isCombat || combatResult.result === "win") {
+    refreshQuestPool(char, qType);
+  }
   await char.save();
   res.json(combatResult ? { character: char, combat: combatResult, loot } : char);
 });
