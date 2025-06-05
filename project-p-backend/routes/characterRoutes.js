@@ -28,6 +28,13 @@ function replaceQuest(char, type, tierIndex) {
   else char.riskyQuestPool[tierIndex] = quest;
 }
 
+function refreshQuestPool(char, type) {
+  const tiers = type === "safe" ? SAFE_QUEST_TIERS : RISKY_QUEST_TIERS;
+  const pool = [0, 1, 2].map((i) => randomQuest(tiers, i, type));
+  if (type === "safe") char.safeQuestPool = pool;
+  else char.riskyQuestPool = pool;
+}
+
 // Limit history stored per character to avoid unbounded growth
 const MAX_HISTORY_ENTRIES = 100;
 
@@ -208,7 +215,8 @@ router.get("/characters/:id/quest/status", loadCharacter, async (req, res) => {
     }
     logHistory(char, quest, combatResult);
     char.activeQuest = null;
-    replaceQuest(char, quest.path || (quest.isCombat ? "risky" : "safe"), quest.tier - 1);
+    const qType = quest.path || (quest.isCombat ? "risky" : "safe");
+    refreshQuestPool(char, qType);
     await char.save();
     return res.json({ completed: true, character: char, combat: combatResult, loot });
   } else {
@@ -278,7 +286,8 @@ router.post("/characters/:id/quest/complete", loadCharacter, async (req, res) =>
   }
   logHistory(char, quest, combatResult);
   char.activeQuest = null;
-  replaceQuest(char, quest.path || (quest.isCombat ? "risky" : "safe"), quest.tier - 1);
+  const qType = quest.path || (quest.isCombat ? "risky" : "safe");
+  refreshQuestPool(char, qType);
   await char.save();
   res.json(combatResult ? { character: char, combat: combatResult, loot } : char);
 });

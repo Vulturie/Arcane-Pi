@@ -46,17 +46,18 @@ function Tavern({ character, refreshCharacter }) {
     }
   };
 
-    const handleCancelQuest = async () => {
-        try {
-          await cancelQuest(character._id);
-          setActiveQuest(null);
-          setTimeLeft(0);
-          refreshCharacter();
-        } catch (err) {
-          console.error("Failed to cancel quest:", err);
-          alert("Server error cancelling quest.");
-        }
-      };
+  const handleCancelQuest = async () => {
+    if (!window.confirm("Are you sure you want to cancel the quest?")) return;
+    try {
+      await cancelQuest(character._id);
+      setActiveQuest(null);
+      setTimeLeft(0);
+      refreshCharacter();
+    } catch (err) {
+      console.error("Failed to cancel quest:", err);
+      alert("Server error cancelling quest.");
+    }
+  };
 
   useEffect(() => {
     const interval = setInterval(async () => {
