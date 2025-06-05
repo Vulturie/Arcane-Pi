@@ -1,13 +1,29 @@
 import React, { useState, useEffect } from "react";
-import { buyItem } from "../services/playerService";
+import { buyItem, getEquipment } from "../services/playerService";
 
 function Shop({ username, character, refreshCharacter }) {
   const [preview, setPreview] = useState(null);
   const [shopItems, setShopItems] = useState([]);
+  const [equipped, setEquipped] = useState({});
+
+  const loadEquipment = async () => {
+    if (!username) return;
+    try {
+      const data = await getEquipment(username);
+      setEquipped(data);
+    } catch (err) {
+      console.error("Failed to load equipment", err);
+    }
+  };
 
   useEffect(() => {
     refreshCharacter();
+    loadEquipment();
   }, []);
+
+  useEffect(() => {
+    loadEquipment();
+  }, [username]);
 
   useEffect(() => {
     if (character && character.shopPool) {
@@ -25,6 +41,11 @@ function Shop({ username, character, refreshCharacter }) {
     }
   };
 
+  const openPreview = (item) => {
+    const compareItem = equipped[item.type];
+    setPreview({ item, compareItem });
+  };
+
   return (
     <div>
       <h2>Shop</h2>
@@ -33,7 +54,7 @@ function Shop({ username, character, refreshCharacter }) {
         {shopItems.map((it) => (
           <li key={it.id}>
             {it.name} - {it.cost} Gold
-            <button onClick={() => setPreview(it)}>Preview</button>
+            <button onClick={() => openPreview(it)}>Preview</button>
             <button onClick={() => handleBuy(it)}>Buy</button>
           </li>
         ))}
@@ -41,20 +62,31 @@ function Shop({ username, character, refreshCharacter }) {
       {preview && (
         <div className="modal" onClick={() => setPreview(null)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h3>{preview.name}</h3>
-            <p>Type: {preview.type}</p>
-            {preview.classRestriction && (
-              <p>Classes: {preview.classRestriction.join(", ")}</p>
+            <h3>{preview.item.name}</h3>
+            <p>Type: {preview.item.type}</p>
+            {preview.item.classRestriction && (
+              <p>Classes: {preview.item.classRestriction.join(", ")}</p>
             )}
-            <p>Cost: {preview.cost} Gold</p>
-            {preview.statBonus && (
+            <p>Cost: {preview.item.cost} Gold</p>
+            {preview.item.statBonus && (
               <ul>
-                {Object.entries(preview.statBonus).map(([k, v]) => (
-                  <li key={k}>
-                    {k}: +{v}
-                  </li>
+                {Object.entries(preview.item.statBonus).map(([k, v]) => (
+                  <li key={k}>{k}: +{v}</li>
                 ))}
               </ul>
+            )}
+            {preview.compareItem && (
+              <>
+                <h4>Currently Equipped</h4>
+                <p>{preview.compareItem.name}</p>
+                {preview.compareItem.statBonus && (
+                  <ul>
+                    {Object.entries(preview.compareItem.statBonus).map(([k, v]) => (
+                      <li key={k}>{k}: +{v}</li>
+                    ))}
+                  </ul>
+                )}
+              </>
             )}
             <button onClick={() => setPreview(null)}>Close</button>
           </div>
