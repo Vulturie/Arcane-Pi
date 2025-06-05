@@ -13,6 +13,7 @@ function Inventory({ username, character, refreshCharacter }) {
   const [equipped, setEquipped] = useState({});
   const [slots, setSlots] = useState(0);
   const [maxSlots, setMaxSlots] = useState(0);
+  const [preview, setPreview] = useState(null);
 
   const loadInventory = async () => {
       if (!username) return;
@@ -61,6 +62,11 @@ function Inventory({ username, character, refreshCharacter }) {
     }
   };
 
+  const openPreview = (item, compare = false) => {
+    const compareItem = compare ? equipped[item.type] : null;
+    setPreview({ item, compareItem });
+  };
+
   const handleUnequip = async (slot) => {
     try {
       await unequipItem(username, slot);
@@ -87,11 +93,24 @@ function Inventory({ username, character, refreshCharacter }) {
     <div>
       <h2>Equipped Items</h2>
       <ul>
-        {['weapon', 'headpiece', 'chestplate', 'gloves', 'footwear', 'necklace', 'belt', 'ring', 'artifact'].map((slot) => (
+        {[
+          "weapon",
+          "headpiece",
+          "chestplate",
+          "gloves",
+          "footwear",
+          "necklace",
+          "belt",
+          "ring",
+          "artifact",
+        ].map((slot) => (
           <li key={slot}>
-            {slot}: {equipped && equipped[slot] ? `${equipped[slot].name}` : 'None'}
+            {slot}: {equipped && equipped[slot] ? `${equipped[slot].name}` : "None"}
             {equipped && equipped[slot] && (
-              <button onClick={() => handleUnequip(slot)}>Unequip</button>
+              <>
+                <button onClick={() => handleUnequip(slot)}>Unequip</button>
+                <button onClick={() => openPreview(equipped[slot])}>Preview</button>
+              </>
             )}
           </li>
         ))}
@@ -104,6 +123,7 @@ function Inventory({ username, character, refreshCharacter }) {
         {items.map((item, idx) => (
           <li key={idx}>
             {item.name} ({item.type})
+            <button onClick={() => openPreview(item, true)}>Preview</button>
             <button onClick={() => handleEquip(item.id)}>Equip</button>
             {character && (
               <button onClick={() => handleSell(item.id)}>Sell</button>
@@ -111,6 +131,38 @@ function Inventory({ username, character, refreshCharacter }) {
           </li>
         ))}
       </ul>
+      {preview && (
+        <div className="modal" onClick={() => setPreview(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h3>{preview.item.name}</h3>
+            <p>Type: {preview.item.type}</p>
+            {preview.item.classRestriction && (
+              <p>Classes: {preview.item.classRestriction.join(", ")}</p>
+            )}
+            {preview.item.statBonus && (
+              <ul>
+                {Object.entries(preview.item.statBonus).map(([k, v]) => (
+                  <li key={k}>{k}: +{v}</li>
+                ))}
+              </ul>
+            )}
+            {preview.compareItem && (
+              <>
+                <h4>Currently Equipped</h4>
+                <p>{preview.compareItem.name}</p>
+                {preview.compareItem.statBonus && (
+                  <ul>
+                    {Object.entries(preview.compareItem.statBonus).map(([k, v]) => (
+                      <li key={k}>{k}: +{v}</li>
+                    ))}
+                  </ul>
+                )}
+              </>
+            )}
+            <button onClick={() => setPreview(null)}>Close</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
