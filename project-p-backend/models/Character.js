@@ -16,6 +16,8 @@ const characterSchema = new mongoose.Schema({
   gold: { type: Number, default: 0 },
   energy: { type: Number, default: 100 },
   lastEnergyUpdate: { type: Date, default: Date.now },
+  // Timestamp of when quest pools were last refreshed
+  lastQuestRefresh: { type: Date, default: Date.now },
   safeQuestPool: { type: [mongoose.Schema.Types.Mixed], default: [] },
   riskyQuestPool: { type: [mongoose.Schema.Types.Mixed], default: [] },
   activeQuest: {

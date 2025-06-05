@@ -16,6 +16,7 @@ function randomQuest(tiers, tierIndex, path) {
 function initQuestPools(char) {
   char.safeQuestPool = [0, 1, 2].map((i) => randomQuest(SAFE_QUEST_TIERS, i, "safe"));
   char.riskyQuestPool = [0, 1, 2].map((i) => randomQuest(RISKY_QUEST_TIERS, i, "risky"));
+  char.lastQuestRefresh = new Date();
 }
 
 function replaceQuest(char, type, tierIndex) {
@@ -135,16 +136,28 @@ async function loadCharacter(req, res, next) {
     const ENERGY_REGEN_INTERVAL = 10;
     const MAX_ENERGY = 100;
     const energyToAdd = Math.floor(elapsed / ENERGY_REGEN_INTERVAL);
+    let updated = false;
     if (energyToAdd > 0 && char.energy < MAX_ENERGY) {
       char.energy = Math.min(char.energy + energyToAdd, MAX_ENERGY);
       char.lastEnergyUpdate = new Date(now - (elapsed % ENERGY_REGEN_INTERVAL) * 1000);
-      await char.save();
+      updated = true;
     }
+
+    const todayUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+    if (!char.lastQuestRefresh || char.lastQuestRefresh < todayUTC) {
+      refreshQuestPool(char, "safe");
+      refreshQuestPool(char, "risky");
+      char.lastQuestRefresh = now;
+      updated = true;
+    }
+
     if (!char.safeQuestPool || char.safeQuestPool.length === 0) {
       initQuestPools(char);
-      await char.save();
+      updated = true;
     }
-    req.character = char;
+
+    if (updated) await char.save();
+        req.character = char;
     next();
   } catch (err) {
     console.error(err);
