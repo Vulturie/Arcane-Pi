@@ -109,6 +109,17 @@ export const setPlayerClass = async (id, className) => {
   return data;
 };
 
+export const setAccountClass = async (username, className) => {
+  const res = await fetch(`http://localhost:4000/player/${username}/class`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ className }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Failed to set class");
+  return data;
+};
+
 export const deleteCharacter = async (id) => {
   const res = await fetch(`http://localhost:4000/api/characters/${id}`, {
     method: "DELETE",

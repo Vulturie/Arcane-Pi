@@ -70,9 +70,29 @@ function Shop({ username, character, refreshCharacter }) {
             <p>Cost: {preview.item.cost} Gold</p>
             {preview.item.statBonus && (
               <ul>
-                {Object.entries(preview.item.statBonus).map(([k, v]) => (
-                  <li key={k}>{k}: +{v}</li>
-                ))}
+                {Object.entries(preview.item.statBonus).map(([k, v]) => {
+                  const current = preview.compareItem?.statBonus?.[k] || 0;
+                  const diff = v - current;
+                  return (
+                    <li key={k}>
+                      {k}: +{v}{" "}
+                      {preview.compareItem && diff !== 0 && (
+                        <span className={diff > 0 ? "better" : "worse"}>
+                          ({diff > 0 ? "+" : ""}{diff})
+                        </span>
+                      )}
+                    </li>
+                  );
+                })}
+                {preview.compareItem &&
+                  Object.entries(preview.compareItem.statBonus || {})
+                    .filter(([k]) => !(preview.item.statBonus || {})[k])
+                    .map(([k, v]) => (
+                      <li key={k}>
+                        {k}: +0 {" "}
+                        <span className="worse">({-v})</span>
+                      </li>
+                    ))}
               </ul>
             )}
             {preview.compareItem && (

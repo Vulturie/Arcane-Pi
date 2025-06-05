@@ -4,6 +4,7 @@ import {
   getStatsForClass,
   getEquipment,
   setPlayerClass,
+  setAccountClass,
   deleteCharacter,
 } from "../services/playerService";
 
@@ -27,6 +28,9 @@ function Character({ character, refreshCharacter, username }) {
   const handleChoose = async () => {
     try {
       await setPlayerClass(character._id, chosenClass);
+      if (username) {
+        await setAccountClass(username, chosenClass);
+      }
       await refreshCharacter();
     } catch (err) {
       console.error(err);
