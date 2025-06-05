@@ -261,7 +261,11 @@ router.get("/:username/inventory", async (req, res) => {
     const player = await Player.findOne({ username });
     if (!player) return res.status(404).json({ error: "Player not found" });
 
-    res.json(player.inventory);
+    res.json({
+      inventory: player.inventory,
+      slots: player.inventory.length,
+      maxSlots: player.maxInventorySlots,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });
@@ -277,10 +281,18 @@ router.post("/:username/inventory", async (req, res) => {
     const player = await Player.findOne({ username });
     if (!player) return res.status(404).json({ error: "Player not found" });
 
+    if (inventory.length > player.maxInventorySlots) {
+      return res.status(400).json({ error: "Inventory exceeds capacity" });
+    }
+
     player.inventory = inventory;
     await player.save();
 
-    res.json(player.inventory);
+    res.json({
+      inventory: player.inventory,
+      slots: player.inventory.length,
+      maxSlots: player.maxInventorySlots,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });
@@ -300,10 +312,18 @@ router.post("/:username/inventory/add", async (req, res) => {
     const item = ITEMS.find((it) => it.id === itemId);
     if (!item) return res.status(400).json({ error: "Invalid item" });
 
+    if (player.inventory.length >= player.maxInventorySlots) {
+      return res.status(400).json({ error: "Inventory full" });
+    }
+
     player.inventory.push(item);
     await player.save();
 
-    res.json(player.inventory);
+    res.json({
+      inventory: player.inventory,
+      slots: player.inventory.length,
+      maxSlots: player.maxInventorySlots,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });
@@ -330,13 +350,22 @@ router.post("/:username/buy", async (req, res) => {
       return res.status(400).json({ error: "Not enough gold" });
     }
 
+    if (player.inventory.length >= player.maxInventorySlots) {
+      return res.status(400).json({ error: "Inventory full" });
+    }
+
     character.gold -= item.cost;
     player.inventory.push(item);
 
     await character.save();
     await player.save();
 
-  res.json({ gold: character.gold, inventory: player.inventory });
+    res.json({
+      gold: character.gold,
+      inventory: player.inventory,
+      slots: player.inventory.length,
+      maxSlots: player.maxInventorySlots,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });
@@ -370,7 +399,12 @@ router.post("/:username/sell", async (req, res) => {
     await character.save();
     await player.save();
 
-    res.json({ gold: character.gold, inventory: player.inventory });
+    res.json({
+      gold: character.gold,
+      inventory: player.inventory,
+      slots: player.inventory.length,
+      maxSlots: player.maxInventorySlots,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });
@@ -408,6 +442,9 @@ router.post("/:username/equip", async (req, res) => {
 
     // Unequip existing item in slot
     if (player.equippedItems && player.equippedItems[slot]) {
+      if (player.inventory.length >= player.maxInventorySlots) {
+        return res.status(400).json({ error: "Inventory full" });
+      }
       player.inventory.push(player.equippedItems[slot]);
     }
 
@@ -416,7 +453,12 @@ router.post("/:username/equip", async (req, res) => {
     player.equippedItems[slot] = item;
     await player.save();
 
-    res.json({ inventory: player.inventory, equippedItems: player.equippedItems });
+    res.json({
+      inventory: player.inventory,
+      equippedItems: player.equippedItems,
+      slots: player.inventory.length,
+      maxSlots: player.maxInventorySlots,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });
@@ -434,12 +476,20 @@ router.post("/:username/unequip", async (req, res) => {
 
     const item = player.equippedItems && player.equippedItems[slot];
     if (item) {
+      if (player.inventory.length >= player.maxInventorySlots) {
+        return res.status(400).json({ error: "Inventory full" });
+      }
       player.inventory.push(item);
       player.equippedItems[slot] = null;
       await player.save();
     }
 
-    res.json({ inventory: player.inventory, equippedItems: player.equippedItems });
+    res.json({
+      inventory: player.inventory,
+      equippedItems: player.equippedItems,
+      slots: player.inventory.length,
+      maxSlots: player.maxInventorySlots,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });

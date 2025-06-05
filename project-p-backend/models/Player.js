@@ -24,6 +24,8 @@ const playerSchema = new mongoose.Schema({
   class: { type: String, default: "Novice" },
   energy: { type: Number, default: 100 },
   lastEnergyUpdate: { type: Date, default: Date.now },
+  // Maximum number of items that can be stored in the inventory
+  maxInventorySlots: { type: Number, default: 10 },
 
 // Array of items in the player's inventory
   inventory: {

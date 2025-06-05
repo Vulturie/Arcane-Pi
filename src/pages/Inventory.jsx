@@ -11,12 +11,16 @@ import {
 function Inventory({ username, character, refreshCharacter }) {
   const [items, setItems] = useState([]);
   const [equipped, setEquipped] = useState({});
+  const [slots, setSlots] = useState(0);
+  const [maxSlots, setMaxSlots] = useState(0);
 
   const loadInventory = async () => {
       if (!username) return;
       try {
         const data = await getInventory(username);
-        setItems(data);
+        setItems(data.inventory);
+        setSlots(data.slots);
+        setMaxSlots(data.maxSlots);
       } catch (err) {
         console.error("Failed to load inventory", err);
       }
@@ -94,6 +98,7 @@ function Inventory({ username, character, refreshCharacter }) {
       </ul>
       <h2>Inventory</h2>
       {character && <p>Your Gold: {character.gold}</p>}
+      <p>Items: {slots} / {maxSlots}</p>
       <button onClick={giveTestItem}>Give Test Item</button>
       <ul>
         {items.map((item, idx) => (
