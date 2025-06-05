@@ -336,6 +336,40 @@ router.post("/:username/buy", async (req, res) => {
     await character.save();
     await player.save();
 
+  res.json({ gold: character.gold, inventory: player.inventory });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// POST /player/:username/sell
+router.post("/:username/sell", async (req, res) => {
+  const { username } = req.params;
+  const { itemId, characterId } = req.body;
+
+  try {
+    const player = await Player.findOne({ username });
+    if (!player) return res.status(404).json({ error: "Player not found" });
+
+    const character = await Character.findById(characterId);
+    if (!character) return res.status(404).json({ error: "Character not found" });
+
+    const idx = player.inventory.findIndex((it) => it.id === itemId);
+    if (idx === -1) return res.status(404).json({ error: "Item not in inventory" });
+    const item = player.inventory[idx];
+
+    const ITEMS = require("../data/items");
+    const itemData = ITEMS.find((it) => it.id === itemId);
+    const sellPrice = itemData ? Math.floor(itemData.cost * 0.5) : 0;
+
+    // Remove item and credit gold
+    player.inventory.splice(idx, 1);
+    character.gold += sellPrice;
+
+    await character.save();
+    await player.save();
+
     res.json({ gold: character.gold, inventory: player.inventory });
   } catch (err) {
     console.error(err);

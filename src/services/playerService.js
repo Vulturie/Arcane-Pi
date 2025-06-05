@@ -165,6 +165,17 @@ export const buyItem = async (username, characterId, itemId) => {
   return data;
 };
 
+export const sellItem = async (username, characterId, itemId) => {
+  const res = await fetch(`http://localhost:4000/player/${username}/sell`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ itemId, characterId }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Failed to sell item");
+  return data;
+};
+
  export const getEquipment = async (username) => {
    const res = await fetch(`http://localhost:4000/player/${username}/equipment`);
    const data = await res.json();

@@ -5,9 +5,10 @@ import {
   getEquipment,
   equipItem,
   unequipItem,
+  sellItem,
 } from "../services/playerService";
 
-function Inventory({ username }) {
+function Inventory({ username, character, refreshCharacter }) {
   const [items, setItems] = useState([]);
   const [equipped, setEquipped] = useState({});
 
@@ -66,31 +67,47 @@ function Inventory({ username }) {
     }
   };
 
-    return (
-      <div>
-        <h2>Equipped Items</h2>
-        <ul>
-          {['weapon', 'armor', 'accessory'].map((slot) => (
-            <li key={slot}>
-              {slot}: {equipped && equipped[slot] ? `${equipped[slot].name}` : 'None'}
-              {equipped && equipped[slot] && (
-                <button onClick={() => handleUnequip(slot)}>Unequip</button>
-              )}
-            </li>
-          ))}
-        </ul>
-        <h2>Inventory</h2>
-        <button onClick={giveTestItem}>Give Test Item</button>
-        <ul>
-          {items.map((item, idx) => (
-            <li key={idx}>
-              {item.name} ({item.type})
-              <button onClick={() => handleEquip(item.id)}>Equip</button>
-            </li>
-          ))}
-        </ul>
-      </div>
-    );
+  const handleSell = async (id) => {
+    if (!character) return;
+    try {
+      await sellItem(username, character._id, id);
+      loadInventory();
+      loadEquipment();
+      if (refreshCharacter) refreshCharacter();
+    } catch (err) {
+      console.error("Failed to sell item", err);
+    }
+  };
+
+  return (
+    <div>
+      <h2>Equipped Items</h2>
+      <ul>
+        {['weapon', 'armor', 'accessory'].map((slot) => (
+          <li key={slot}>
+            {slot}: {equipped && equipped[slot] ? `${equipped[slot].name}` : 'None'}
+            {equipped && equipped[slot] && (
+              <button onClick={() => handleUnequip(slot)}>Unequip</button>
+            )}
+          </li>
+        ))}
+      </ul>
+      <h2>Inventory</h2>
+      {character && <p>Your Gold: {character.gold}</p>}
+      <button onClick={giveTestItem}>Give Test Item</button>
+      <ul>
+        {items.map((item, idx) => (
+          <li key={idx}>
+            {item.name} ({item.type})
+            <button onClick={() => handleEquip(item.id)}>Equip</button>
+            {character && (
+              <button onClick={() => handleSell(item.id)}>Sell</button>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 }
 
 export default Inventory;
