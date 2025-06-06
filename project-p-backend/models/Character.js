@@ -67,6 +67,8 @@ const characterSchema = new mongoose.Schema({
   arenaFightReset: { type: Date, default: Date.now },
   dailyArenaRefreshes: { type: Number, default: 0 },
   arenaRefreshReset: { type: Date, default: Date.now },
+  // Indicates whether the player has visited the Arena page at least once
+  hasEnteredArena: { type: Boolean, default: false },
   activeQuest: {
     type: {
       id: Number,

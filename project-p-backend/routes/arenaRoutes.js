@@ -38,7 +38,12 @@ router.get("/profile/:id", async (req, res) => {
   try {
     const char = await Character.findById(req.params.id);
     if (!char) return res.status(404).json({ error: "Character not found" });
-    if (resetArenaCounters(char)) await char.save();
+    let updated = resetArenaCounters(char);
+    if (!char.hasEnteredArena) {
+      char.hasEnteredArena = true;
+      updated = true;
+    }
+    if (updated) await char.save();
     const base = getStatsForClass(char.class, char.level);
     const equip = getEquipmentStatTotals(char);
     const combatScore = calculateCombatScore(char.level, base, equip);
@@ -68,7 +73,7 @@ router.get("/opponents/:id", async (req, res) => {
     const candidates = await Character.find({
       _id: { $ne: char._id },
       mmr: { $gte: mmr - 200, $lte: mmr + 200 },
-      $or: [{ arenaWins: { $gt: 0 } }, { arenaLosses: { $gt: 0 } }],
+      hasEnteredArena: true,
     }).lean();
 
     const shuffled = shuffle(candidates);
@@ -113,7 +118,7 @@ router.post("/opponents/:id/refresh", async (req, res) => {
     const candidates = await Character.find({
       _id: { $ne: char._id },
       mmr: { $gte: mmr - 200, $lte: mmr + 200 },
-      $or: [{ arenaWins: { $gt: 0 } }, { arenaLosses: { $gt: 0 } }],
+      hasEnteredArena: true,
     }).lean();
 
     const shuffled = shuffle(candidates);
@@ -160,11 +165,15 @@ router.post("/match/:id", async (req, res) => {
       opponent = await Character.findOne({
         _id: { $ne: char._id },
         mmr: { $gte: mmr - r, $lte: mmr + r },
+        hasEnteredArena: true,
       }).lean();
       if (opponent) break;
     }
     if (!opponent) {
-      opponent = await Character.findOne({ _id: { $ne: char._id } }).lean();
+      opponent = await Character.findOne({
+        _id: { $ne: char._id },
+        hasEnteredArena: true,
+      }).lean();
       if (!opponent) return res.status(400).json({ error: "No opponents" });
     }
 
