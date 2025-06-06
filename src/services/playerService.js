@@ -193,6 +193,15 @@ export const buyItem = async (characterId, itemId) => {
   return data;
 };
 
+export const forceRefreshShop = async (characterId) => {
+  const res = await fetch(`http://localhost:4000/api/characters/${characterId}/shop/refresh`, {
+    method: "POST",
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Failed to refresh shop");
+  return data;
+};
+
 export const sellItem = async (characterId, itemId) => {
   const res = await fetch(`http://localhost:4000/api/characters/${characterId}/sell`, {
     method: "POST",

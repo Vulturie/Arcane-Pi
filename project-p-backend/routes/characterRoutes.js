@@ -38,6 +38,7 @@ function initShopPool(char) {
 
 function refreshShopPool(char) {
   initShopPool(char);
+  char.lastShopRefresh = new Date();
 }
 
 function replaceQuest(char, type, tierIndex) {
@@ -176,6 +177,7 @@ async function loadCharacter(req, res, next) {
 
     if (!char.lastShopRefresh || char.lastShopRefresh < todayUTC) {
       refreshShopPool(char);
+      char.lastShopRefresh = now;
       updated = true;
     }
 
@@ -523,6 +525,15 @@ router.post("/characters/:id/sell", loadCharacter, async (req, res) => {
     slots: char.inventory.length,
     maxSlots: char.maxInventorySlots,
   });
+});
+
+// POST /characters/:id/shop/refresh
+// Debug route to force a shop refresh
+router.post("/characters/:id/shop/refresh", loadCharacter, async (req, res) => {
+  const char = req.character;
+  refreshShopPool(char);
+  await char.save();
+  res.json({ shopPool: char.shopPool, lastShopRefresh: char.lastShopRefresh });
 });
 
 // GET /characters/:id/equipment

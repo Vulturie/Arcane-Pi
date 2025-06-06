@@ -57,6 +57,7 @@ function Shop({ character, refreshCharacter }) {
     <div>
       <h2>Shop</h2>
       <p>Your Gold: {character.gold}</p>
+      <p>Next refresh at 00:00 UTC</p>
       <ul>
         {shopItems.map((it) => (
           <li key={it.id}>
