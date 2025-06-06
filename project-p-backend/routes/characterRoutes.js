@@ -189,8 +189,22 @@ async function loadCharacter(req, res, next) {
       updated = true;
     }
 
-    if (updated) await char.save();
-        req.character = char;
+    if (updated) {
+      try {
+        await char.save();
+      } catch (err) {
+        if (err.name === "VersionError") {
+          await Character.findByIdAndUpdate(char._id, char.toObject());
+          const fresh = await Character.findById(char._id);
+          req.character = fresh || char;
+        } else {
+          throw err;
+        }
+      }
+    }
+    if (!req.character) {
+      req.character = char;
+    }
     next();
   } catch (err) {
     console.error(err);
