@@ -285,11 +285,30 @@ export const getTowerLeaderboard = async (page = 1, limit = 10, charId) => {
     return data;
   };
 
-  export const startArenaMatch = async (id) => {
-    const res = await fetch(`http://localhost:4000/arena/match/${id}`, {
+export const startArenaMatch = async (id) => {
+  const res = await fetch(`http://localhost:4000/arena/match/${id}`, {
+    method: "POST",
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Failed to start match");
+  return data;
+};
+
+export const getArenaOpponents = async (id) => {
+  const res = await fetch(`http://localhost:4000/arena/opponents/${id}`);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Failed to load opponents");
+  return data;
+};
+
+export const challengeArenaOpponent = async (id, opponentId) => {
+  const res = await fetch(
+    `http://localhost:4000/arena/challenge/${id}/${opponentId}`,
+    {
       method: "POST",
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "Failed to start match");
-    return data;
+    }
+  );
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Failed to start match");
+  return data;
 };

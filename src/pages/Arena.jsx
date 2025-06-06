@@ -1,10 +1,15 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { getArenaProfile, startArenaMatch } from "../services/playerService";
+import {
+  getArenaProfile,
+  getArenaOpponents,
+  challengeArenaOpponent,
+} from "../services/playerService";
 
 function Arena({ character, refreshCharacter }) {
   const [profile, setProfile] = useState(null);
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
+  const [opponents, setOpponents] = useState([]);
 
   const loadProfile = useCallback(async () => {
     if (!character) return;
@@ -20,12 +25,27 @@ function Arena({ character, refreshCharacter }) {
     loadProfile();
   }, [loadProfile]);
 
-  const handleMatch = async () => {
+  const loadOpponents = useCallback(async () => {
+    if (!character) return;
     try {
-      const data = await startArenaMatch(character._id);
+      const data = await getArenaOpponents(character._id);
+      setOpponents(data);
+    } catch (err) {
+      setError(err.message);
+    }
+  }, [character]);
+
+  useEffect(() => {
+    loadOpponents();
+  }, [loadOpponents]);
+
+  const handleChallenge = async (oppId) => {
+    try {
+      const data = await challengeArenaOpponent(character._id, oppId);
       setResult(data);
       await refreshCharacter();
       loadProfile();
+      loadOpponents();
     } catch (err) {
       setError(err.message);
     }
@@ -41,7 +61,17 @@ function Arena({ character, refreshCharacter }) {
             Record: {profile.wins}W / {profile.losses}L
           </p>
           <p>Combat Score: {profile.combatScore}</p>
-          {!result && <button onClick={handleMatch}>Find Match</button>}
+          {opponents.length > 0 && !result && (
+            <ul>
+              {opponents.map((o) => (
+                <li key={o.id}>
+                  {o.name} - lvl {o.level} {o.class} | Score: {o.combatScore} |
+                  MMR: {o.mmr}
+                  <button onClick={() => handleChallenge(o.id)}>Challenge</button>
+                </li>
+              ))}
+            </ul>
+          )}
         </>
       ) : (
         <p>Loading...</p>
