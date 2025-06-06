@@ -62,6 +62,11 @@ const characterSchema = new mongoose.Schema({
   mmr: { type: Number, default: 1000 },
   arenaWins: { type: Number, default: 0 },
   arenaLosses: { type: Number, default: 0 },
+  // Daily arena limits
+  dailyArenaFights: { type: Number, default: 0 },
+  arenaFightReset: { type: Date, default: Date.now },
+  dailyArenaRefreshes: { type: Number, default: 0 },
+  arenaRefreshReset: { type: Date, default: Date.now },
   activeQuest: {
     type: {
       id: Number,

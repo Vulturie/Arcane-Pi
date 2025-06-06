@@ -301,6 +301,15 @@ export const getArenaOpponents = async (id) => {
   return data;
 };
 
+export const refreshArenaOpponents = async (id) => {
+  const res = await fetch(`http://localhost:4000/arena/opponents/${id}/refresh`, {
+    method: "POST",
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Failed to load opponents");
+  return data;
+};
+
 export const challengeArenaOpponent = async (id, opponentId) => {
   const res = await fetch(
     `http://localhost:4000/arena/challenge/${id}/${opponentId}`,

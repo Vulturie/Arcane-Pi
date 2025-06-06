@@ -185,6 +185,18 @@ async function loadCharacter(req, res, next) {
       updated = true;
     }
 
+    if (!char.arenaFightReset || char.arenaFightReset < todayUTC) {
+      char.dailyArenaFights = 0;
+      char.arenaFightReset = now;
+      updated = true;
+    }
+
+    if (!char.arenaRefreshReset || char.arenaRefreshReset < todayUTC) {
+      char.dailyArenaRefreshes = 0;
+      char.arenaRefreshReset = now;
+      updated = true;
+    }
+
     if (!char.safeQuestPool || char.safeQuestPool.length === 0) {
       initQuestPools(char);
       updated = true;

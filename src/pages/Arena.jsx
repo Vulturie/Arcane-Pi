@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import {
   getArenaProfile,
   getArenaOpponents,
+  refreshArenaOpponents,
   challengeArenaOpponent,
 } from "../services/playerService";
 
@@ -10,12 +11,16 @@ function Arena({ character, refreshCharacter }) {
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
   const [opponents, setOpponents] = useState([]);
+  const [refreshRemaining, setRefreshRemaining] = useState(3);
 
   const loadProfile = useCallback(async () => {
     if (!character) return;
     try {
       const data = await getArenaProfile(character._id);
       setProfile(data);
+      if (typeof data.refreshesRemaining === "number") {
+        setRefreshRemaining(data.refreshesRemaining);
+      }
     } catch (err) {
       setError(err.message);
     }
@@ -51,6 +56,18 @@ function Arena({ character, refreshCharacter }) {
     }
   };
 
+  const handleRefreshOpponents = async () => {
+    try {
+      const data = await refreshArenaOpponents(character._id);
+      setOpponents(data.opponents);
+      if (typeof data.refreshesRemaining === "number") {
+        setRefreshRemaining(data.refreshesRemaining);
+      }
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
   return (
     <div>
       <h2>Arena</h2>
@@ -61,13 +78,31 @@ function Arena({ character, refreshCharacter }) {
             Record: {profile.wins}W / {profile.losses}L
           </p>
           <p>Combat Score: {profile.combatScore}</p>
+          <p>Fights Remaining: {profile.fightsRemaining}</p>
+          <p>Opponent Refreshes Left: {refreshRemaining}</p>
+          <button
+            onClick={handleRefreshOpponents}
+            disabled={refreshRemaining <= 0}
+          >
+            Refresh Opponents
+          </button>
+          {profile.fightsRemaining === 0 && (
+            <p style={{ color: "red" }}>
+              You’ve reached your daily Arena battle limit. Come back tomorrow!
+            </p>
+          )}
           {opponents.length > 0 && !result && (
             <ul>
               {opponents.map((o) => (
                 <li key={o.id}>
                   {o.name} - lvl {o.level} {o.class} | Score: {o.combatScore} |
                   MMR: {o.mmr}
-                  <button onClick={() => handleChallenge(o.id)}>Challenge</button>
+                  <button
+                    onClick={() => handleChallenge(o.id)}
+                    disabled={profile.fightsRemaining === 0}
+                  >
+                    Challenge
+                  </button>
                 </li>
               ))}
             </ul>

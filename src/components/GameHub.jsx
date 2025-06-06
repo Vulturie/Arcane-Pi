@@ -4,6 +4,7 @@ import { getXpForNextLevel } from "../services/playerService";
 
 function GameHub({ character, refreshCharacter, username }) {
   const [showTowerInfo, setShowTowerInfo] = useState(false);
+  const [showArenaInfo, setShowArenaInfo] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -26,7 +27,28 @@ function GameHub({ character, refreshCharacter, username }) {
       <div className="menu">
         <Link to="/character"><button>🏰 Character</button></Link>
         <Link to="/tavern"><button>📜 Tavern</button></Link>
-        <Link to="/arena"><button>⚔️ Arena</button></Link>
+        {character.level >= 20 ? (
+          <Link to="/arena"><button>⚔️ Arena</button></Link>
+        ) : (
+          <>
+            <button
+              className="locked"
+              disabled
+              title="Arena unlocks at level 20"
+              onClick={() => setShowArenaInfo(true)}
+            >
+              ⚔️ Arena (Locked)
+            </button>
+            {showArenaInfo && (
+              <div className="modal" onClick={() => setShowArenaInfo(false)}>
+                <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                  <p>Arena unlocks at level 20</p>
+                  <button onClick={() => setShowArenaInfo(false)}>Close</button>
+                </div>
+              </div>
+            )}
+          </>
+        )}
         <Link to="/shop"><button>🛒 Shop</button></Link>
         <Link to="/inventory"><button>💼 Inventory</button></Link>
         <Link to="/history"><button>📖 History</button></Link>

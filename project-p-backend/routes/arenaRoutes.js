@@ -9,6 +9,23 @@ const {
   simulateCombat,
 } = require("../utils/combat");
 
+function resetArenaCounters(char) {
+  const now = new Date();
+  const todayUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  let updated = false;
+  if (!char.arenaFightReset || char.arenaFightReset < todayUTC) {
+    char.dailyArenaFights = 0;
+    char.arenaFightReset = now;
+    updated = true;
+  }
+  if (!char.arenaRefreshReset || char.arenaRefreshReset < todayUTC) {
+    char.dailyArenaRefreshes = 0;
+    char.arenaRefreshReset = now;
+    updated = true;
+  }
+  return updated;
+}
+
 function shuffle(arr) {
   return arr
     .map((a) => [Math.random(), a])
@@ -21,6 +38,7 @@ router.get("/profile/:id", async (req, res) => {
   try {
     const char = await Character.findById(req.params.id);
     if (!char) return res.status(404).json({ error: "Character not found" });
+    if (resetArenaCounters(char)) await char.save();
     const base = getStatsForClass(char.class, char.level);
     const equip = getEquipmentStatTotals(char);
     const combatScore = calculateCombatScore(char.level, base, equip);
@@ -29,6 +47,8 @@ router.get("/profile/:id", async (req, res) => {
       wins: char.arenaWins || 0,
       losses: char.arenaLosses || 0,
       combatScore,
+      fightsRemaining: Math.max(0, 5 - (char.dailyArenaFights || 0)),
+      refreshesRemaining: Math.max(0, 3 - (char.dailyArenaRefreshes || 0)),
     });
   } catch (err) {
     console.error(err);
@@ -41,12 +61,14 @@ router.get("/opponents/:id", async (req, res) => {
   try {
     const char = await Character.findById(req.params.id);
     if (!char) return res.status(404).json({ error: "Character not found" });
+    if (resetArenaCounters(char)) await char.save();
 
     const mmr = char.mmr || 1000;
 
     const candidates = await Character.find({
       _id: { $ne: char._id },
       mmr: { $gte: mmr - 200, $lte: mmr + 200 },
+      $or: [{ arenaWins: { $gt: 0 } }, { arenaLosses: { $gt: 0 } }],
     }).lean();
 
     const shuffled = shuffle(candidates);
@@ -76,11 +98,60 @@ router.get("/opponents/:id", async (req, res) => {
   }
 });
 
+// Refresh the list of opponents and count towards daily limit
+router.post("/opponents/:id/refresh", async (req, res) => {
+  try {
+    const char = await Character.findById(req.params.id);
+    if (!char) return res.status(404).json({ error: "Character not found" });
+    if (resetArenaCounters(char)) await char.save();
+    if ((char.dailyArenaRefreshes || 0) >= 3) {
+      return res.status(400).json({ error: "No more refreshes today" });
+    }
+    char.dailyArenaRefreshes = (char.dailyArenaRefreshes || 0) + 1;
+
+    const mmr = char.mmr || 1000;
+    const candidates = await Character.find({
+      _id: { $ne: char._id },
+      mmr: { $gte: mmr - 200, $lte: mmr + 200 },
+      $or: [{ arenaWins: { $gt: 0 } }, { arenaLosses: { $gt: 0 } }],
+    }).lean();
+
+    const shuffled = shuffle(candidates);
+    const max = Math.min(shuffled.length, 5);
+    const min = Math.min(3, max);
+    const count = Math.floor(Math.random() * (max - min + 1)) + min;
+    const selected = shuffled.slice(0, count);
+
+    const result = selected.map((op) => {
+      const base = getStatsForClass(op.class, op.level);
+      const equip = getEquipmentStatTotals(op);
+      const combatScore = calculateCombatScore(op.level, base, equip);
+      return {
+        id: op._id,
+        name: op.name,
+        class: op.class,
+        level: op.level,
+        mmr: op.mmr || 1000,
+        combatScore,
+      };
+    });
+    await char.save();
+    res.json({ opponents: result, refreshesRemaining: Math.max(0, 3 - char.dailyArenaRefreshes) });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 // Start an arena match and return the result
 router.post("/match/:id", async (req, res) => {
   try {
     const char = await Character.findById(req.params.id);
     if (!char) return res.status(404).json({ error: "Character not found" });
+    if (resetArenaCounters(char)) await char.save();
+    if ((char.dailyArenaFights || 0) >= 5) {
+      return res.status(400).json({ error: "Daily arena fight limit reached" });
+    }
     const mmr = char.mmr || 1000;
 
     const ranges = [100, 200, 400, 800];
@@ -99,6 +170,7 @@ router.post("/match/:id", async (req, res) => {
 
     const playerStats = getPlayerStats(char);
     const opponentChar = await Character.findById(opponent._id);
+    if (resetArenaCounters(opponentChar)) await opponentChar.save();
     const oppStats = getPlayerStats(opponentChar);
     const combat = simulateCombat(playerStats, { ...oppStats, name: opponentChar.name });
 
@@ -114,6 +186,8 @@ router.post("/match/:id", async (req, res) => {
       opponentChar.mmr = (opponentChar.mmr || 1000) + DELTA;
       opponentChar.arenaWins = (opponentChar.arenaWins || 0) + 1;
     }
+    char.dailyArenaFights = (char.dailyArenaFights || 0) + 1;
+    opponentChar.dailyArenaFights = (opponentChar.dailyArenaFights || 0) + 1;
     await char.save();
     await opponentChar.save();
 
@@ -153,6 +227,11 @@ router.post("/challenge/:id/:oppId", async (req, res) => {
     const opponentChar = await Character.findById(req.params.oppId);
     if (!char || !opponentChar)
       return res.status(404).json({ error: "Character not found" });
+    if (resetArenaCounters(char)) await char.save();
+    if (resetArenaCounters(opponentChar)) await opponentChar.save();
+    if ((char.dailyArenaFights || 0) >= 5) {
+      return res.status(400).json({ error: "Daily arena fight limit reached" });
+    }
 
     if (String(char._id) === String(opponentChar._id)) {
       return res.status(400).json({ error: "Cannot fight yourself" });
@@ -177,6 +256,8 @@ router.post("/challenge/:id/:oppId", async (req, res) => {
       opponentChar.mmr = (opponentChar.mmr || 1000) + DELTA;
       opponentChar.arenaWins = (opponentChar.arenaWins || 0) + 1;
     }
+    char.dailyArenaFights = (char.dailyArenaFights || 0) + 1;
+    opponentChar.dailyArenaFights = (opponentChar.dailyArenaFights || 0) + 1;
     await char.save();
     await opponentChar.save();
 
