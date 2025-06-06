@@ -278,6 +278,17 @@ export const getTowerLeaderboard = async (page = 1, limit = 10, charId) => {
   return data;
   };
 
+export const getArenaLeaderboard = async (page = 1, limit = 10, charId) => {
+  const params = new URLSearchParams({ page, limit });
+  if (charId) params.append("charId", charId);
+  const res = await fetch(
+    `http://localhost:4000/api/leaderboard/arena?${params.toString()}`
+  );
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Failed to load leaderboard");
+  return data;
+};
+
   export const getArenaProfile = async (id) => {
     const res = await fetch(`http://localhost:4000/arena/profile/${id}`);
     const data = await res.json();

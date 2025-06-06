@@ -641,12 +641,24 @@ router.post("/characters/:id/tower/attempt", loadCharacter, async (req, res) => 
 let towerLeaderboard = [];
 let leaderboardUpdatedAt = null;
 
+// Arena leaderboard cached once per UTC day
+let arenaLeaderboard = [];
+let arenaLeaderboardUpdatedAt = null;
+
 async function refreshTowerLeaderboard() {
   towerLeaderboard = await Character.find({})
     .sort({ towerProgress: -1 })
     .select("name level class towerProgress")
     .lean();
   leaderboardUpdatedAt = new Date();
+}
+
+async function refreshArenaLeaderboard() {
+  arenaLeaderboard = await Character.find({ hasEnteredArena: true })
+    .sort({ mmr: -1 })
+    .select("name level class mmr arenaWins arenaLosses")
+    .lean();
+  arenaLeaderboardUpdatedAt = new Date();
 }
 
 function needsLeaderboardRefresh() {
@@ -656,6 +668,16 @@ function needsLeaderboardRefresh() {
     now.getUTCFullYear() !== leaderboardUpdatedAt.getUTCFullYear() ||
     now.getUTCMonth() !== leaderboardUpdatedAt.getUTCMonth() ||
     now.getUTCDate() !== leaderboardUpdatedAt.getUTCDate()
+  );
+}
+
+function needsArenaLeaderboardRefresh() {
+  if (!arenaLeaderboardUpdatedAt) return true;
+  const now = new Date();
+  return (
+    now.getUTCFullYear() !== arenaLeaderboardUpdatedAt.getUTCFullYear() ||
+    now.getUTCMonth() !== arenaLeaderboardUpdatedAt.getUTCMonth() ||
+    now.getUTCDate() !== arenaLeaderboardUpdatedAt.getUTCDate()
   );
 }
 
@@ -682,6 +704,38 @@ router.get("/leaderboard/tower", async (req, res) => {
     res.json({
       lastUpdated: leaderboardUpdatedAt.toISOString(),
       total: towerLeaderboard.length,
+      results: slice,
+      myRank,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// GET /leaderboard/arena?page=&limit=&charId=
+router.get("/leaderboard/arena", async (req, res) => {
+  try {
+    if (needsArenaLeaderboardRefresh()) {
+      await refreshArenaLeaderboard();
+    }
+
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 10;
+    const start = (page - 1) * limit;
+    const slice = arenaLeaderboard.slice(start, start + limit);
+
+    let myRank = null;
+    if (req.query.charId) {
+      const idx = arenaLeaderboard.findIndex(
+        (c) => String(c._id) === String(req.query.charId)
+      );
+      if (idx !== -1) myRank = idx + 1;
+    }
+
+    res.json({
+      lastUpdated: arenaLeaderboardUpdatedAt.toISOString(),
+      total: arenaLeaderboard.length,
       results: slice,
       myRank,
     });
