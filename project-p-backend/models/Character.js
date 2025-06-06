@@ -102,7 +102,11 @@ const characterSchema = new mongoose.Schema({
     type: [
       {
         questName: String,
+        questType: String,
         result: String,
+        xp: Number,
+        gold: Number,
+        loot: inventoryItemSchema,
         playerHP: Number,
         enemyHP: Number,
         enemyName: String,

@@ -10,7 +10,8 @@ function Shop({ character, refreshCharacter }) {
   const getBonus = (item, stat) => {
     if (!item || !item.statBonus) return 0;
     const mult = RARITY_MULTIPLIER[item.rarity] || 1;
-    return (item.statBonus[stat] || 0) * mult;
+    const value = (item.statBonus[stat] || 0) * mult;
+    return Math.round(value * 10) / 10;
   };
 
   const loadEquipment = useCallback(async () => {

@@ -63,13 +63,17 @@ const MAX_HISTORY_ENTRIES = 100;
 
 const getXpForNextLevel = (level) => 100 + (level - 1) * 50;
 
-function logHistory(char, quest, combatResult) {
+function logHistory(char, quest, combatResult, xpGain, goldGain, loot) {
   const entry = {
     questName: quest.name,
-    result: combatResult ? combatResult.result : "completed",
+    questType: quest.path || (quest.isCombat ? "risky" : "safe"),
+    result: combatResult && combatResult.result === "win" ? "success" : "failure",
+    xp: xpGain,
+    gold: goldGain,
+    loot,
     playerHP: combatResult ? combatResult.playerHP : undefined,
     enemyHP: combatResult ? combatResult.enemyHP : undefined,
-    enemyName: combatResult ? quest.enemy.name : undefined,
+    enemyName: combatResult && quest.enemy ? quest.enemy.name : undefined,
     timestamp: new Date(),
   };
   if (!char.history) char.history = [];
@@ -292,7 +296,7 @@ router.get("/characters/:id/quest/status", loadCharacter, async (req, res) => {
       xpToLevel = getXpForNextLevel(char.level);
     }
 
-    logHistory(char, quest, combatResult);
+    logHistory(char, quest, combatResult, xpGain, goldGain, loot);
 
         char.pendingQuestResult = {
           questName: quest.name,
@@ -394,7 +398,7 @@ router.post("/characters/:id/quest/complete", loadCharacter, async (req, res) =>
     xpToLevel = getXpForNextLevel(char.level);
   }
 
-  logHistory(char, quest, combatResult);
+  logHistory(char, quest, combatResult, xpGain, goldGain, loot);
 
     char.pendingQuestResult = {
       questName: quest.name,
