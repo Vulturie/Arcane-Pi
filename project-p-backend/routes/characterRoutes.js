@@ -248,7 +248,12 @@ router.post("/characters/:id/energy", loadCharacter, async (req, res) => {
 router.get("/characters/:id/quest/status", loadCharacter, async (req, res) => {
   const char = req.character;
   const quest = char.activeQuest;
-  if (!quest) return res.json({ quest: null });
+  if (!quest) {
+    if (char.pendingQuestResult) {
+      return res.json({ completed: true, questResult: char.pendingQuestResult, character: char });
+    }
+    return res.json({ quest: null });
+  }
   const now = new Date();
   const startedAt = new Date(quest.startedAt);
   const elapsed = (now - startedAt) / 1000;
@@ -259,28 +264,52 @@ router.get("/characters/:id/quest/status", loadCharacter, async (req, res) => {
       const playerStats = getPlayerStats(char);
       combatResult = simulateCombat(playerStats, quest.enemy);
       if (combatResult.result === "win") {
-        char.gold += quest.gold;
-        char.xp += quest.xp;
         loot = await grantLoot(char, quest.path === "risky");
       }
     } else {
+      // Non-combat quests always succeed
+      combatResult = { result: "win", log: [] };
+    }
+
+    const qType = quest.path || (quest.isCombat ? "risky" : "safe");
+    const outcome = combatResult.result === "win" ? "success" : "failure";
+    const message = outcome === "failure" ? "You were defeated by the enemy!" : null;
+
+    const xpGain = outcome === "success" ? quest.xp : 0;
+    const goldGain = outcome === "success" ? quest.gold : 0;
+
+    if (outcome === "success") {
       char.gold += quest.gold;
       char.xp += quest.xp;
     }
+
     let xpToLevel = getXpForNextLevel(char.level);
     while (char.xp >= xpToLevel) {
       char.xp -= xpToLevel;
       char.level += 1;
       xpToLevel = getXpForNextLevel(char.level);
     }
+
     logHistory(char, quest, combatResult);
+
+        char.pendingQuestResult = {
+          questName: quest.name,
+          questType: qType,
+          outcome,
+          xp: xpGain,
+          gold: goldGain,
+          loot,
+          message,
+          log: combatResult.log,
+        };
+
     char.activeQuest = null;
-    const qType = quest.path || (quest.isCombat ? "risky" : "safe");
-    if (!quest.isCombat || combatResult.result === "win") {
+    if (!quest.isCombat || outcome === "success") {
       refreshQuestPool(char, qType);
     }
+
     await char.save();
-    return res.json({ completed: true, character: char, combat: combatResult, loot });
+    return res.json({ completed: true, character: char, questResult: char.pendingQuestResult });
   } else {
     const timeLeft = Math.ceil(quest.duration - elapsed);
     return res.json({ completed: false, timeLeft, quest });
@@ -339,28 +368,50 @@ router.post("/characters/:id/quest/complete", loadCharacter, async (req, res) =>
     const playerStats = getPlayerStats(char);
     combatResult = simulateCombat(playerStats, quest.enemy);
     if (combatResult.result === "win") {
-      char.gold += quest.gold;
-      char.xp += quest.xp;
       loot = await grantLoot(char, quest.path === "risky");
     }
   } else {
+    combatResult = { result: "win", log: [] };
+  }
+
+  const qType = quest.path || (quest.isCombat ? "risky" : "safe");
+  const outcome = combatResult.result === "win" ? "success" : "failure";
+  const message = outcome === "failure" ? "You were defeated by the enemy!" : null;
+  const xpGain = outcome === "success" ? quest.xp : 0;
+  const goldGain = outcome === "success" ? quest.gold : 0;
+
+  if (outcome === "success") {
     char.gold += quest.gold;
     char.xp += quest.xp;
   }
+
   let xpToLevel = getXpForNextLevel(char.level);
   while (char.xp >= xpToLevel) {
     char.xp -= xpToLevel;
     char.level += 1;
     xpToLevel = getXpForNextLevel(char.level);
   }
+
   logHistory(char, quest, combatResult);
+
+    char.pendingQuestResult = {
+      questName: quest.name,
+      questType: qType,
+      outcome,
+      xp: xpGain,
+      gold: goldGain,
+      loot,
+      message,
+      log: combatResult.log,
+    };
+
   char.activeQuest = null;
-  const qType = quest.path || (quest.isCombat ? "risky" : "safe");
-  if (!quest.isCombat || combatResult.result === "win") {
+  if (!quest.isCombat || outcome === "success") {
     refreshQuestPool(char, qType);
   }
+
   await char.save();
-  res.json(combatResult ? { character: char, combat: combatResult, loot } : char);
+  res.json({ character: char, questResult: char.pendingQuestResult });
 });
 
 // POST /characters/:id/quest/cancel
@@ -372,6 +423,14 @@ router.post("/characters/:id/quest/cancel", loadCharacter, async (req, res) => {
   char.activeQuest = null;
   await char.save();
   res.json(char);
+});
+
+// POST /characters/:id/quest/result/ack
+router.post("/characters/:id/quest/result/ack", loadCharacter, async (req, res) => {
+  const char = req.character;
+  char.pendingQuestResult = null;
+  await char.save();
+  res.json({ success: true });
 });
 
 // GET /characters/:id/history

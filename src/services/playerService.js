@@ -98,6 +98,15 @@ export const cancelQuest = async (id) => {
   return data;
 };
 
+export const acknowledgeQuestResult = async (id) => {
+  const res = await fetch(`http://localhost:4000/api/characters/${id}/quest/result/ack`, {
+    method: "POST",
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Failed to acknowledge quest result");
+  return data;
+};
+
 export const setPlayerClass = async (id, className) => {
   const res = await fetch(`http://localhost:4000/api/characters/${id}/class`, {
     method: "POST",

@@ -1,13 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { getQuestStatus, cancelQuest } from "../services/playerService";
-import { getRarityLabel } from "../rarity";
 
-function Tavern({ character, refreshCharacter }) {
+function Tavern({ character, refreshCharacter, onQuestResult }) {
   const [activeQuest, setActiveQuest] = useState(null);
   const [timeLeft, setTimeLeft] = useState(0);
   const [loadingQuestStatus, setLoadingQuestStatus] = useState(true);
-  const [combatResult, setCombatResult] = useState(null);
-  const [questResult, setQuestResult] = useState(null);
 
   const startQuest = async (quest, force = false) => {
     if (character.energy < quest.energyCost) {
@@ -35,6 +32,7 @@ function Tavern({ character, refreshCharacter }) {
           xp: quest.xp,
           gold: quest.gold,
           isCombat: quest.isCombat,
+          path: quest.path,
           startedAt,
         });
         setTimeLeft(quest.duration); // start countdown immediately
@@ -68,15 +66,26 @@ function Tavern({ character, refreshCharacter }) {
   const checkQuestStatus = async () => {
     try {
       const result = await getQuestStatus(character._id);
-      if (result.completed) {
+      if (result.questResult) {
+        onQuestResult(result.questResult);
+        setActiveQuest(null);
+        setTimeLeft(0);
+        refreshCharacter();
+      } else if (result.completed) {
         const info = activeQuest;
         setActiveQuest(null);
         setTimeLeft(0);
         refreshCharacter();
-        if (result.combat) {
-          setCombatResult({ ...result.combat, loot: result.loot });
-        } else if (info) {
-          setQuestResult({ name: info.name, xp: info.xp, gold: info.gold });
+        if (info) {
+          onQuestResult({
+            questName: info.name,
+            questType: info.path,
+            outcome: "success",
+            xp: info.xp,
+            gold: info.gold,
+            loot: result.loot || null,
+            log: result.combat ? result.combat.log : null,
+          });
         }
       } else if (result.quest) {
         setActiveQuest(result.quest);
@@ -153,41 +162,6 @@ function Tavern({ character, refreshCharacter }) {
             </div>
           ))}
         </>
-      )}
-      {combatResult && (
-        <div className="modal" onClick={() => setCombatResult(null)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h3>
-              {combatResult.result === "win" ? "Victory!" : "Defeat"}
-            </h3>
-            <p>Player HP: {combatResult.playerHP}</p>
-            <p>Enemy HP: {combatResult.enemyHP}</p>
-            <h4>Turn Log</h4>
-            <ul>
-              {combatResult.log.map((line, idx) => (
-                <li key={idx}>{line}</li>
-              ))}
-            </ul>
-            {combatResult.loot && (
-              <p>
-                You obtained: {" "}
-                <span className={`rarity-${combatResult.loot.rarity}`}>
-                  {combatResult.loot.name} ({getRarityLabel(combatResult.loot.rarity)})
-                </span>
-              </p>
-            )}
-            <button onClick={() => setCombatResult(null)}>Close</button>
-          </div>
-        </div>
-      )}
-      {questResult && (
-        <div className="modal" onClick={() => setQuestResult(null)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h3>Quest Completed!</h3>
-            <p>You earned {questResult.xp} XP and {questResult.gold} Gold.</p>
-            <button onClick={() => setQuestResult(null)}>Close</button>
-          </div>
-        </div>
       )}
     </div>
   );

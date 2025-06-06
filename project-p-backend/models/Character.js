@@ -82,6 +82,21 @@ const characterSchema = new mongoose.Schema({
     },
     default: undefined,
   },
+  // Stores the outcome of the last completed quest until the
+  // player acknowledges it
+  pendingQuestResult: {
+    type: {
+      questName: String,
+      questType: String,
+      outcome: String,
+      xp: Number,
+      gold: Number,
+      loot: inventoryItemSchema,
+      message: String,
+      log: [String],
+    },
+    default: null,
+  },
   // Log of completed quests and combat outcomes
   history: {
     type: [
