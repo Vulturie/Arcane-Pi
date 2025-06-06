@@ -14,6 +14,7 @@ import Inventory from "./pages/Inventory";
 import History from "./pages/History";
 import Shop from "./pages/Shop";
 import Tower from "./pages/Tower";
+import Arena from "./pages/Arena";
 import QuestResultModal from "./components/QuestResultModal";
 
 function App() {
@@ -110,6 +111,10 @@ function App() {
         <Route
           path="/history"
           element={<History character={activeChar} />}
+        />
+        <Route
+          path="/arena"
+          element={<Arena character={activeChar} refreshCharacter={refreshActiveCharacter} />}
         />
         <Route
           path="/tower"

@@ -276,4 +276,20 @@ export const getTowerLeaderboard = async (page = 1, limit = 10, charId) => {
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Failed to load leaderboard");
   return data;
+  };
+
+  export const getArenaProfile = async (id) => {
+    const res = await fetch(`http://localhost:4000/arena/profile/${id}`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Failed to load arena profile");
+    return data;
+  };
+
+  export const startArenaMatch = async (id) => {
+    const res = await fetch(`http://localhost:4000/arena/match/${id}`, {
+      method: "POST",
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Failed to start match");
+    return data;
 };
