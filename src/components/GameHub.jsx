@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { getXpForNextLevel } from "../services/playerService";
 
 function GameHub({ character, refreshCharacter, username }) {
+  const [showTowerInfo, setShowTowerInfo] = useState(false);
+
   useEffect(() => {
     const interval = setInterval(() => {
       refreshCharacter(); // Pull latest data
@@ -28,7 +30,28 @@ function GameHub({ character, refreshCharacter, username }) {
         <Link to="/shop"><button>🛒 Shop</button></Link>
         <Link to="/inventory"><button>💼 Inventory</button></Link>
         <Link to="/history"><button>📖 History</button></Link>
-        <Link to="/tower"><button>🗼 Tower</button></Link>
+        {character.level >= 10 ? (
+          <Link to="/tower"><button>🗼 Tower</button></Link>
+        ) : (
+          <>
+            <button
+              className="locked"
+              disabled
+              title="Unlocks at level 10"
+              onClick={() => setShowTowerInfo(true)}
+            >
+              🗼 Tower (Locked)
+            </button>
+            {showTowerInfo && (
+              <div className="modal" onClick={() => setShowTowerInfo(false)}>
+                <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                  <p>Unlocks at level 10</p>
+                  <button onClick={() => setShowTowerInfo(false)}>Close</button>
+                </div>
+              </div>
+            )}
+          </>
+        )}
         <Link to="/stats"><button>📊 Stats</button></Link>
       </div>
     </div>

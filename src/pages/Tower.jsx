@@ -8,7 +8,7 @@ function Tower({ character, refreshCharacter }) {
   const [error, setError] = useState("");
 
   const loadStatus = useCallback(async () => {
-    if (!character) return;
+    if (!character || character.level < 10) return;
     try {
       const data = await getTowerStatus(character._id);
       setStatus(data);
@@ -18,7 +18,9 @@ function Tower({ character, refreshCharacter }) {
   }, [character]);
 
   useEffect(() => {
-    loadStatus();
+    if (character.level >= 10) {
+      loadStatus();
+    }
   }, [character, loadStatus]);
 
   const handleAttempt = async () => {
@@ -34,6 +36,15 @@ function Tower({ character, refreshCharacter }) {
       else console.error(err);
     }
   };
+
+  if (character.level < 10) {
+    return (
+      <div>
+        <h2>The Tower</h2>
+        <p>Unlocks at level 10</p>
+      </div>
+    );
+  }
 
   if (!status) return <p>Loading...</p>;
 
