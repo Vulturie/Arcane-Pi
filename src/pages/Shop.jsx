@@ -1,10 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { buyItem, getEquipment } from "../services/playerService";
+import { RARITY_MULTIPLIER, getRarityLabel } from "../rarity";
 
 function Shop({ character, refreshCharacter }) {
   const [preview, setPreview] = useState(null);
   const [shopItems, setShopItems] = useState([]);
   const [equipped, setEquipped] = useState({});
+
+  const getBonus = (item, stat) => {
+    if (!item || !item.statBonus) return 0;
+    const mult = RARITY_MULTIPLIER[item.rarity] || 1;
+    return (item.statBonus[stat] || 0) * mult;
+  };
 
   const loadEquipment = async () => {
     if (!character) return;
@@ -53,7 +60,7 @@ function Shop({ character, refreshCharacter }) {
       <ul>
         {shopItems.map((it) => (
           <li key={it.id}>
-            {it.name} - {it.cost} Gold
+            <span className={`rarity-${it.rarity}`}>{it.name} ({getRarityLabel(it.rarity)})</span> - {it.cost} Gold
             <button onClick={() => openPreview(it)}>Preview</button>
             <button onClick={() => handleBuy(it)}>Buy</button>
           </li>
@@ -62,7 +69,9 @@ function Shop({ character, refreshCharacter }) {
       {preview && (
         <div className="modal" onClick={() => setPreview(null)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h3>{preview.item.name}</h3>
+            <h3 className={`rarity-${preview.item.rarity}`}>
+              {preview.item.name} ({getRarityLabel(preview.item.rarity)})
+            </h3>
             <p>Type: {preview.item.type}</p>
             {preview.item.classRestriction && (
               <p>Classes: {preview.item.classRestriction.join(", ")}</p>
@@ -70,12 +79,13 @@ function Shop({ character, refreshCharacter }) {
             <p>Cost: {preview.item.cost} Gold</p>
             {preview.item.statBonus && (
               <ul>
-                {Object.entries(preview.item.statBonus).map(([k, v]) => {
-                  const current = preview.compareItem?.statBonus?.[k] || 0;
-                  const diff = v - current;
+                {Object.entries(preview.item.statBonus).map(([k]) => {
+                  const value = getBonus(preview.item, k);
+                  const current = getBonus(preview.compareItem, k);
+                  const diff = value - current;
                   return (
                     <li key={k}>
-                      {k}: +{v}{" "}
+                      {k}: +{value}
                       {preview.compareItem && diff !== 0 && (
                         <span className={diff > 0 ? "better" : "worse"}>
                           ({diff > 0 ? "+" : ""}{diff})
@@ -90,7 +100,7 @@ function Shop({ character, refreshCharacter }) {
                     .map(([k, v]) => (
                       <li key={k}>
                         {k}: +0 {" "}
-                        <span className="worse">({-v})</span>
+                        <span className="worse">({-getBonus(preview.compareItem, k)})</span>
                       </li>
                     ))}
               </ul>
@@ -98,11 +108,13 @@ function Shop({ character, refreshCharacter }) {
             {preview.compareItem && (
               <>
                 <h4>Currently Equipped</h4>
-                <p>{preview.compareItem.name}</p>
+                <p className={`rarity-${preview.compareItem.rarity}`}>
+                  {preview.compareItem.name} ({getRarityLabel(preview.compareItem.rarity)})
+                </p>
                 {preview.compareItem.statBonus && (
                   <ul>
                     {Object.entries(preview.compareItem.statBonus).map(([k, v]) => (
-                      <li key={k}>{k}: +{v}</li>
+                      <li key={k}>{k}: +{getBonus(preview.compareItem, k)}</li>
                     ))}
                   </ul>
                 )}

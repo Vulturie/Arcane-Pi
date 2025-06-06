@@ -10,6 +10,7 @@ const inventoryItemSchema = new mongoose.Schema(
     name: String,
     type: { type: String },
     classRestriction: [String],
+    rarity: { type: String, default: "common" },
     statBonus: mongoose.Schema.Types.Mixed,
   },
   { _id: false }

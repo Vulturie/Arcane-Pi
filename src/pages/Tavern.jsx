@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { getQuestStatus, cancelQuest } from "../services/playerService";
+import { getRarityLabel } from "../rarity";
 
 function Tavern({ character, refreshCharacter }) {
   const [activeQuest, setActiveQuest] = useState(null);
@@ -168,7 +169,12 @@ function Tavern({ character, refreshCharacter }) {
               ))}
             </ul>
             {combatResult.loot && (
-              <p>You obtained: {combatResult.loot.name}</p>
+              <p>
+                You obtained: {" "}
+                <span className={`rarity-${combatResult.loot.rarity}`}>
+                  {combatResult.loot.name} ({getRarityLabel(combatResult.loot.rarity)})
+                </span>
+              </p>
             )}
             <button onClick={() => setCombatResult(null)}>Close</button>
           </div>

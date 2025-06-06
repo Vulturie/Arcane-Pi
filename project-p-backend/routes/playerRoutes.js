@@ -9,12 +9,23 @@ const getXpForNextLevel = (level) => {
   return 100 + (level - 1) * 50;
 };
 
+function getRandomRarity() {
+  const r = Math.random();
+  if (r < 0.005) return "legendary";
+  if (r < 0.03) return "epic";
+  if (r < 0.115) return "rare";
+  if (r < 0.34) return "uncommon";
+  return "common";
+}
+
 async function grantLoot(username, isRisky) {
   const chance = isRisky ? 0.5 : 0.05;
   if (Math.random() < chance) {
     const player = await Player.findOne({ username });
     if (player && player.inventory.length < player.maxInventorySlots) {
-      const item = ITEMS[Math.floor(Math.random() * ITEMS.length)];
+      const base = ITEMS[Math.floor(Math.random() * ITEMS.length)];
+      const rarity = getRandomRarity();
+      const item = { ...base, rarity };
       player.inventory.push(item);
       await player.save();
       return item;
@@ -349,7 +360,7 @@ router.post("/:username/inventory/add", async (req, res) => {
       return res.status(400).json({ error: "Inventory full" });
     }
 
-    player.inventory.push(item);
+    player.inventory.push({ ...item, rarity: "common" });
     await player.save();
 
     res.json({
@@ -388,7 +399,7 @@ router.post("/:username/buy", async (req, res) => {
     }
 
     character.gold -= item.cost;
-    player.inventory.push(item);
+    player.inventory.push({ ...item, rarity: "common" });
 
     await character.save();
     await player.save();

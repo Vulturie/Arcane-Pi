@@ -1,5 +1,13 @@
 // Utility functions for calculating stats and running simple auto-combat
 
+const RARITY_MULTIPLIER = {
+  common: 1,
+  uncommon: 1.2,
+  rare: 1.5,
+  epic: 2.0,
+  legendary: 3.0,
+};
+
 const CLASS_BASE_STATS = {
   Warrior: { STR: 7, AGI: 4, INT: 2, VIT: 7 },
   Rogue: { STR: 5, AGI: 8, INT: 2, VIT: 5 },
@@ -36,8 +44,9 @@ function getPlayerStats(player) {
   if (player.equippedItems) {
     Object.values(player.equippedItems).forEach((item) => {
       if (item && item.statBonus) {
+        const mult = RARITY_MULTIPLIER[item.rarity] || 1;
         Object.entries(item.statBonus).forEach(([k, v]) => {
-          stats[k] = (stats[k] || 0) + v;
+          stats[k] = (stats[k] || 0) + v * mult;
         });
       }
     });
@@ -52,8 +61,9 @@ function getEquipmentStatTotals(player) {
   if (player.equippedItems) {
     Object.values(player.equippedItems).forEach((item) => {
       if (item && item.statBonus) {
+        const mult = RARITY_MULTIPLIER[item.rarity] || 1;
         Object.entries(item.statBonus).forEach(([k, v]) => {
-          totals[k] = (totals[k] || 0) + v;
+          totals[k] = (totals[k] || 0) + v * mult;
         });
       }
     });

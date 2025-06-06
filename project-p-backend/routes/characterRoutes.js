@@ -6,6 +6,15 @@ const { getPlayerStats, simulateCombat } = require("../utils/combat");
 const ITEMS = require("../data/items");
 const { SAFE_QUEST_TIERS, RISKY_QUEST_TIERS } = require("../data/quests");
 
+function getRandomRarity() {
+  const r = Math.random();
+  if (r < 0.005) return "legendary";
+  if (r < 0.03) return "epic"; // 0.005 + 0.025
+  if (r < 0.115) return "rare"; // +0.085
+  if (r < 0.34) return "uncommon"; // +0.225
+  return "common";
+}
+
 function randomQuest(tiers, tierIndex, path) {
   const quests = tiers[tierIndex];
   const q = quests[Math.floor(Math.random() * quests.length)];
@@ -21,7 +30,9 @@ function initQuestPools(char) {
 function initShopPool(char) {
   const shuffled = [...ITEMS].sort(() => 0.5 - Math.random());
   char.shopPool = shuffled.slice(0, Math.min(8, ITEMS.length));
-  char.lastShopRefresh = new Date();
+  char.shopPool = shuffled
+    .slice(0, Math.min(8, ITEMS.length))
+    .map((it) => ({ ...it, rarity: "common" }));
 }
 
 function refreshShopPool(char) {
@@ -69,7 +80,9 @@ async function grantLoot(char, isRisky) {
   const chance = isRisky ? 0.5 : 0.05;
   if (Math.random() < chance) {
     if (char.inventory.length < char.maxInventorySlots) {
-      const item = ITEMS[Math.floor(Math.random() * ITEMS.length)];
+      const base = ITEMS[Math.floor(Math.random() * ITEMS.length)];
+      const rarity = getRandomRarity();
+      const item = { ...base, rarity };
       char.inventory.push(item);
       await char.save();
       return item;
@@ -388,7 +401,7 @@ router.post("/characters/:id/inventory/add", loadCharacter, async (req, res) => 
   if (char.inventory.length >= char.maxInventorySlots) {
     return res.status(400).json({ error: "Inventory full" });
   }
-  char.inventory.push(item);
+  char.inventory.push({ ...item, rarity: "common" });
   await char.save();
   res.json({
     inventory: char.inventory,
@@ -408,7 +421,7 @@ router.post("/characters/:id/buy", loadCharacter, async (req, res) => {
     return res.status(400).json({ error: "Inventory full" });
   }
   char.gold -= item.cost;
-  char.inventory.push(item);
+  char.inventory.push({ ...item, rarity: "common" });
   await char.save();
   res.json({
     gold: char.gold,

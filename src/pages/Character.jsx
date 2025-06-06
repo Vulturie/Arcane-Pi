@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { RARITY_MULTIPLIER, getRarityLabel } from "../rarity";
 import {
   CLASS_BASE_STATS,
   getStatsForClass,
@@ -11,6 +12,12 @@ import {
 function Character({ character, refreshCharacter, username }) {
   const [chosenClass, setChosenClass] = useState("Warrior");
   const [equipped, setEquipped] = useState({});
+
+  const getBonus = (item, stat) => {
+    if (!item || !item.statBonus) return 0;
+    const mult = RARITY_MULTIPLIER[item.rarity] || 1;
+    return (item.statBonus[stat] || 0) * mult;
+  };
 
     useEffect(() => {
       if (!character) return;
@@ -50,14 +57,14 @@ function Character({ character, refreshCharacter, username }) {
 
   const stats = getStatsForClass(character.class, character.level);
   if (stats && equipped) {
-      Object.values(equipped).forEach((item) => {
-        if (item && item.statBonus) {
-          Object.entries(item.statBonus).forEach(([k, v]) => {
-            stats[k] = (stats[k] || 0) + v;
-          });
-        }
-      });
-    }
+    Object.values(equipped).forEach((item) => {
+      if (item && item.statBonus) {
+        Object.keys(item.statBonus).forEach((k) => {
+          stats[k] = (stats[k] || 0) + getBonus(item, k);
+        });
+      }
+    });
+  }
 
   return (
     <div>

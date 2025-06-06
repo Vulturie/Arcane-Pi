@@ -18,4 +18,8 @@ code {
 
 .worse {
   color: red;
-}
+}.rarity-common { color: gray; }
+.rarity-uncommon { color: green; }
+.rarity-rare { color: blue; }
+.rarity-epic { color: purple; }
+.rarity-legendary { color: orange; }
