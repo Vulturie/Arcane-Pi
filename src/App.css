@@ -50,6 +50,10 @@
   overflow-y: auto;
 }
 
+.leaderboard-highlight {
+  background-color: #ffff99;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

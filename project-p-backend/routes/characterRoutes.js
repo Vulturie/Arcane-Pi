@@ -625,4 +625,58 @@ router.post("/characters/:id/tower/attempt", loadCharacter, async (req, res) => 
   return res.json({ result: "loss", combat, progress: char.towerProgress });
 });
 
+// Cached leaderboard data refreshed once per UTC day
+let towerLeaderboard = [];
+let leaderboardUpdatedAt = null;
+
+async function refreshTowerLeaderboard() {
+  towerLeaderboard = await Character.find({})
+    .sort({ towerProgress: -1 })
+    .select("name level class towerProgress")
+    .lean();
+  leaderboardUpdatedAt = new Date();
+}
+
+function needsLeaderboardRefresh() {
+  if (!leaderboardUpdatedAt) return true;
+  const now = new Date();
+  return (
+    now.getUTCFullYear() !== leaderboardUpdatedAt.getUTCFullYear() ||
+    now.getUTCMonth() !== leaderboardUpdatedAt.getUTCMonth() ||
+    now.getUTCDate() !== leaderboardUpdatedAt.getUTCDate()
+  );
+}
+
+// GET /leaderboard/tower?page=&limit=&charId=
+router.get("/leaderboard/tower", async (req, res) => {
+  try {
+    if (needsLeaderboardRefresh()) {
+      await refreshTowerLeaderboard();
+    }
+
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 10;
+    const start = (page - 1) * limit;
+    const slice = towerLeaderboard.slice(start, start + limit);
+
+    let myRank = null;
+    if (req.query.charId) {
+      const idx = towerLeaderboard.findIndex(
+        (c) => String(c._id) === String(req.query.charId)
+      );
+      if (idx !== -1) myRank = idx + 1;
+    }
+
+    res.json({
+      lastUpdated: leaderboardUpdatedAt.toISOString(),
+      total: towerLeaderboard.length,
+      results: slice,
+      myRank,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 module.exports = router;

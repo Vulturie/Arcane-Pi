@@ -266,3 +266,14 @@ export const attemptTowerLevel = async (id) => {
   if (!res.ok) throw new Error(data.error || "Failed to attempt tower level");
   return data;
 };
+
+export const getTowerLeaderboard = async (page = 1, limit = 10, charId) => {
+  const params = new URLSearchParams({ page, limit });
+  if (charId) params.append("charId", charId);
+  const res = await fetch(
+    `http://localhost:4000/api/leaderboard/tower?${params.toString()}`
+  );
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Failed to load leaderboard");
+  return data;
+};
