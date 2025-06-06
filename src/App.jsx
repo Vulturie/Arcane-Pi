@@ -69,17 +69,19 @@ function App() {
 
   if (!username) return <p>Logging in...</p>;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
-      return (
-        <CharacterSelect
-          owner={username}
-          characters={characters}
-          onSelect={(c) => {
-            setActiveChar(c);
-            if (c.pendingQuestResult) setQuestResult(c.pendingQuestResult);
-          }}
-          refresh={() => loadCharacters(username)}
-        />
-      );
+  if (!activeChar) {
+    return (
+      <CharacterSelect
+        owner={username}
+        characters={characters}
+        onSelect={(c) => {
+          setActiveChar(c);
+          if (c.pendingQuestResult) setQuestResult(c.pendingQuestResult);
+        }}
+        refresh={() => loadCharacters(username)}
+      />
+    );
+  }
 
   return (
     <Router>
