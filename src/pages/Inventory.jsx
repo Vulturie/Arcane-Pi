@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { RARITY_MULTIPLIER, getRarityLabel } from "../rarity";
 import {
   getInventory,
@@ -22,32 +22,32 @@ function Inventory({ character, refreshCharacter }) {
     return (item.statBonus[stat] || 0) * mult;
   };
 
-  const loadInventory = async () => {
-      if (!character) return;
-      try {
-        const data = await getInventory(character._id);
-        setItems(data.inventory);
-        setSlots(data.slots);
-        setMaxSlots(data.maxSlots);
-      } catch (err) {
-        console.error("Failed to load inventory", err);
-      }
-    };
+  const loadInventory = useCallback(async () => {
+    if (!character) return;
+    try {
+      const data = await getInventory(character._id);
+      setItems(data.inventory);
+      setSlots(data.slots);
+      setMaxSlots(data.maxSlots);
+    } catch (err) {
+      console.error("Failed to load inventory", err);
+    }
+  }, [character]);
 
-    const loadEquipment = async () => {
-        if (!character) return;
-        try {
-          const data = await getEquipment(character._id);
-          setEquipped(data);
-        } catch (err) {
-          console.error("Failed to load equipment", err);
-        }
-      };
+  const loadEquipment = useCallback(async () => {
+    if (!character) return;
+    try {
+      const data = await getEquipment(character._id);
+      setEquipped(data);
+    } catch (err) {
+      console.error("Failed to load equipment", err);
+    }
+  }, [character]);
 
   useEffect(() => {
     loadInventory();
     loadEquipment();
-  }, [character]);
+  }, [character, loadInventory, loadEquipment]);
 
     const giveTestItem = async () => {
         try {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { getTowerStatus, attemptTowerLevel } from "../services/playerService";
 import { getRarityLabel } from "../rarity";
 
@@ -7,7 +7,7 @@ function Tower({ character, refreshCharacter }) {
   const [combat, setCombat] = useState(null);
   const [error, setError] = useState("");
 
-  const loadStatus = async () => {
+  const loadStatus = useCallback(async () => {
     if (!character) return;
     try {
       const data = await getTowerStatus(character._id);
@@ -15,11 +15,11 @@ function Tower({ character, refreshCharacter }) {
     } catch (err) {
       console.error("Failed to load tower status", err);
     }
-  };
+  }, [character]);
 
   useEffect(() => {
     loadStatus();
-  }, [character]);
+  }, [character, loadStatus]);
 
   const handleAttempt = async () => {
     try {

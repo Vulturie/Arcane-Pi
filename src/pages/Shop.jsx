@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { buyItem, getEquipment } from "../services/playerService";
 import { RARITY_MULTIPLIER, getRarityLabel } from "../rarity";
 
@@ -13,7 +13,7 @@ function Shop({ character, refreshCharacter }) {
     return (item.statBonus[stat] || 0) * mult;
   };
 
-  const loadEquipment = async () => {
+  const loadEquipment = useCallback(async () => {
     if (!character) return;
     try {
       const data = await getEquipment(character._id);
@@ -21,16 +21,16 @@ function Shop({ character, refreshCharacter }) {
     } catch (err) {
       console.error("Failed to load equipment", err);
     }
-  };
+  }, [character]);
 
   useEffect(() => {
     refreshCharacter();
     loadEquipment();
-  }, []);
+  }, [refreshCharacter, loadEquipment]);
 
   useEffect(() => {
     loadEquipment();
-  }, [character]);
+  }, [character, loadEquipment]);
 
   useEffect(() => {
     if (character && character.shopPool) {

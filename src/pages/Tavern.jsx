@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { getQuestStatus, cancelQuest } from "../services/playerService";
 
 function Tavern({ character, refreshCharacter, onQuestResult }) {
@@ -63,7 +63,7 @@ function Tavern({ character, refreshCharacter, onQuestResult }) {
     }
   };
 
-  const checkQuestStatus = async () => {
+  const checkQuestStatus = useCallback(async () => {
     try {
       const result = await getQuestStatus(character._id);
       if (result.questResult) {
@@ -98,13 +98,13 @@ function Tavern({ character, refreshCharacter, onQuestResult }) {
     } catch (err) {
       console.error("Quest status check failed", err);
     }
-  };
+  }, [character._id, activeQuest, onQuestResult, refreshCharacter]);
 
   useEffect(() => {
     checkQuestStatus();
     const interval = setInterval(checkQuestStatus, 3000);
     return () => clearInterval(interval);
-  }, [character._id]);
+  }, [character._id, checkQuestStatus]);
 
 // Keep character state (energy, gold, etc.) up-to-date while in the Tavern
   useEffect(() => {
@@ -113,7 +113,7 @@ function Tavern({ character, refreshCharacter, onQuestResult }) {
       refreshCharacter();
     }, 5000); // match GameHub refresh rate
     return () => clearInterval(interval);
-  }, []);
+  }, [refreshCharacter]);
 
   useEffect(() => {
     if (!activeQuest) return;

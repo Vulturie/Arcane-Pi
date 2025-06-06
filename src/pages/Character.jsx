@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { RARITY_MULTIPLIER, getRarityLabel } from "../rarity";
+import { RARITY_MULTIPLIER } from "../rarity";
 import {
   CLASS_BASE_STATS,
   getStatsForClass,

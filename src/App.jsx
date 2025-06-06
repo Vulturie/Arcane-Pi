@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Pi from "./piSdk";
 import {
@@ -42,7 +42,7 @@ function App() {
     }
   };
 
-  const refreshActiveCharacter = async () => {
+  const refreshActiveCharacter = useCallback(async () => {
     if (!activeChar) return;
     try {
       const data = await getCharacter(activeChar._id);
@@ -53,7 +53,7 @@ function App() {
     } catch (err) {
       console.error("Failed to refresh character");
     }
-  };
+  }, [activeChar]);
 
   const handleQuestResultClose = async () => {
     if (activeChar && questResult) {
@@ -68,7 +68,7 @@ function App() {
   };
 
   if (!username) return <p>Logging in...</p>;
-  if (!activeChar)
+  if (error) return <p style={{ color: "red" }}>{error}</p>;
       return (
         <CharacterSelect
           owner={username}

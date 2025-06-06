@@ -9,26 +9,7 @@ function GameHub({ character, refreshCharacter, username }) {
     }, 5000); // Every 5 seconds
 
     return () => clearInterval(interval); // Cleanup on unmount
-  }, []);
-
-  const completeQuest = async () => {
-    try {
-      const res = await fetch(`http://localhost:4000/api/characters/${character._id}/quest/complete`, {
-        method: "POST",
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        console.log("✅ Quest completed:", data);
-        refreshCharacter();
-      } else {
-        alert(data.error); // e.g., "Quest is still in progress"
-      }
-    } catch (err) {
-      console.error("Failed to complete quest:", err);
-    }
-  };
+  }, [refreshCharacter]);
 
   return (
     <div className="game-hub">
