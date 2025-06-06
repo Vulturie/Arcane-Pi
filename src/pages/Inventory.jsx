@@ -149,7 +149,13 @@ function Inventory({ character, refreshCharacter }) {
             </h3>
             <p>Type: {preview.item.type}</p>
             {preview.item.classRestriction && (
-              <p>Classes: {preview.item.classRestriction.join(", ")}</p>
+              <p className={
+                preview.item.classRestriction.includes(character.class)
+                  ? "equip-allowed"
+                  : "equip-denied"
+              }>
+                Classes: {preview.item.classRestriction.join(", ")}
+              </p>
             )}
             {preview.item.statBonus && (
               <ul>
