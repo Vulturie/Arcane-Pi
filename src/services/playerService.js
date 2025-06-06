@@ -232,3 +232,19 @@ export const getHistory = async (id) => {
   if (!res.ok) throw new Error(data.error || "Failed to load history");
   return data;
 };
+
+export const getTowerStatus = async (id) => {
+  const res = await fetch(`http://localhost:4000/api/characters/${id}/tower/status`);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Failed to load tower status");
+  return data;
+};
+
+export const attemptTowerLevel = async (id) => {
+  const res = await fetch(`http://localhost:4000/api/characters/${id}/tower/attempt`, {
+    method: "POST",
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Failed to attempt tower level");
+  return data;
+};

@@ -56,6 +56,8 @@ const characterSchema = new mongoose.Schema({
   riskyQuestPool: { type: [mongoose.Schema.Types.Mixed], default: [] },
   // Items currently offered in the shop for this character
   shopPool: { type: [mongoose.Schema.Types.Mixed], default: [] },
+  // Highest completed Tower level
+  towerProgress: { type: Number, default: 0 },
   activeQuest: {
     type: {
       id: Number,

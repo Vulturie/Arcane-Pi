@@ -12,6 +12,7 @@ import Tavern from "./pages/Tavern";
 import Inventory from "./pages/Inventory";
 import History from "./pages/History";
 import Shop from "./pages/Shop";
+import Tower from "./pages/Tower";
 
 function App() {
   const [username, setUsername] = useState("");
@@ -86,6 +87,10 @@ function App() {
         <Route
           path="/history"
           element={<History character={activeChar} />}
+        />
+        <Route
+          path="/tower"
+          element={<Tower character={activeChar} refreshCharacter={refreshActiveCharacter} />}
         />
         <Route
           path="/"

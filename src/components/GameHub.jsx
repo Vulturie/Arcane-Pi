@@ -47,6 +47,7 @@ function GameHub({ character, refreshCharacter, username }) {
         <Link to="/shop"><button>🛒 Shop</button></Link>
         <Link to="/inventory"><button>💼 Inventory</button></Link>
         <Link to="/history"><button>📖 History</button></Link>
+        <Link to="/tower"><button>🗼 Tower</button></Link>
         <Link to="/stats"><button>📊 Stats</button></Link>
       </div>
     </div>

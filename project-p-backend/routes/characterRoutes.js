@@ -5,6 +5,7 @@ const { generateEnemy } = require("../utils/enemyGenerator");
 const { getPlayerStats, simulateCombat } = require("../utils/combat");
 const ITEMS = require("../data/items");
 const { SAFE_QUEST_TIERS, RISKY_QUEST_TIERS } = require("../data/quests");
+const { getRewardForLevel, getEnemyForLevel } = require("../data/tower");
 
 function getRandomRarity() {
   const r = Math.random();
@@ -501,8 +502,39 @@ router.post("/characters/:id/unequip", loadCharacter, async (req, res) => {
     inventory: char.inventory,
     equippedItems: char.equippedItems,
     slots: char.inventory.length,
-    maxSlots: char.maxInventorySlots,
+  maxSlots: char.maxInventorySlots,
   });
+});
+
+// ---------------- Tower -----------------
+
+// Get tower status and next challenge info
+router.get("/characters/:id/tower/status", loadCharacter, (req, res) => {
+  const char = req.character;
+  const nextLevel = (char.towerProgress || 0) + 1;
+  const enemy = getEnemyForLevel(nextLevel);
+  const reward = getRewardForLevel(nextLevel);
+  res.json({ progress: char.towerProgress || 0, nextLevel, enemy, reward });
+});
+
+// Attempt the next tower level
+router.post("/characters/:id/tower/attempt", loadCharacter, async (req, res) => {
+  const char = req.character;
+  if (char.inventory.length >= char.maxInventorySlots) {
+    return res.status(400).json({ error: "Inventory full" });
+  }
+  const level = (char.towerProgress || 0) + 1;
+  const enemy = getEnemyForLevel(level);
+  const reward = getRewardForLevel(level);
+  const playerStats = getPlayerStats(char);
+  const combat = simulateCombat(playerStats, enemy);
+  if (combat.result === "win") {
+    char.inventory.push(reward);
+    char.towerProgress = level;
+    await char.save();
+    return res.json({ result: "win", combat, reward, progress: char.towerProgress });
+  }
+  return res.json({ result: "loss", combat, progress: char.towerProgress });
 });
 
 module.exports = router;
