@@ -1,7 +1,4 @@
 .character-select {
-  /* Use absolute path so CRA resolves the image from the public folder */
-  background: url('/assets/ui/backgrounds/selection_background.png') no-repeat center center fixed;
-  background-size: cover;
   min-height: 100vh;
   width: 100%;
   padding: 1rem;
