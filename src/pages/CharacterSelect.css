@@ -21,24 +21,25 @@
 .characters-list {
   list-style: none;
   padding: 0;
-  margin: 4rem 0 2rem 0;
+  margin: 4rem auto 2rem auto;
   width: 100%;
-  max-width: 420px;
+  max-width: 480px;
 }
 
 .character-item {
   position: relative;
   display: flex;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .class-banner {
   width: 120px;
+  margin-left: 0.5rem;
 }
 
 .character-info {
-  margin-left: 0.5rem;
+  margin-right: 0.5rem;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -46,14 +47,15 @@
 
 .character-name {
   font-weight: bold;
+  font-size: 1rem;
 }
 
 .character-level {
-  font-size: 0.9rem;
+  font-size: 1rem;
 }
 
 .character-buttons img {
-  width: 40px;
+  width: 32px;
   margin-left: 0.5rem;
   cursor: pointer;
 }

@@ -68,15 +68,15 @@ function CharacterSelect({ owner, characters, onSelect, refresh }) {
               selected && selected._id === c._id ? "selected" : ""
             }`}
           >
+            <div className="character-info">
+              <span className="character-name">{c.name}</span>
+              <span className="character-level">Lvl {c.level}</span>
+            </div>
             <img
               src={bannerForClass(c)}
               alt={`${c.class} banner`}
               className="class-banner"
             />
-            <div className="character-info">
-              <span className="character-name">{c.name}</span>
-              <span className="character-level">Lvl {c.level}</span>
-            </div>
             <div className="character-buttons">
               <img
                 src="/assets/ui/buttons/select_button.png"
