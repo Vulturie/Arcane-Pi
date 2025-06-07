@@ -16,7 +16,7 @@ import Shop from "./pages/Shop";
 import Tower from "./pages/Tower";
 import Arena from "./pages/Arena";
 import QuestResultModal from "./components/QuestResultModal";
-import LoadingScreen from "./components/LoadingScreen";
+import LoadingScreenWrapper from "./components/LoadingScreenWrapper";
 
 function App() {
   const [isInitializing, setIsInitializing] = useState(true);
@@ -74,10 +74,11 @@ function App() {
     refreshActiveCharacter();
   };
 
-  if (isInitializing) return <LoadingScreen />;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
+
+  let content;
   if (!activeChar) {
-    return (
+    content = (
       <CharacterSelect
         owner={username}
         characters={characters}
@@ -88,11 +89,10 @@ function App() {
         refresh={() => loadCharacters(username)}
       />
     );
-  }
-
-  return (
-    <Router>
-      <Routes>
+  } else {
+    content = (
+      <Router>
+        <Routes>
         <Route
           path="/tavern"
           element={<Tavern character={activeChar} refreshCharacter={refreshActiveCharacter} onQuestResult={setQuestResult} />}
@@ -133,6 +133,14 @@ function App() {
       </Routes>
       <QuestResultModal result={questResult} onClose={handleQuestResultClose} />
     </Router>
+    );
+  }
+
+  return (
+    <>
+      {content}
+      <LoadingScreenWrapper isInitializing={isInitializing} />
+    </>
   );
 }
 

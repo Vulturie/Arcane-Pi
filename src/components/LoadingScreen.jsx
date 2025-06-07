@@ -6,7 +6,7 @@ const loadingImages = [
   "/assets/loading/loading_two.png",
 ];
 
-function LoadingScreen() {
+function LoadingScreen({ fadingOut = false }) {
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
@@ -17,7 +17,7 @@ function LoadingScreen() {
   }, []);
 
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} ${fadingOut ? styles.fadeOut : ""}`}>
       <img
         src="/assets/loading/background.png"
         className={styles.background}
