@@ -1,0 +1,81 @@
+.character-select {
+  background: url('/assets/ui/backgrounds/selection_background.png') no-repeat center center fixed;
+  background-size: cover;
+  min-height: 100vh;
+  width: 100%;
+  padding: 1rem;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  color: #fff;
+}
+
+.back-button {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  width: 40px;
+  cursor: pointer;
+}
+
+.characters-list {
+  list-style: none;
+  padding: 0;
+  margin: 4rem 0 2rem 0;
+  width: 100%;
+  max-width: 420px;
+}
+
+.character-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.class-banner {
+  width: 120px;
+}
+
+.character-info {
+  margin-left: 0.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.character-name {
+  font-weight: bold;
+}
+
+.character-level {
+  font-size: 0.9rem;
+}
+
+.character-buttons img {
+  width: 40px;
+  margin-left: 0.5rem;
+  cursor: pointer;
+}
+
+.select-indicator {
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  width: calc(100% + 20px);
+  height: calc(100% + 20px);
+  pointer-events: none;
+}
+
+.continue-button {
+  width: 150px;
+  margin-top: auto;
+  cursor: pointer;
+}
+
+.create-section {
+  margin-top: 1rem;
+  text-align: center;
+}

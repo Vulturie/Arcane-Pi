@@ -4,10 +4,23 @@ import {
   createCharacter,
   deleteCharacter,
 } from "../services/playerService";
+import "./CharacterSelect.css";
 
 function CharacterSelect({ owner, characters, onSelect, refresh }) {
   const [name, setName] = useState("");
   const [cls, setCls] = useState("Warrior");
+  const [selected, setSelected] = useState(null);
+
+  const bannerForClass = (c) =>
+    `/assets/ui/banners/${c.class.toLowerCase()}_banner.png`;
+
+  const handlePlay = (char) => {
+    setSelected(char);
+  };
+
+  const handleContinue = () => {
+    if (selected) onSelect(selected);
+  };
 
   const handleCreate = async () => {
     if (!name) return alert("Enter a name");
@@ -31,19 +44,62 @@ function CharacterSelect({ owner, characters, onSelect, refresh }) {
   };
 
   return (
-    <div>
-      <h2>Select Character</h2>
-      <ul>
+    <div className="character-select">
+      <img
+        src="/assets/ui/buttons/back_button.png"
+        alt="Back"
+        className="back-button"
+        onClick={() => window.location.reload()}
+      />
+      <ul className="characters-list">
         {characters.map((c) => (
-          <li key={c._id}>
-            {c.name} (lvl {c.level} {c.class})
-            <button onClick={() => onSelect(c)}>Play</button>
-            <button onClick={() => handleDelete(c._id)}>Delete</button>
+          <li
+            key={c._id}
+            className={`character-item ${
+              selected && selected._id === c._id ? "selected" : ""
+            }`}
+          >
+            <img
+              src={bannerForClass(c)}
+              alt={`${c.class} banner`}
+              className="class-banner"
+            />
+            <div className="character-info">
+              <span className="character-name">{c.name}</span>
+              <span className="character-level">Lvl {c.level}</span>
+            </div>
+            <div className="character-buttons">
+              <img
+                src="/assets/ui/buttons/select_button.png"
+                alt="Play"
+                onClick={() => handlePlay(c)}
+              />
+              <img
+                src="/assets/ui/buttons/delete_button.png"
+                alt="Delete"
+                onClick={() => handleDelete(c._id)}
+              />
+            </div>
+            {selected && selected._id === c._id && (
+              <img
+                src="/assets/ui/buttons/select_indicator.png"
+                alt="Selected"
+                className="select-indicator"
+              />
+            )}
           </li>
         ))}
       </ul>
+      {selected && (
+        <img
+          src="/assets/ui/buttons/continue_button.png"
+          alt="Continue"
+          className="continue-button"
+          onClick={handleContinue}
+        />
+      )}
       {characters.length < 4 && (
-        <div>
+        <div className="create-section">
           <h3>Create New</h3>
           <input
             value={name}
