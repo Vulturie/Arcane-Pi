@@ -10,14 +10,14 @@
   color: #fff;
 }
 
-.back-button {
-  position: absolute;
-  top: 1rem;
-  left: 1rem;
-  width: 40px;
-  cursor: pointer;
-  transition: transform 0.2s ease, filter 0.2s ease;
-}
+  .back-button {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    width: 30px; /* slightly smaller for better mobile fit */
+    cursor: pointer;
+    transition: transform 0.2s ease, filter 0.2s ease;
+  }
 
 .character-grid {
   list-style: none;
@@ -26,7 +26,7 @@
   width: 100%;
   max-width: 600px;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 1rem;
   justify-items: center;
 }
@@ -39,10 +39,10 @@
   padding: 0.5rem 0;
 }
 
-.class-banner {
-  width: 70px; /* scaled down for better fit */
-  margin-left: 0.5rem;
-}
+  .class-banner {
+    width: 50px; /* scaled down for better fit */
+    margin-left: 0.5rem;
+  }
 
 .character-info {
   margin-right: 0.5rem;
@@ -54,13 +54,13 @@
 .character-name {
   font-family: 'Cinzel', serif;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 12px;
   text-shadow: 0 0 2px #000;
 }
 
 .character-level {
   font-family: 'Cinzel', serif;
-  font-size: 12px;
+  font-size: 10px;
   text-shadow: 0 0 2px #000;
 }
 
@@ -81,10 +81,10 @@
 
 .select-indicator {
   position: absolute;
-  top: calc(50% - 5px);
+  top: calc(40% - 5px);
   left: 50%;
   width: 100%;
-  max-width: 210px;
+  max-width: 120px;
   height: auto;
   transform: translate(-50%, -50%);
   object-fit: contain;
@@ -92,7 +92,7 @@
 }
 
 .continue-button {
-  width: 150px;
+  width: 120px;
   margin-top: auto;
   cursor: pointer;
   transition: transform 0.2s ease, filter 0.2s ease;
@@ -113,7 +113,7 @@
   }
 
   .class-banner {
-    width: 50px;
+    width: 30px;
     margin: 0.25rem 0;
   }
 
