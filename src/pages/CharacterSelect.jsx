@@ -60,7 +60,7 @@ function CharacterSelect({ owner, characters, onSelect, refresh }) {
         className="back-button"
         onClick={() => window.location.reload()}
       />
-      <ul className="characters-list">
+      <ul className="character-grid">
         {characters.map((c) => (
           <li
             key={c._id}

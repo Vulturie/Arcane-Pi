@@ -19,24 +19,28 @@
   transition: transform 0.2s ease, filter 0.2s ease;
 }
 
-.characters-list {
+.character-grid {
   list-style: none;
   padding: 0;
   margin: 4rem auto 2rem auto;
   width: 100%;
-  max-width: 480px;
+  max-width: 600px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  justify-items: center;
 }
 
 .character-item {
   position: relative;
   display: flex;
   align-items: center;
-  margin-bottom: 1.5rem;
+  width: 100%;
   padding: 0.5rem 0;
 }
 
 .class-banner {
-  width: 90px; /* scaled down for better fit */
+  width: 70px; /* scaled down for better fit */
   margin-left: 0.5rem;
 }
 
@@ -50,19 +54,20 @@
 .character-name {
   font-family: 'Cinzel', serif;
   font-weight: 700;
-  font-size: 18px;
+  font-size: 14px;
   text-shadow: 0 0 2px #000;
 }
 
 .character-level {
   font-family: 'Cinzel', serif;
-  font-size: 14px;
+  font-size: 12px;
   text-shadow: 0 0 2px #000;
 }
 
 .character-buttons img {
-  width: 32px;
-  margin-left: 0.5rem;
+  width: 24px;
+  margin-left: 0.25rem;
+  margin-right: 0.25rem;
   cursor: pointer;
   transition: transform 0.2s ease, filter 0.2s ease;
 }
@@ -78,7 +83,8 @@
   position: absolute;
   top: calc(50% - 5px);
   left: 50%;
-  width: 210px;
+  width: 100%;
+  max-width: 210px;
   height: auto;
   transform: translate(-50%, -50%);
   object-fit: contain;
@@ -98,13 +104,16 @@
 }
 
 @media (max-width: 480px) {
+  .character-grid {
+    grid-template-columns: 1fr;
+  }
   .character-item {
     flex-direction: column;
     align-items: center;
   }
 
   .class-banner {
-    width: 70px;
+    width: 50px;
     margin: 0.25rem 0;
   }
 
