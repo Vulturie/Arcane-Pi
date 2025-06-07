@@ -16,8 +16,10 @@ import Shop from "./pages/Shop";
 import Tower from "./pages/Tower";
 import Arena from "./pages/Arena";
 import QuestResultModal from "./components/QuestResultModal";
+import LoadingScreen from "./components/LoadingScreen";
 
 function App() {
+  const [isInitializing, setIsInitializing] = useState(true);
   const [username, setUsername] = useState("");
   const [characters, setCharacters] = useState([]);
   const [activeChar, setActiveChar] = useState(null);
@@ -30,17 +32,21 @@ function App() {
         setUsername(user.username);
         loadCharacters(user.username);
       },
-      onError: () => setError("Login failed"),
+      onError: () => {
+        setError("Login failed");
+        setIsInitializing(false);
+      },
     });
   }, []);
 
   const loadCharacters = async (owner) => {
     try {
       const data = await getCharacters(owner);
-      setCharacters(data);;
+      setCharacters(data);
     } catch (err) {
       setError(err.message);
     }
+    setIsInitializing(false);
   };
 
   const refreshActiveCharacter = useCallback(async () => {
@@ -68,7 +74,7 @@ function App() {
     refreshActiveCharacter();
   };
 
-  if (!username) return <p>Logging in...</p>;
+  if (isInitializing) return <LoadingScreen />;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
   if (!activeChar) {
     return (
