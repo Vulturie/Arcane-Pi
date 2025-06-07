@@ -16,6 +16,7 @@
   left: 1rem;
   width: 40px;
   cursor: pointer;
+  transition: transform 0.2s ease, filter 0.2s ease;
 }
 
 .characters-list {
@@ -30,7 +31,7 @@
   position: relative;
   display: flex;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   padding: 0.5rem 0;
 }
 
@@ -47,26 +48,38 @@
 }
 
 .character-name {
-  font-weight: bold;
-  font-size: 16px;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 18px;
+  text-shadow: 0 0 2px #000;
 }
 
 .character-level {
+  font-family: 'Cinzel', serif;
   font-size: 14px;
+  text-shadow: 0 0 2px #000;
 }
 
 .character-buttons img {
   width: 32px;
   margin-left: 0.5rem;
   cursor: pointer;
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.character-buttons img:hover,
+.back-button:hover,
+.continue-button:hover {
+  transform: scale(1.05);
+  filter: drop-shadow(0 0 4px #fff);
 }
 
 .select-indicator {
   position: absolute;
-  top: 50%;
+  top: calc(50% - 5px);
   left: 50%;
   width: 210px;
-  height: 100px;
+  height: auto;
   transform: translate(-50%, -50%);
   object-fit: contain;
   pointer-events: none;
@@ -76,6 +89,7 @@
   width: 150px;
   margin-top: auto;
   cursor: pointer;
+  transition: transform 0.2s ease, filter 0.2s ease;
 }
 
 .create-section {
@@ -91,7 +105,15 @@
 
   .class-banner {
     width: 70px;
-    margin: 0.5rem 0;
+    margin: 0.25rem 0;
+  }
+
+  .character-info {
+    margin-bottom: 0.25rem;
+  }
+
+  .character-buttons {
+    margin-top: 0.25rem;
   }
 
   .character-buttons img {
