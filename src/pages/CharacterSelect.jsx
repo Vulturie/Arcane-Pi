@@ -7,8 +7,8 @@ function CharacterSelect({ owner, characters, onSelect, refresh }) {
   const navigate = useNavigate();
   const [selected, setSelected] = useState(null);
 
-  const bannerForClass = (c) =>
-    `/assets/ui/banners/${c.class.toLowerCase()}_banner.png`;
+  const portraitForCharacter = (c) =>
+    `/assets/character_creation/${c.class.toLowerCase()}_${c.gender}.png`;
 
   const handleSelect = (id) => {
     const char = characters.find((c) => c._id === id);
@@ -64,8 +64,16 @@ function CharacterSelect({ owner, characters, onSelect, refresh }) {
                 className={`character-item ${
                   selected && selected._id === c._id ? "selected" : ""
                 }`}
+                onClick={() => handleSelect(c._id)}
               >
                 <div className="character-header">
+                  <div className="portrait-wrapper">
+                    <img
+                      src={portraitForCharacter(c)}
+                      alt={`${c.class} ${c.gender}`}
+                      className="character-portrait"
+                    />
+                  </div>
                   <div className="character-info">
                     <span
                       className={`character-name ${
@@ -82,18 +90,16 @@ function CharacterSelect({ owner, characters, onSelect, refresh }) {
                       Lvl {c.level}
                     </span>
                   </div>
-                  <img
-                    src={bannerForClass(c)}
-                    alt={`${c.class} banner`}
-                    className="class-banner"
-                  />
                 </div>
                 <div className="character-buttons">
                   <img
                     src="/assets/ui/buttons/select_button.png"
                     alt="Select"
                     className="select-btn image-btn"
-                    onClick={() => handleSelect(c._id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleSelect(c._id);
+                    }}
                     onMouseDown={addGlow}
                     onMouseUp={removeGlow}
                     onMouseLeave={removeGlow}
@@ -104,7 +110,10 @@ function CharacterSelect({ owner, characters, onSelect, refresh }) {
                     src="/assets/ui/buttons/delete_button.png"
                     alt="Delete"
                     className="delete-btn image-btn"
-                    onClick={() => handleDelete(c._id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(c._id);
+                    }}
                     onMouseDown={addGlow}
                     onMouseUp={removeGlow}
                     onMouseLeave={removeGlow}

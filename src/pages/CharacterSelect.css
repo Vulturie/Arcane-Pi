@@ -1,5 +1,5 @@
 .character-select {
-  min-height: 100vh;
+  height: 100vh;
   width: 100%;
   padding: 1rem;
   box-sizing: border-box;
@@ -7,6 +7,7 @@
   flex-direction: column;
   align-items: center;
   position: relative;
+  overflow: hidden;
   color: #fff;
 }
 
@@ -85,9 +86,21 @@
   width: 100%;
 }
 
-.class-banner {
-  width: 60px;
-  margin-left: 0.5rem;
+.portrait-wrapper {
+  width: 64px;
+  height: 64px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.character-portrait {
+  width: 100%;
+  height: auto;
+}
+
+.character-item.selected .portrait-wrapper {
+  filter: drop-shadow(0 0 8px #fff);
 }
 
 .character-info {
@@ -209,8 +222,9 @@
     align-items: center;
   }
 
-  .class-banner {
-    width: 36px;
+  .portrait-wrapper {
+    width: 48px;
+    height: 48px;
     margin: 0.25rem 0;
   }
 
