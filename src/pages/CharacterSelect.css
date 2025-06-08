@@ -116,10 +116,15 @@
   text-shadow: 0 0 2px #000;
 }
 
+.image-btn {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
 .select-btn,
 .delete-btn {
-  width: 35vw;
-  max-width: 140px;
+  width: 21vw;
+  max-width: 84px;
   min-height: 48px;
   margin: 0 4px;
   cursor: pointer;
@@ -156,6 +161,10 @@
 .delete-btn:active {
   transform: scale(1.05);
   box-shadow: 0 0 6px rgba(255, 255, 255, 0.3);
+}
+
+.image-btn.pressed {
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
 }
 
 .character-button:hover,

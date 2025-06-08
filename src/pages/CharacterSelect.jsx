@@ -44,6 +44,14 @@ function CharacterSelect({ owner, characters, onSelect, refresh }) {
     }
   };
 
+  const addGlow = (e) => {
+    e.currentTarget.classList.add("pressed");
+  };
+
+  const removeGlow = (e) => {
+    e.currentTarget.classList.remove("pressed");
+  };
+
   return (
     <div
       className="character-select"
@@ -98,14 +106,24 @@ function CharacterSelect({ owner, characters, onSelect, refresh }) {
                   <img
                     src="/assets/ui/buttons/select_button.png"
                     alt="Select"
-                    className="select-btn"
+                    className="select-btn image-btn"
                     onClick={() => handleSelect(c._id)}
+                    onMouseDown={addGlow}
+                    onMouseUp={removeGlow}
+                    onMouseLeave={removeGlow}
+                    onTouchStart={addGlow}
+                    onTouchEnd={removeGlow}
                   />
                   <img
                     src="/assets/ui/buttons/delete_button.png"
                     alt="Delete"
-                    className="delete-btn"
+                    className="delete-btn image-btn"
                     onClick={() => handleDelete(c._id)}
+                    onMouseDown={addGlow}
+                    onMouseUp={removeGlow}
+                    onMouseLeave={removeGlow}
+                    onTouchStart={addGlow}
+                    onTouchEnd={removeGlow}
                   />
                 </div>
                 {/* selection indicator removed */}
