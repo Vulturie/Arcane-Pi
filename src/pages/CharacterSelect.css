@@ -95,39 +95,44 @@
   text-shadow: 0 0 2px #000;
 }
 
+.character-name.selected,
+.character-level.selected {
+  color: #ffd700;
+  text-shadow: 1px 1px 2px #000;
+}
+
 .character-level {
   font-family: "Cinzel", serif;
   font-size: 10px;
   text-shadow: 0 0 2px #000;
 }
 
-.character-buttons img {
-  width: 24px;
-  margin-left: 0.25rem;
-  margin-right: 0.25rem;
+
+.character-button {
+  width: 35vw;
+  max-width: 140px;
+  font-size: clamp(14px, 2.5vw, 18px);
+  padding: 8px 0;
+  margin: 0 4px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid #fff;
+  color: #fff;
+  font-family: "Cinzel", serif;
   cursor: pointer;
   transition:
     transform 0.2s ease,
-    filter 0.2s ease;
+    box-shadow 0.2s ease;
 }
 
-.character-buttons img:hover,
+.character-button:active {
+  transform: scale(1.05);
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.3);
+}
+
+.character-button:hover,
 .back-button:hover,
 .continue-button:hover {
   transform: scale(1.05);
-  filter: drop-shadow(0 0 4px #fff);
-}
-
-.select-indicator {
-  position: absolute;
-  top: calc(40% - 5px);
-  left: 50%;
-  width: 100%;
-  max-width: 120px;
-  height: auto;
-  transform: translate(-50%, -50%);
-  object-fit: contain;
-  pointer-events: none;
 }
 
 .continue-button {
@@ -137,6 +142,7 @@
     transform 0.2s ease,
     filter 0.2s ease;
 }
+
 
 .create-section {
   margin-top: 1rem;
@@ -163,9 +169,12 @@
 
   .character-buttons {
     margin-top: 0.25rem;
+    display: flex;
+    justify-content: center;
   }
 
-  .character-buttons img {
+
+  .character-button {
     margin-left: 0.25rem;
     margin-right: 0.25rem;
   }

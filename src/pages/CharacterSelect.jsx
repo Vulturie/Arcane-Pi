@@ -71,8 +71,20 @@ function CharacterSelect({ owner, characters, onSelect, refresh }) {
                 }`}
               >
                 <div className="character-info">
-                  <span className="character-name">{c.name}</span>
-                  <span className="character-level">Lvl {c.level}</span>
+                  <span
+                    className={`character-name ${
+                      selected && selected._id === c._id ? "selected" : ""
+                    }`}
+                  >
+                    {c.name}
+                  </span>
+                  <span
+                    className={`character-level ${
+                      selected && selected._id === c._id ? "selected" : ""
+                    }`}
+                  >
+                    Lvl {c.level}
+                  </span>
                 </div>
                 <img
                   src={bannerForClass(c)}
@@ -80,24 +92,20 @@ function CharacterSelect({ owner, characters, onSelect, refresh }) {
                   className="class-banner"
                 />
                 <div className="character-buttons">
-                  <img
-                    src="/assets/ui/buttons/select_button.png"
-                    alt="Play"
+                  <button
+                    className="character-button"
                     onClick={() => handlePlay(c)}
-                  />
-                  <img
-                    src="/assets/ui/buttons/delete_button.png"
-                    alt="Delete"
+                  >
+                    Select
+                  </button>
+                  <button
+                    className="character-button"
                     onClick={() => handleDelete(c._id)}
-                  />
+                  >
+                    Delete
+                  </button>
                 </div>
-                {selected && selected._id === c._id && (
-                  <img
-                    src="/assets/ui/buttons/select_indicator.png"
-                    alt="Selected"
-                    className="select-indicator"
-                  />
-                )}
+                {/* selection indicator removed */}
               </li>
             ))}
           </ul>
