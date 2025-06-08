@@ -42,7 +42,7 @@ function CharacterSelect({ owner, characters, onSelect, refresh }) {
     <div
       className="character-select"
       style={{
-        backgroundImage: `url(${process.env.PUBLIC_URL}/assets/ui/backgrounds/selection_background.png)`,
+        backgroundImage: "url(/assets/ui/backgrounds/selection_background.png)",
         backgroundRepeat: "no-repeat",
         backgroundPosition: "center center",
         backgroundAttachment: "fixed",

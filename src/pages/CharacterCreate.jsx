@@ -45,7 +45,7 @@ function CharacterCreate({ owner, refresh }) {
     <div
       className="character-create"
       style={{
-        backgroundImage: `url(${process.env.PUBLIC_URL}/assets/character_creation/creation_background.png)`,
+        backgroundImage: "url(/assets/character_creation/creation_background.png)",
       }}
     >
       <img
@@ -57,13 +57,15 @@ function CharacterCreate({ owner, refresh }) {
       <div
         className="panel"
         style={{
-          background: `url(${process.env.PUBLIC_URL}/assets/character_creation/creation_panel.png) no-repeat center/contain`,
+          background:
+            "url(/assets/character_creation/creation_panel.png) no-repeat center/contain",
         }}
       >
         <div
           className="name-input"
           style={{
-            background: `url(${process.env.PUBLIC_URL}/assets/character_creation/character_name.png) no-repeat center/contain`,
+            background:
+              "url(/assets/character_creation/character_name.png) no-repeat center/contain",
           }}
         >
           <input
