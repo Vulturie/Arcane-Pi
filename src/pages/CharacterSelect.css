@@ -71,13 +71,22 @@
 .character-item {
   position: relative;
   display: flex;
+  flex-direction: column;
   align-items: center;
   width: 100%;
   padding: 0.5rem 0;
 }
 
+.character-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
 .class-banner {
-  width: 50px; /* scaled down for better fit */
+  width: 60px;
   margin-left: 0.5rem;
 }
 
@@ -107,6 +116,23 @@
   text-shadow: 0 0 2px #000;
 }
 
+.select-btn,
+.delete-btn {
+  width: 35vw;
+  max-width: 140px;
+  min-height: 48px;
+  margin: 0 4px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.character-buttons {
+  margin-top: 0.5rem;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
 
 .character-button {
   width: 35vw;
@@ -124,12 +150,17 @@
     box-shadow 0.2s ease;
 }
 
-.character-button:active {
+
+.character-button:active,
+.select-btn:active,
+.delete-btn:active {
   transform: scale(1.05);
   box-shadow: 0 0 6px rgba(255, 255, 255, 0.3);
 }
 
 .character-button:hover,
+.select-btn:hover,
+.delete-btn:hover,
 .back-button:hover,
 .continue-button:hover {
   transform: scale(1.05);
@@ -159,7 +190,7 @@
   }
 
   .class-banner {
-    width: 30px;
+    width: 36px;
     margin: 0.25rem 0;
   }
 

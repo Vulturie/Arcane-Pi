@@ -14,8 +14,9 @@ function CharacterSelect({ owner, characters, onSelect, refresh }) {
   const bannerForClass = (c) =>
     `/assets/ui/banners/${c.class.toLowerCase()}_banner.png`;
 
-  const handlePlay = (char) => {
-    setSelected(char);
+  const handleSelect = (id) => {
+    const char = characters.find((c) => c._id === id);
+    if (char) setSelected(char);
   };
 
   const handleContinue = () => {
@@ -70,40 +71,42 @@ function CharacterSelect({ owner, characters, onSelect, refresh }) {
                   selected && selected._id === c._id ? "selected" : ""
                 }`}
               >
-                <div className="character-info">
-                  <span
-                    className={`character-name ${
-                      selected && selected._id === c._id ? "selected" : ""
-                    }`}
-                  >
-                    {c.name}
-                  </span>
-                  <span
-                    className={`character-level ${
-                      selected && selected._id === c._id ? "selected" : ""
-                    }`}
-                  >
-                    Lvl {c.level}
-                  </span>
+                <div className="character-header">
+                  <div className="character-info">
+                    <span
+                      className={`character-name ${
+                        selected && selected._id === c._id ? "selected" : ""
+                      }`}
+                    >
+                      {c.name}
+                    </span>
+                    <span
+                      className={`character-level ${
+                        selected && selected._id === c._id ? "selected" : ""
+                      }`}
+                    >
+                      Lvl {c.level}
+                    </span>
+                  </div>
+                  <img
+                    src={bannerForClass(c)}
+                    alt={`${c.class} banner`}
+                    className="class-banner"
+                  />
                 </div>
-                <img
-                  src={bannerForClass(c)}
-                  alt={`${c.class} banner`}
-                  className="class-banner"
-                />
                 <div className="character-buttons">
-                  <button
-                    className="character-button"
-                    onClick={() => handlePlay(c)}
-                  >
-                    Select
-                  </button>
-                  <button
-                    className="character-button"
+                  <img
+                    src="/assets/ui/buttons/select_button.png"
+                    alt="Select"
+                    className="select-btn"
+                    onClick={() => handleSelect(c._id)}
+                  />
+                  <img
+                    src="/assets/ui/buttons/delete_button.png"
+                    alt="Delete"
+                    className="delete-btn"
                     onClick={() => handleDelete(c._id)}
-                  >
-                    Delete
-                  </button>
+                  />
                 </div>
                 {/* selection indicator removed */}
               </li>
