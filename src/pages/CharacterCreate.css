@@ -1,0 +1,88 @@
+.character-create {
+  min-height: 100vh;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  color: #fff;
+  font-family: "Cinzel", serif;
+}
+
+.back-btn {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  width: 32px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.back-btn:hover {
+  transform: scale(1.05);
+}
+
+.panel {
+  background: url('/assets/character_creation/creation_panel.png') no-repeat center/contain;
+  width: 90%;
+  max-width: 400px;
+  padding: 2rem 1rem;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.gender-select,
+.class-select {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 1rem;
+}
+
+.gender-btn,
+.class-btn,
+.create-btn {
+  width: 72px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.gender-btn.selected,
+.class-btn.selected {
+  box-shadow: 0 0 12px #fff;
+}
+
+.gender-btn:hover,
+.class-btn:hover,
+.create-btn:hover {
+  transform: scale(1.05);
+}
+
+.preview {
+  width: 60%;
+  margin: 0 auto 1rem auto;
+  display: block;
+}
+
+.name-input {
+  background: url('/assets/character_creation/character_name_field.png') no-repeat center/contain;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.name-input input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: #000;
+  text-align: center;
+  font-family: "Cinzel", serif;
+  font-size: 16px;
+}
+
+.create-btn {
+  width: 160px;
+  margin-top: 0.5rem;
+}

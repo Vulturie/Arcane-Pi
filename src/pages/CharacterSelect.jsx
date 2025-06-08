@@ -1,14 +1,10 @@
 import React, { useState } from "react";
-import {
-  CLASS_BASE_STATS,
-  createCharacter,
-  deleteCharacter,
-} from "../services/playerService";
+import { useNavigate } from "react-router-dom";
+import { deleteCharacter } from "../services/playerService";
 import "./CharacterSelect.css";
 
 function CharacterSelect({ owner, characters, onSelect, refresh }) {
-  const [name, setName] = useState("");
-  const [cls, setCls] = useState("Warrior");
+  const navigate = useNavigate();
   const [selected, setSelected] = useState(null);
 
   const bannerForClass = (c) =>
@@ -23,16 +19,6 @@ function CharacterSelect({ owner, characters, onSelect, refresh }) {
     if (selected) onSelect(selected);
   };
 
-  const handleCreate = async () => {
-    if (!name) return alert("Enter a name");
-    try {
-      await createCharacter(owner, name, cls, "male");
-      setName("");
-      refresh();
-    } catch (err) {
-      alert(err.message);
-    }
-  };
 
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this character?")) return;
@@ -131,21 +117,13 @@ function CharacterSelect({ owner, characters, onSelect, refresh }) {
             ))}
           </ul>
           {characters.length < 4 && (
-            <div className="create-section">
-              <h3>Create New</h3>
-              <input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Name"
+            <div className="create-button-wrapper">
+              <img
+                src="/assets/character_creation/+_create_character_button.png"
+                alt="Create"
+                className="create-new-btn"
+                onClick={() => navigate("/create-character")}
               />
-              <select value={cls} onChange={(e) => setCls(e.target.value)}>
-                {Object.keys(CLASS_BASE_STATS).map((cls) => (
-                  <option key={cls} value={cls}>
-                    {cls}
-                  </option>
-                ))}
-              </select>
-              <button onClick={handleCreate}>Create</button>
             </div>
           )}
         </div>

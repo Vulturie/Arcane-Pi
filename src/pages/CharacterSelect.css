@@ -184,9 +184,20 @@
 }
 
 
-.create-section {
+
+.create-button-wrapper {
   margin-top: 1rem;
   text-align: center;
+}
+
+.create-new-btn {
+  width: 120px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.create-new-btn:hover {
+  transform: scale(1.05);
 }
 
 @media (max-width: 480px) {

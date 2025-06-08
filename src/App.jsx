@@ -9,6 +9,7 @@ import {
 import GameHub from "./components/GameHub";
 import Character from "./pages/Character";
 import CharacterSelect from "./pages/CharacterSelect";
+import CharacterCreate from "./pages/CharacterCreate";
 import Tavern from "./pages/Tavern";
 import Inventory from "./pages/Inventory";
 import History from "./pages/History";
@@ -76,23 +77,33 @@ function App() {
 
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 
-  let content;
+  let routes;
   if (!activeChar) {
-    content = (
-      <CharacterSelect
-        owner={username}
-        characters={characters}
-        onSelect={(c) => {
-          setActiveChar(c);
-          if (c.pendingQuestResult) setQuestResult(c.pendingQuestResult);
-        }}
-        refresh={() => loadCharacters(username)}
-      />
+    routes = (
+      <Routes>
+        <Route
+          path="/create-character"
+          element={<CharacterCreate owner={username} refresh={() => loadCharacters(username)} />}
+        />
+        <Route
+          path="*"
+          element={
+            <CharacterSelect
+              owner={username}
+              characters={characters}
+              onSelect={(c) => {
+                setActiveChar(c);
+                if (c.pendingQuestResult) setQuestResult(c.pendingQuestResult);
+              }}
+              refresh={() => loadCharacters(username)}
+            />
+          }
+        />
+      </Routes>
     );
   } else {
-    content = (
-      <Router>
-        <Routes>
+    routes = (
+      <Routes>
         <Route
           path="/tavern"
           element={<Tavern character={activeChar} refreshCharacter={refreshActiveCharacter} onQuestResult={setQuestResult} />}
@@ -131,16 +142,17 @@ function App() {
           element={<GameHub character={activeChar} refreshCharacter={refreshActiveCharacter} username={username} />}
         />
       </Routes>
-      <QuestResultModal result={questResult} onClose={handleQuestResultClose} />
-    </Router>
     );
   }
 
   return (
-    <>
-      {content}
+    <Router>
+      {routes}
+      {activeChar && (
+        <QuestResultModal result={questResult} onClose={handleQuestResultClose} />
+      )}
       <LoadingScreenWrapper isInitializing={isInitializing} />
-    </>
+    </Router>
   );
 }
 
