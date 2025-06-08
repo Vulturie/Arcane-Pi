@@ -54,7 +54,12 @@ function CharacterCreate({ owner, refresh }) {
         className="back-btn"
         onClick={() => navigate("/")}
       />
-      <div className="panel">
+      <div
+        className="panel"
+        style={{
+          background: `url(${process.env.PUBLIC_URL}/assets/character_creation/creation_panel.png) no-repeat center/contain`,
+        }}
+      >
         <div className="gender-select">
           {genderButton("male")}
           {genderButton("female")}
@@ -66,7 +71,12 @@ function CharacterCreate({ owner, refresh }) {
           {classButton("Assassin")}
         </div>
         <img src={previewSrc} alt="Preview" className="preview" />
-        <div className="name-input">
+        <div
+          className="name-input"
+          style={{
+            background: `url(${process.env.PUBLIC_URL}/assets/character_creation/character_name.png) no-repeat center/contain`,
+          }}
+        >
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
