@@ -15,7 +15,7 @@
   position: absolute;
   top: 1rem;
   left: 1rem;
-  width: 32px;
+  width: 64px;
   cursor: pointer;
   transition: transform 0.2s ease;
 }
@@ -25,19 +25,22 @@
 }
 
 .panel {
-  width: 90%;
-  max-width: 400px;
-  padding: 2rem 1rem;
+  width: 100%;
+  max-width: 500px;
+  padding: 7rem 1rem 1rem 1rem;
   text-align: center;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .gender-select,
 .class-select {
   display: flex;
   justify-content: center;
-  gap: 8px;
-  margin-bottom: 1rem;
+  gap: 4px;
+  margin-bottom: 2rem;
 }
 
 .gender-btn,
@@ -45,12 +48,15 @@
 .create-btn {
   width: 72px;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    filter 0.2s ease;
+  display: block;
 }
 
 .gender-btn.selected,
 .class-btn.selected {
-  box-shadow: 0 0 12px #fff;
+  filter: drop-shadow(0 0 8px #fff);
 }
 
 .gender-btn:hover,
@@ -66,8 +72,8 @@
 }
 
 .name-input {
-  padding: 0.5rem;
-  margin-bottom: 1rem;
+  padding: 1.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .name-input input {
@@ -82,5 +88,5 @@
 
 .create-btn {
   width: 160px;
-  margin-top: 0.5rem;
+  margin-top: 2.5rem;
 }

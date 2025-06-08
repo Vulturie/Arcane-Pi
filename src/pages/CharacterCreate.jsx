@@ -60,17 +60,6 @@ function CharacterCreate({ owner, refresh }) {
           background: `url(${process.env.PUBLIC_URL}/assets/character_creation/creation_panel.png) no-repeat center/contain`,
         }}
       >
-        <div className="gender-select">
-          {genderButton("male")}
-          {genderButton("female")}
-        </div>
-        <div className="class-select">
-          {classButton("Warrior")}
-          {classButton("Mage")}
-          {classButton("Rogue")}
-          {classButton("Assassin")}
-        </div>
-        <img src={previewSrc} alt="Preview" className="preview" />
         <div
           className="name-input"
           style={{
@@ -83,6 +72,17 @@ function CharacterCreate({ owner, refresh }) {
             placeholder="Name"
           />
         </div>
+        <div className="gender-select">
+          {genderButton("male")}
+          {genderButton("female")}
+        </div>
+        <div className="class-select">
+          {classButton("Warrior")}
+          {classButton("Mage")}
+          {classButton("Rogue")}
+          {classButton("Assassin")}
+        </div>
+        <img src={previewSrc} alt="Preview" className="preview" />
         <img
           src="/assets/character_creation/create_character_button.png"
           alt="Create"

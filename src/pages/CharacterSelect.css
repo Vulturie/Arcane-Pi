@@ -49,7 +49,7 @@
   position: absolute;
   top: 1rem;
   left: 1rem;
-  width: 30px; /* slightly smaller for better mobile fit */
+  width: 64px;
   cursor: pointer;
   transition:
     transform 0.2s ease,
@@ -160,11 +160,11 @@
 .select-btn:active,
 .delete-btn:active {
   transform: scale(1.05);
-  box-shadow: 0 0 6px rgba(255, 255, 255, 0.3);
+  filter: drop-shadow(0 0 8px #fff);
 }
 
 .image-btn.pressed {
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
+  filter: drop-shadow(0 0 8px #fff);
 }
 
 .character-button:hover,
