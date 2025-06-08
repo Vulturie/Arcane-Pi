@@ -112,7 +112,7 @@ router.get("/account/:owner/characters", async (req, res) => {
 // POST /account/:owner/characters
 router.post("/account/:owner/characters", async (req, res) => {
   const { owner } = req.params;
-  const { name, className } = req.body;
+  const { name, className, gender } = req.body;
   try {
     const count = await Character.countDocuments({ owner });
     if (count >= 4) return res.status(400).json({ error: "Character limit reached" });
@@ -127,7 +127,10 @@ router.post("/account/:owner/characters", async (req, res) => {
       return res.status(400).json({ error: "Name already taken" });
     }
 
-    const character = await Character.create({ owner, name: trimmed, class: className });
+    if (gender !== "male" && gender !== "female") {
+      return res.status(400).json({ error: "Gender must be 'male' or 'female'" });
+    }
+    const character = await Character.create({ owner, name: trimmed, class: className, gender });
     initQuestPools(character);
     initShopPool(character);
     await character.save();

@@ -26,7 +26,7 @@ function CharacterSelect({ owner, characters, onSelect, refresh }) {
   const handleCreate = async () => {
     if (!name) return alert("Enter a name");
     try {
-      await createCharacter(owner, name, cls);
+      await createCharacter(owner, name, cls, "male");
       setName("");
       refresh();
     } catch (err) {

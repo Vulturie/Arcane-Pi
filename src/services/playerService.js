@@ -35,11 +35,11 @@ export const getCharacters = async (owner) => {
     return data;
   };
 
-  export const createCharacter = async (owner, name, className) => {
+export const createCharacter = async (owner, name, className, gender) => {
     const res = await fetch(`http://localhost:4000/api/account/${owner}/characters`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, className }),
+      body: JSON.stringify({ name, className, gender }),
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || "Failed to create character");

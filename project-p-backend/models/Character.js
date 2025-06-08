@@ -26,6 +26,11 @@ const characterSchema = new mongoose.Schema({
     maxlength: 15,
     trim: true,
   }, // character name
+  gender: {
+    type: String,
+    enum: ["male", "female"],
+    required: true,
+  },
   class: { type: String, default: "Novice" },
   level: { type: Number, default: 1 },
   xp: { type: Number, default: 0 },
