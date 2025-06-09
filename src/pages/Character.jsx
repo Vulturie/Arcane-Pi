@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { RARITY_MULTIPLIER } from "../rarity";
 import {
   CLASS_BASE_STATS,
@@ -8,10 +9,12 @@ import {
   setAccountClass,
   deleteCharacter,
 } from "../services/playerService";
+import "./Character.css";
 
-function Character({ character, refreshCharacter, username }) {
+function Character({ character, refreshCharacter, username, onDelete, onSwitch }) {
   const [chosenClass, setChosenClass] = useState("Warrior");
   const [equipped, setEquipped] = useState({});
+  const navigate = useNavigate();
 
   const getBonus = (item, stat) => {
     if (!item || !item.statBonus) return 0;
@@ -47,13 +50,20 @@ function Character({ character, refreshCharacter, username }) {
   };
 
   const handleDelete = async () => {
+    if (!window.confirm("Delete this character?")) return;
     try {
       await deleteCharacter(character._id);
-      window.location.reload();
+      if (onDelete) await onDelete();
+      navigate("/character-select");
     } catch (err) {
       console.error(err);
       alert("Failed to delete profile");
     }
+  };
+
+  const handleSwitch = () => {
+    if (onSwitch) onSwitch();
+    navigate("/character-select");
   };
 
   const stats = getStatsForClass(character.class, character.level);
@@ -98,7 +108,10 @@ function Character({ character, refreshCharacter, username }) {
                 )}
               </div>
             )}
-            <button onClick={handleDelete}>Delete Character</button>
+            <div className="character-actions">
+              <button className="character-action-button" onClick={handleDelete}>Delete Character</button>
+              <button className="character-action-button" onClick={handleSwitch}>Switch Character</button>
+            </div>
     </div>
   );
 }

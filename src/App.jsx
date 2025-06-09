@@ -86,6 +86,20 @@ function App() {
           element={<CharacterCreate owner={username} refresh={() => loadCharacters(username)} />}
         />
         <Route
+          path="/character-select"
+          element={
+            <CharacterSelect
+              owner={username}
+              characters={characters}
+              onSelect={(c) => {
+                setActiveChar(c);
+                if (c.pendingQuestResult) setQuestResult(c.pendingQuestResult);
+              }}
+              refresh={() => loadCharacters(username)}
+            />
+          }
+        />
+        <Route
           path="*"
           element={
             <CharacterSelect
@@ -110,7 +124,18 @@ function App() {
         />
         <Route
           path="/character"
-          element={<Character character={activeChar} refreshCharacter={refreshActiveCharacter} username={username} />}
+          element={
+            <Character
+              character={activeChar}
+              refreshCharacter={refreshActiveCharacter}
+              username={username}
+              onDelete={async () => {
+                await loadCharacters(username);
+                setActiveChar(null);
+              }}
+              onSwitch={() => setActiveChar(null)}
+            />
+          }
         />
         <Route
           path="/inventory"
@@ -136,6 +161,20 @@ function App() {
         <Route
           path="/tower"
           element={<Tower character={activeChar} refreshCharacter={refreshActiveCharacter} />}
+        />
+        <Route
+          path="/character-select"
+          element={
+            <CharacterSelect
+              owner={username}
+              characters={characters}
+              onSelect={(c) => {
+                setActiveChar(c);
+                if (c.pendingQuestResult) setQuestResult(c.pendingQuestResult);
+              }}
+              refresh={() => loadCharacters(username)}
+            />
+          }
         />
         <Route
           path="/"
