@@ -35,14 +35,16 @@ function GameHub({ character, refreshCharacter, username }) {
         <Link to="/character">
           <img src={portrait} alt="Character" className={styles.portrait} />
         </Link>
-        <div className={styles.stats}>
-          <div className={styles.stat}><img src="/assets/game_hub/gold_icon.png" alt="Gold" /><span>{character.gold}</span></div>
-          <div className={styles.stat}><img src="/assets/game_hub/pie_icon.png" alt="Pi" /><span>0</span></div>
-          <div className={styles.stat}><img src="/assets/game_hub/level_icon.png" alt="Level" /><span>{character.level}</span></div>
-        </div>
-        <div className={styles.xpBar}>
-          <div className={styles.xpFill} style={{ width: `${xpPercent}%` }} />
-          <img src="/assets/game_hub/xp_bar.png" alt="XP" className={styles.xpImage} />
+        <div className={styles.topRight}>
+          <div className={styles.stats}>
+            <div className={styles.stat}><img src="/assets/game_hub/gold_icon.png" alt="Gold" /><span>{character.gold}</span></div>
+            <div className={styles.stat}><img src="/assets/game_hub/pie_icon.png" alt="Pi" /><span>0</span></div>
+            <div className={styles.stat}><img src="/assets/game_hub/level_icon.png" alt="Level" /><span>{character.level}</span></div>
+          </div>
+          <div className={styles.xpBar}>
+            <div className={styles.xpFill} style={{ width: `${xpPercent}%` }} />
+            <img src="/assets/game_hub/xp_bar.png" alt="XP" className={styles.xpImage} />
+          </div>
         </div>
       </div>
 
