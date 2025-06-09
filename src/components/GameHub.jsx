@@ -36,6 +36,7 @@ function GameHub({ character, refreshCharacter, username }) {
           <img src={portrait} alt="Character" className={styles.portrait} />
         </Link>
         <div className={styles.topRight}>
+          <div className={styles.name}>{character.name}</div>
           <div className={styles.stats}>
             <div className={styles.stat}><img src="/assets/game_hub/gold_icon.png" alt="Gold" /><span>{character.gold}</span></div>
             <div className={styles.stat}><img src="/assets/game_hub/pie_icon.png" alt="Pi" /><span>0</span></div>
@@ -43,6 +44,7 @@ function GameHub({ character, refreshCharacter, username }) {
           </div>
           <div className={styles.xpBar}>
             <div className={styles.xpFill} style={{ width: `${xpPercent}%` }} />
+            <div className={styles.xpText}>{`${character.xp} / ${nextXp} XP`}</div>
             <img src="/assets/game_hub/xp_bar.png" alt="XP" className={styles.xpImage} />
           </div>
         </div>

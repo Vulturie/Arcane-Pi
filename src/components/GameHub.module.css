@@ -18,7 +18,7 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  padding: 0 1rem;
+  padding: 0 2rem;
   box-sizing: border-box;
   background: url(../../public/assets/game_hub/top_frame.png) no-repeat center/contain;
 }
@@ -26,14 +26,27 @@
 .portrait {
   width: 64px;
   cursor: pointer;
+  align-self: center;
+  margin-top: 8px;
 }
 
 .topRight {
   flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
+  justify-content: center;
+  gap: 0px;
   margin-left: 8px;
+  margin-top: 14px;
+}
+
+.name {
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 1px 1px 2px #000;
+  font-size: 14px;
+  margin-bottom: 2px;
 }
 
 .stats {
@@ -52,9 +65,22 @@
 
 .xpBar {
   width: 100%;
-  height: 24px;
+  height: 40px;
   position: relative;
-  margin-top: 4px;
+  margin-top: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.xpText {
+  font-size: 14px;
+  color: #000;
+  text-shadow: 1px 1px 2px #000;
+  font-weight: bold;
+  z-index: 2;
 }
 
 .xpImage {
@@ -64,6 +90,7 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
+  z-index: 2;
 }
 
 .xpFill {
@@ -71,8 +98,10 @@
   top: 0;
   left: 0;
   height: 100%;
-  background: linear-gradient(to right, #4af, #7cf);
-  border-radius: 4px;
+  background: linear-gradient(to right, #ffcf33, #ffe884);
+  border-radius: 6px;
+  z-index: 1;
+  clip-path: inset(6% round 8px);
 }
 
 .bottomDrawer {
