@@ -7,8 +7,11 @@ function CharacterSelect({ owner, characters, onSelect, refresh }) {
   const navigate = useNavigate();
   const [selected, setSelected] = useState(null);
 
-  const portraitForCharacter = (c) =>
-    `/assets/character_creation/${c.class.toLowerCase()}_${c.gender}.png`;
+  const portraitForCharacter = (c) => {
+    const cls = c.class ? c.class.toLowerCase() : "novice";
+    const gender = c.gender ? c.gender.toLowerCase() : "male";
+    return `/assets/character_creation/${cls}_${gender}.png`;
+  };
 
   const handleSelect = (id) => {
     const char = characters.find((c) => c._id === id);
