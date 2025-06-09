@@ -1,0 +1,101 @@
+.container {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center;
+  overflow: hidden;
+  font-family: "Cinzel", serif;
+}
+
+.topFrame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1rem;
+  box-sizing: border-box;
+  background: url(/assets/game_hub/top_frame.png) no-repeat center/contain;
+}
+
+.portrait {
+  width: 64px;
+  cursor: pointer;
+}
+
+.stats {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #fff;
+  text-shadow: 1px 1px 2px #000;
+  font-size: 12px;
+}
+
+.stat img {
+  width: 24px;
+  margin-right: 4px;
+}
+
+.xpBar {
+  flex: 1;
+  height: 16px;
+  position: relative;
+  margin-left: 8px;
+}
+
+.xpImage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.xpFill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: linear-gradient(to right, #4af, #7cf);
+  border-radius: 4px;
+}
+
+.bottomDrawer {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 160px;
+  background: url(/assets/game_hub/bottom_frame.png) no-repeat center/contain;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding-top: 20px;
+  box-sizing: border-box;
+  transition: transform 0.3s ease;
+}
+
+.closed {
+  transform: translateY(100px);
+}
+
+.open {
+  transform: translateY(0);
+}
+
+.icon {
+  width: 64px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.icon:hover {
+  transform: scale(1.05);
+}
