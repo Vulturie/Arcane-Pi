@@ -30,6 +30,7 @@ const characterSchema = new mongoose.Schema({
     type: String,
     enum: ["male", "female"],
     required: true,
+    default: "male",
   },
   class: { type: String, default: "Novice" },
   level: { type: Number, default: 1 },

@@ -161,13 +161,18 @@ async function loadCharacter(req, res, next) {
   try {
     const char = await Character.findById(req.params.id);
     if (!char) return res.status(404).json({ error: "Character not found" });
+    let updated = false;
+    // Populate missing gender for older records
+    if (!char.gender) {
+      char.gender = "male";
+      updated = true;
+    }
     // Energy regeneration
     const now = new Date();
     const elapsed = (now - new Date(char.lastEnergyUpdate)) / 1000;
     const ENERGY_REGEN_INTERVAL = 10;
     const MAX_ENERGY = 100;
     const energyToAdd = Math.floor(elapsed / ENERGY_REGEN_INTERVAL);
-    let updated = false;
     if (energyToAdd > 0 && char.energy < MAX_ENERGY) {
       char.energy = Math.min(char.energy + energyToAdd, MAX_ENERGY);
       char.lastEnergyUpdate = new Date(now - (elapsed % ENERGY_REGEN_INTERVAL) * 1000);
