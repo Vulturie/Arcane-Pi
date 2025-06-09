@@ -20,7 +20,7 @@
   justify-content: space-between;
   padding: 0 1rem;
   box-sizing: border-box;
-  background: url(/assets/game_hub/top_frame.png) no-repeat center/contain;
+  background: url(%PUBLIC_URL%/assets/game_hub/top_frame.png) no-repeat center/contain;
 }
 
 .portrait {
@@ -73,7 +73,7 @@
   bottom: 0;
   width: 100%;
   height: 160px;
-  background: url(/assets/game_hub/bottom_frame.png) no-repeat center/contain;
+  background: url(%PUBLIC_URL%/assets/game_hub/bottom_frame.png) no-repeat center/contain;
   display: flex;
   justify-content: space-around;
   align-items: center;
