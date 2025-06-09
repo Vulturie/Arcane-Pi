@@ -19,7 +19,10 @@ function CharacterSelect({ owner, characters, onSelect, refresh }) {
   };
 
   const handleContinue = () => {
-    if (selected) onSelect(selected);
+    if (selected) {
+      onSelect(selected);
+      navigate("/");
+    }
   };
 
 
