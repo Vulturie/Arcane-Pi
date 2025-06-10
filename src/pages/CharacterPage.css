@@ -31,7 +31,7 @@
   height: 100%;
   padding: 6rem 1rem 2rem 1rem;
   box-sizing: border-box;
-  background: url(/assets/character/character_page_frame.png) no-repeat center/contain;
+  background: url(../../public/assets/character/character_page_frame.png) no-repeat center/contain;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -167,7 +167,7 @@
   background: linear-gradient(to right, #ffcf33, #ffe884);
   border-radius: 6px;
   z-index: 1;
-  clip-path: inset(6% round 8px);
+  clip-path: inset(8% round 8px);
 }
 
 .bottom-buttons {
