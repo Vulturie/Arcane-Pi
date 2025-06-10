@@ -41,6 +41,7 @@ function GameHub({ character, refreshCharacter, username }) {
             <div className={styles.stat}><img src="/assets/game_hub/gold_icon.png" alt="Gold" /><span>{character.gold}</span></div>
             <div className={styles.stat}><img src="/assets/game_hub/pie_icon.png" alt="Pi" /><span>0</span></div>
             <div className={styles.stat}><img src="/assets/game_hub/level_icon.png" alt="Level" /><span>{character.level}</span></div>
+            <div className={styles.stat}><img src="/assets/character/energy_icon.png" alt="Energy" /><span>{`${character.energy}/100`}</span></div>
           </div>
           <div className={styles.xpBar}>
             <div className={styles.xpFill} style={{ width: `${xpPercent}%` }} />

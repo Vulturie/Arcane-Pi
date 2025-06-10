@@ -7,7 +7,7 @@ import {
   acknowledgeQuestResult,
 } from "./services/playerService";
 import GameHub from "./components/GameHub";
-import Character from "./pages/Character";
+import CharacterPage from "./pages/CharacterPage";
 import CharacterSelect from "./pages/CharacterSelect";
 import CharacterCreate from "./pages/CharacterCreate";
 import Tavern from "./pages/Tavern";
@@ -125,10 +125,8 @@ function App() {
         <Route
           path="/character"
           element={
-            <Character
+            <CharacterPage
               character={activeChar}
-              refreshCharacter={refreshActiveCharacter}
-              username={username}
               onDelete={async () => {
                 await loadCharacters(username);
                 setActiveChar(null);
