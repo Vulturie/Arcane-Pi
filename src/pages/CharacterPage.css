@@ -27,27 +27,29 @@
 
 .frame {
   width: 100%;
-  max-width: 480px;
+  max-width: 600px;
   height: 100%;
-  padding: 6rem 1rem 2rem 1rem;
+  padding: 6rem 1rem 1rem 1rem;
   box-sizing: border-box;
   background: url(../../public/assets/character/character_page_frame.png) no-repeat center/contain;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: flex-start;
 }
 
 .name {
   font-weight: 700;
   font-size: 20px;
   text-shadow: 1px 1px 2px #000;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
 }
 
 .portrait-wrapper {
   position: relative;
-  width: 120px;
-  height: 120px;
+  width: 180px; /* Increased */
+  height: 180px; /* Increased */
+  margin-top: 0.5rem;
 }
 
 .portrait {
@@ -66,15 +68,15 @@
 }
 
 .class-info {
-  margin-top: 0.5rem;
   display: flex;
   align-items: center;
   gap: 8px;
+  margin-top: 0.5rem;
   text-shadow: 1px 1px 2px #000;
 }
 
 .class-icon {
-  width: 64px;
+  width: 48px;
   height: auto;
 }
 
@@ -84,26 +86,32 @@
 }
 
 .stats-table {
-  width: 80%;
-  max-width: 260px;
-  margin-top: 1rem;
-  padding: 2rem 1rem;
+  width: 260px;
+  height: 140px;
+  background-image: url('/assets/character/stats_table.png');
   background-repeat: no-repeat;
-  background-position: center center;
   background-size: contain;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  align-items: center;
+  position: relative;
+  margin-top: auto;
+  margin-bottom: 2rem;
 }
 
 .stat-row {
-  width: 80%;
+  position: absolute;
+  width: 100%;
   display: flex;
   justify-content: space-between;
-  font-size: 14px;
+  padding: 0 2rem;
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff;
   text-shadow: 1px 1px 2px #000;
 }
+
+.stat-str { top: 15px; }
+.stat-agi { top: 45px; }
+.stat-int { top: 75px; }
+.stat-vit { top: 105px; }
 
 .stat-row .value {
   color: #ffd700;
@@ -111,11 +119,12 @@
 
 .info-icons {
   margin-top: 1rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
   font-size: 14px;
+  justify-items: center;
+  text-align: center;
   text-shadow: 1px 1px 2px #000;
 }
 
@@ -173,13 +182,14 @@
 .bottom-buttons {
   margin-top: auto;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  gap: 12px;
 }
 
 .bottom-button {
-  width: 160px;
+  width: 120px; /* Slightly smaller */
   cursor: pointer;
   transition: transform 0.2s ease;
 }

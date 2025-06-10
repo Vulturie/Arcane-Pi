@@ -23,7 +23,7 @@ function CharacterPage({ character, onDelete, onSwitch }) {
 
   const stats = getStatsForClass(character.class, character.level);
   const portrait = `/assets/character_creation/${character.class.toLowerCase()}_${character.gender}.png`;
-  const classIcon = `/assets/ui/banners/${character.class.toLowerCase()}_banner.png`;
+  const classIcon = `/assets/character_creation/${character.class.toLowerCase()}_button.png`;
   const nextXp = getXpForNextLevel(character.level);
   const xpPercent = Math.min((character.xp / nextXp) * 100, 100);
 
@@ -69,27 +69,6 @@ function CharacterPage({ character, onDelete, onSwitch }) {
           <img src={classIcon} alt={character.class} className="class-icon" />
           <span className="class-name">{character.class}</span>
         </div>
-        <div
-          className="stats-table"
-          style={{ backgroundImage: "url(/assets/character/stats_table.png)" }}
-        >
-          <div className="stat-row">
-            <span>STR</span>
-            <span className="value">{stats.STR}</span>
-          </div>
-          <div className="stat-row">
-            <span>AGI</span>
-            <span className="value">{stats.AGI}</span>
-          </div>
-          <div className="stat-row">
-            <span>INT</span>
-            <span className="value">{stats.INT}</span>
-          </div>
-          <div className="stat-row">
-            <span>VIT</span>
-            <span className="value">{stats.VIT}</span>
-          </div>
-        </div>
         <div className="info-icons">
           <div className="stat">
             <img src="/assets/game_hub/gold_icon.png" alt="Gold" />
@@ -112,6 +91,24 @@ function CharacterPage({ character, onDelete, onSwitch }) {
           <div className="xpFill" style={{ width: `${xpPercent}%` }} />
           <div className="xpText">{`${character.xp} / ${nextXp} XP`}</div>
           <img src="/assets/game_hub/xp_bar.png" alt="XP" className="xpImage" />
+        </div>
+        <div className="stats-table">
+          <div className="stat-row stat-str">
+            <span>STR</span>
+            <span className="value">{stats.STR}</span>
+          </div>
+          <div className="stat-row stat-agi">
+            <span>AGI</span>
+            <span className="value">{stats.AGI}</span>
+          </div>
+          <div className="stat-row stat-int">
+            <span>INT</span>
+            <span className="value">{stats.INT}</span>
+          </div>
+          <div className="stat-row stat-vit">
+            <span>VIT</span>
+            <span className="value">{stats.VIT}</span>
+          </div>
         </div>
         <div className="bottom-buttons">
           <img
