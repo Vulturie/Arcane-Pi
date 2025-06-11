@@ -63,6 +63,10 @@ function App() {
     }
   }, [activeChar]);
 
+  const spendEnergy = useCallback((cost) => {
+    setActiveChar((prev) => (prev ? { ...prev, energy: Math.max(prev.energy - cost, 0) } : prev));
+  }, []);
+
   const handleQuestResultClose = async () => {
     if (activeChar && questResult) {
       try {
@@ -120,7 +124,7 @@ function App() {
       <Routes>
         <Route
           path="/tavern"
-          element={<Tavern character={activeChar} refreshCharacter={refreshActiveCharacter} onQuestResult={setQuestResult} />}
+          element={<Tavern character={activeChar} refreshCharacter={refreshActiveCharacter} onQuestResult={setQuestResult} spendEnergy={spendEnergy} />}
         />
         <Route
           path="/character"

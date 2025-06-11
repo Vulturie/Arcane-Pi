@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { getQuestStatus, cancelQuest } from "../services/playerService";
 
-function Tavern({ character, refreshCharacter, onQuestResult }) {
+function Tavern({ character, refreshCharacter, onQuestResult, spendEnergy }) {
   const [activeQuest, setActiveQuest] = useState(null);
   const [timeLeft, setTimeLeft] = useState(0);
   const [loadingQuestStatus, setLoadingQuestStatus] = useState(true);
@@ -36,6 +36,7 @@ function Tavern({ character, refreshCharacter, onQuestResult }) {
           startedAt,
         });
         setTimeLeft(quest.duration); // start countdown immediately
+        if (spendEnergy) spendEnergy(quest.energyCost);
         refreshCharacter();
       } else if (data.inventoryFull && !force) {
         if (window.confirm("Inventory is full. Start quest anyway?")) {
