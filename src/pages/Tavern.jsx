@@ -1,10 +1,16 @@
 import React, { useEffect, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { getQuestStatus, cancelQuest } from "../services/playerService";
 
 function Tavern({ character, refreshCharacter, onQuestResult, spendEnergy }) {
+  const navigate = useNavigate();
+
   const [activeQuest, setActiveQuest] = useState(null);
   const [timeLeft, setTimeLeft] = useState(0);
   const [loadingQuestStatus, setLoadingQuestStatus] = useState(true);
+  const [showStandard, setShowStandard] = useState(false);
+  const [showRisky, setShowRisky] = useState(false);
+  const [questResult, setQuestResult] = useState(null);
 
   const startQuest = async (quest, force = false) => {
     if (character.energy < quest.energyCost) {
@@ -68,6 +74,7 @@ function Tavern({ character, refreshCharacter, onQuestResult, spendEnergy }) {
     try {
       const result = await getQuestStatus(character._id);
       if (result.questResult) {
+        setQuestResult(result.questResult);
         onQuestResult(result.questResult);
         setActiveQuest(null);
         setTimeLeft(0);
@@ -78,7 +85,7 @@ function Tavern({ character, refreshCharacter, onQuestResult, spendEnergy }) {
         setTimeLeft(0);
         refreshCharacter();
         if (info) {
-          onQuestResult({
+          const res = {
             questName: info.name,
             questType: info.path,
             outcome: "success",
@@ -86,7 +93,9 @@ function Tavern({ character, refreshCharacter, onQuestResult, spendEnergy }) {
             gold: info.gold,
             loot: result.loot || null,
             log: result.combat ? result.combat.log : null,
-          });
+          };
+          setQuestResult(res);
+          onQuestResult(res);
         }
       } else if (result.quest) {
         setActiveQuest(result.quest);
@@ -121,49 +130,135 @@ function Tavern({ character, refreshCharacter, onQuestResult, spendEnergy }) {
 
     const timer = setInterval(() => {
       setTimeLeft((prev) => Math.max(prev - 1, 0));
-    }, 1000); // every second
+    }, 1000);
 
     return () => clearInterval(timer);
   }, [activeQuest]);
 
-  return (
-    <div>
-      <h2>Welcome to the Tavern</h2>
-
-      {loadingQuestStatus ? (
-        <p>Checking for active quest...</p>
-      ) : activeQuest ? (
-        <div>
-          <p><strong>Quest in progress:</strong> {activeQuest.name}</p>
-          <p>⏳ Time left: {timeLeft}s</p>
-          <p>You can leave and return later to complete it.</p>
-          <button onClick={handleCancelQuest}>Cancel Quest</button>
+  const renderQuestInfo = (quest, risky) => (
+    <div key={quest.id} className="flex items-center justify-between px-4">
+      <div className="flex flex-col text-xs text-white drop-shadow-sm">
+        <span className="font-bold">{quest.name}{quest.rare ? " (Rare)" : ""}</span>
+        <div className="flex gap-2 mt-1">
+          <div className="flex items-center gap-1"><img src="/assets/tavern/xp_icon.png" alt="XP" className="w-4" /><span>{quest.xp}</span></div>
+          <div className="flex items-center gap-1"><img src="/assets/tavern/time_icon.png" alt="Time" className="w-4" /><span>{quest.duration}s</span></div>
+          <div className="flex items-center gap-1"><img src="/assets/tavern/gold_icon.png" alt="Gold" className="w-4" /><span>{quest.gold}</span></div>
+          {quest.lootChance > 0 && <img src="/assets/tavern/loot_icon.png" alt="Loot" className="w-4" />}
         </div>
-      ) : (
-        <>
-          <p>Your energy: {character.energy}</p>
-          <h3>Standard Quests</h3>
-          {character.safeQuestPool.map((quest, idx) => (
-            <div key={`s${idx}`}>
-              <h4>Tier {quest.tier}</h4>
-              <p>
-                <strong>{quest.name}</strong>{quest.rare && " (Rare)"} — {quest.duration}s, {quest.xp}XP, {quest.gold} Gold, ⚡ {quest.energyCost} Energy
-              </p>
-              <button onClick={() => startQuest(quest)}>Start Quest</button>
+      </div>
+      <img
+        onClick={() => startQuest(quest)}
+        src={`/assets/tavern/${risky ? "start_risky_button.png" : "start_standard_button.png"}`}
+        alt="Start"
+        className="w-28 cursor-pointer transition-all hover:scale-105"
+      />
+    </div>
+  );
+
+  const renderQuestWindow = (quests, risky, onClose) => (
+    <div
+      className="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-30"
+      onClick={onClose}
+    >
+      <div
+        className="relative max-h-[80vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <img
+          src={`/assets/tavern/${risky ? "risky_quests_window.png" : "standard_quests_window.png"}`}
+          alt="Window"
+          className="w-full h-auto"
+        />
+        <div className="absolute inset-0 flex flex-col gap-4 p-4 overflow-y-auto">
+          {activeQuest ? (
+            <div className="flex flex-col items-center text-white gap-2 mt-4">
+              <span className="font-bold text-lg drop-shadow-md text-center">{activeQuest.name}</span>
+              <span>⏳ {timeLeft}s</span>
+              <span>You can leave and return later to complete it.</span>
+              <img
+                src="/assets/tavern/cancel_quest_button.png"
+                alt="Cancel Quest"
+                className="w-40 mt-4 cursor-pointer hover:scale-105 transition-all"
+                onClick={handleCancelQuest}
+              />
             </div>
-          ))}
-          <h3>Risky Quests</h3>
-          {character.riskyQuestPool.map((quest, idx) => (
-            <div key={`r${idx}`}>
-              <h4>Tier {quest.tier}</h4>
-              <p>
-                <strong>{quest.name}</strong>{quest.rare && " (Rare)"} — {quest.duration}s, {quest.xp} XP, {quest.gold} Gold, ⚡ {quest.energyCost} Energy
-              </p>
-              <button onClick={() => startQuest(quest)}>Start Quest</button>
+          ) : (
+            quests.map((q) => renderQuestInfo(q, risky))
+          )}
+          {questResult && (
+            <div className="flex flex-col gap-2 text-white mt-2 text-sm">
+              {questResult.log && (
+                <div className="max-h-40 overflow-y-auto flex flex-col gap-1">
+                  {questResult.log.map((line, i) => (
+                    <p key={i}>{line}</p>
+                  ))}
+                </div>
+              )}
+              <div className="text-center font-bold text-lg">
+                {questResult.outcome === "success" ? "Victory" : "Defeat"}
+              </div>
+              <div className="text-center">XP: {questResult.xp}</div>
+              <div className="text-center">Gold: {questResult.gold}</div>
+              {questResult.loot && (
+                <div className="text-center">Loot: {questResult.loot.name}</div>
+              )}
             </div>
-          ))}
-        </>
-      )}
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div
+      className="relative w-screen h-screen bg-cover bg-center"
+      style={{ backgroundImage: "url(/assets/tavern/tavern_background.png)" }}
+    >
+      <img
+        src="/assets/tavern/back_button.png"
+        alt="Back"
+        className="absolute top-4 left-4 w-12 cursor-pointer hover:scale-105 transition-all"
+        onClick={() => navigate("/")}
+      />
+      <div className="absolute top-4 right-4 flex items-center gap-2 text-white drop-shadow-md">
+        <img src="/assets/tavern/energy_icon.png" alt="Energy" className="w-10" />
+        <span className="font-bold text-lg">{`${character.energy}/100`}</span>
+      </div>
+
+      <img
+        src="/assets/tavern/tavernkeeper.png"
+        alt="Tavernkeeper"
+        className="absolute bottom-40 right-4 w-32 sm:w-48"
+      />
+
+      <div
+        className="fixed bottom-0 left-0 w-full h-[160px] bg-no-repeat bg-contain flex items-center justify-center gap-8"
+        style={{ backgroundImage: "url(/assets/tavern/bottom_frame.png)" }}
+      >
+        <img
+          src="/assets/tavern/standard_quest_button.png"
+          alt="Standard"
+          className="w-32 cursor-pointer transition-all hover:scale-105"
+          onClick={() => {
+            setShowStandard(true);
+            setQuestResult(null);
+          }}
+        />
+        <img
+          src="/assets/tavern/risky_quest_button.png"
+          alt="Risky"
+          className="w-32 cursor-pointer transition-all hover:scale-105"
+          onClick={() => {
+            setShowRisky(true);
+            setQuestResult(null);
+          }}
+        />
+      </div>
+
+      {showStandard &&
+        renderQuestWindow(character.safeQuestPool, false, () => setShowStandard(false))}
+      {showRisky &&
+        renderQuestWindow(character.riskyQuestPool, true, () => setShowRisky(false))}
     </div>
   );
 }
