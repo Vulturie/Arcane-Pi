@@ -3,6 +3,20 @@ const ITEMS = [
   { id: "dagger_shadow", name: "Shadow Dagger", type: "weapon", cost: 25, classRestriction: ["Rogue", "Assassin"], statBonus: { AGI: 2 } },
   { id: "staff_apprentice", name: "Apprentice Staff", type: "weapon", cost: 20, classRestriction: ["Mage"], statBonus: { INT: 3 } },
 
+  { id: "sword_training", name: "Training Blade", type: "weapon", cost: 12, classRestriction: null, statBonus: { STR: 1 } },
+  { id: "bow_training", name: "Training Bow", type: "weapon", cost: 14, classRestriction: ["Rogue"], statBonus: { AGI: 1 } },
+  { id: "wand_novice", name: "Novice Wand", type: "weapon", cost: 16, classRestriction: ["Mage"], statBonus: { INT: 2 } },
+  { id: "dagger_bronze", name: "Bronze Dagger", type: "weapon", cost: 18, classRestriction: ["Rogue", "Assassin"], statBonus: { AGI: 1 } },
+  { id: "sword_steel", name: "Steel Sword", type: "weapon", cost: 24, classRestriction: ["Warrior"], statBonus: { STR: 3 } },
+  { id: "bow_long", name: "Long Bow", type: "weapon", cost: 22, classRestriction: ["Rogue"], statBonus: { AGI: 2 } },
+  { id: "staff_enchanted", name: "Enchanted Staff", type: "weapon", cost: 24, classRestriction: ["Mage"], statBonus: { INT: 3 } },
+  { id: "axe_battle", name: "Battle Axe", type: "weapon", cost: 28, classRestriction: ["Warrior"], statBonus: { STR: 3 } },
+  { id: "mace_iron", name: "Iron Mace", type: "weapon", cost: 26, classRestriction: ["Warrior"], statBonus: { STR: 2 } },
+  { id: "wand_arcane", name: "Arcane Wand", type: "weapon", cost: 28, classRestriction: ["Mage"], statBonus: { INT: 3 } },
+  { id: "dagger_dual", name: "Dual Daggers", type: "weapon", cost: 26, classRestriction: ["Rogue", "Assassin"], statBonus: { AGI: 2 } },
+  { id: "hammer_war", name: "War Hammer", type: "weapon", cost: 32, classRestriction: ["Warrior"], statBonus: { STR: 4 } },
+  { id: "sword_vorpal", name: "Vorpal Sword", type: "weapon", cost: 34, classRestriction: null, statBonus: { STR: 3 } },
+
   // Headpieces
   { id: "head_cloth_hood", name: "Cloth Hood", type: "headpiece", cost: 10, classRestriction: null, statBonus: { VIT: 1 } },
   { id: "head_iron_helm", name: "Iron Helm", type: "headpiece", cost: 15, classRestriction: ["Warrior"], statBonus: { STR: 1 } },
@@ -14,6 +28,13 @@ const ITEMS = [
   { id: "head_crystal_tiara", name: "Crystal Tiara", type: "headpiece", cost: 25, classRestriction: ["Mage"], statBonus: { INT: 2 } },
   { id: "head_bone_mask", name: "Bone Mask", type: "headpiece", cost: 17, classRestriction: null, statBonus: { STR: 1 } },
   { id: "head_golden_helm", name: "Golden Helm", type: "headpiece", cost: 30, classRestriction: null, statBonus: { VIT: 2 } },
+
+  { id: "head_shadow_hood", name: "Shadow Hood", type: "headpiece", cost: 21, classRestriction: ["Assassin"], statBonus: { AGI: 2 } },
+  { id: "head_rogue_bandana", name: "Rogue Bandana", type: "headpiece", cost: 16, classRestriction: ["Rogue"], statBonus: { AGI: 1 } },
+  { id: "head_wizard_hat", name: "Wizard Hat", type: "headpiece", cost: 28, classRestriction: ["Mage"], statBonus: { INT: 2 } },
+  { id: "head_steel_helm", name: "Steel Helm", type: "headpiece", cost: 24, classRestriction: ["Warrior"], statBonus: { STR: 2 } },
+  { id: "head_ruby_crown", name: "Ruby Crown", type: "headpiece", cost: 32, classRestriction: null, statBonus: { VIT: 2 } },
+  { id: "head_sage_tiara", name: "Sage Tiara", type: "headpiece", cost: 34, classRestriction: ["Mage"], statBonus: { INT: 3 } },
 
   // Chestplates
   { id: "chest_linen_tunic", name: "Linen Tunic", type: "chestplate", cost: 10, classRestriction: null, statBonus: { VIT: 1 } },
@@ -27,6 +48,13 @@ const ITEMS = [
   { id: "chest_bone_guard", name: "Bone Chestguard", type: "chestplate", cost: 17, classRestriction: null, statBonus: { VIT: 1 } },
   { id: "chest_golden_plate", name: "Golden Chestplate", type: "chestplate", cost: 30, classRestriction: null, statBonus: { VIT: 2 } },
 
+  { id: "chest_shadow_garb", name: "Shadow Garb", type: "chestplate", cost: 22, classRestriction: ["Assassin"], statBonus: { AGI: 2 } },
+  { id: "chest_rogue_vest", name: "Rogue Vest", type: "chestplate", cost: 18, classRestriction: ["Rogue"], statBonus: { AGI: 1 } },
+  { id: "chest_sage_robes", name: "Sage Robes", type: "chestplate", cost: 26, classRestriction: ["Mage"], statBonus: { INT: 2 } },
+  { id: "chest_berserker_plate", name: "Berserker Plate", type: "chestplate", cost: 28, classRestriction: ["Warrior"], statBonus: { STR: 3 } },
+  { id: "chest_dragon_scale", name: "Dragon Scale Armor", type: "chestplate", cost: 32, classRestriction: null, statBonus: { VIT: 2 } },
+  { id: "chest_nimble_jacket", name: "Nimble Jacket", type: "chestplate", cost: 20, classRestriction: null, statBonus: { AGI: 1 } },
+
   // Gloves
   { id: "glove_cloth", name: "Cloth Gloves", type: "gloves", cost: 8, classRestriction: null, statBonus: { AGI: 1 } },
   { id: "glove_leather_mitts", name: "Leather Mitts", type: "gloves", cost: 10, classRestriction: null, statBonus: { AGI: 1 } },
@@ -38,6 +66,13 @@ const ITEMS = [
   { id: "glove_bone", name: "Bone Claws", type: "gloves", cost: 16, classRestriction: null, statBonus: { STR: 1 } },
   { id: "glove_silk", name: "Silk Gloves", type: "gloves", cost: 14, classRestriction: null, statBonus: { AGI: 1 } },
   { id: "glove_golden", name: "Golden Gauntlets", type: "gloves", cost: 25, classRestriction: null, statBonus: { STR: 2 } },
+
+  { id: "glove_shadow", name: "Shadow Gloves", type: "gloves", cost: 18, classRestriction: ["Assassin"], statBonus: { AGI: 2 } },
+  { id: "glove_rogue_grips", name: "Rogue Grips", type: "gloves", cost: 16, classRestriction: ["Rogue"], statBonus: { AGI: 1 } },
+  { id: "glove_sage_wraps", name: "Sage Wraps", type: "gloves", cost: 24, classRestriction: ["Mage"], statBonus: { INT: 2 } },
+  { id: "glove_war_gauntlets", name: "War Gauntlets", type: "gloves", cost: 26, classRestriction: ["Warrior"], statBonus: { STR: 2 } },
+  { id: "glove_reinforced", name: "Reinforced Gloves", type: "gloves", cost: 20, classRestriction: null, statBonus: { VIT: 1 } },
+  { id: "glove_platinum", name: "Platinum Gauntlets", type: "gloves", cost: 30, classRestriction: null, statBonus: { STR: 3 } },
 
   // Footwear
   { id: "foot_cloth", name: "Cloth Boots", type: "footwear", cost: 8, classRestriction: null, statBonus: { AGI: 1 } },
@@ -51,6 +86,13 @@ const ITEMS = [
   { id: "foot_feather", name: "Feather Boots", type: "footwear", cost: 14, classRestriction: null, statBonus: { AGI: 1 } },
   { id: "foot_golden", name: "Golden Boots", type: "footwear", cost: 25, classRestriction: null, statBonus: { VIT: 2 } },
 
+  { id: "foot_shadow", name: "Shadow Boots", type: "footwear", cost: 21, classRestriction: ["Assassin"], statBonus: { AGI: 2 } },
+  { id: "foot_scout", name: "Scout Shoes", type: "footwear", cost: 16, classRestriction: ["Rogue"], statBonus: { AGI: 1 } },
+  { id: "foot_wizard", name: "Wizard Sandals", type: "footwear", cost: 24, classRestriction: ["Mage"], statBonus: { INT: 2 } },
+  { id: "foot_knight", name: "Knight Greaves", type: "footwear", cost: 26, classRestriction: ["Warrior"], statBonus: { VIT: 2 } },
+  { id: "foot_sprinter", name: "Sprinter Boots", type: "footwear", cost: 18, classRestriction: null, statBonus: { AGI: 1 } },
+  { id: "foot_dragonscale", name: "Dragon Scale Boots", type: "footwear", cost: 30, classRestriction: null, statBonus: { VIT: 2 } },
+
   // Necklaces
   { id: "neck_copper", name: "Copper Necklace", type: "necklace", cost: 8, classRestriction: null, statBonus: { VIT: 1 } },
   { id: "neck_silver", name: "Silver Locket", type: "necklace", cost: 10, classRestriction: null, statBonus: { AGI: 1 } },
@@ -62,6 +104,13 @@ const ITEMS = [
   { id: "neck_dragon", name: "Dragon Tooth Collar", type: "necklace", cost: 24, classRestriction: null, statBonus: { STR: 2 } },
   { id: "neck_gold", name: "Golden Choker", type: "necklace", cost: 25, classRestriction: null, statBonus: { AGI: 1 } },
   { id: "neck_phoenix", name: "Phoenix Talisman", type: "necklace", cost: 28, classRestriction: null, statBonus: { VIT: 2 } },
+
+  { id: "neck_magus_charm", name: "Magus Charm", type: "necklace", cost: 26, classRestriction: ["Mage"], statBonus: { INT: 2 } },
+  { id: "neck_berserker_torque", name: "Berserker Torque", type: "necklace", cost: 24, classRestriction: ["Warrior"], statBonus: { STR: 2 } },
+  { id: "neck_shadow_choker", name: "Shadow Choker", type: "necklace", cost: 22, classRestriction: ["Assassin"], statBonus: { AGI: 2 } },
+  { id: "neck_trickster_pendant", name: "Trickster Pendant", type: "necklace", cost: 20, classRestriction: ["Rogue"], statBonus: { AGI: 1 } },
+  { id: "neck_guardian_amulet", name: "Guardian Amulet", type: "necklace", cost: 28, classRestriction: ["Warrior"], statBonus: { VIT: 2 } },
+  { id: "neck_eternal_focus", name: "Eternal Focus", type: "necklace", cost: 30, classRestriction: ["Mage"], statBonus: { INT: 3 } },
 
   // Belts
   { id: "belt_rope", name: "Rope Belt", type: "belt", cost: 8, classRestriction: null, statBonus: { VIT: 1 } },
@@ -75,6 +124,13 @@ const ITEMS = [
   { id: "belt_dragon", name: "Dragon Scale Belt", type: "belt", cost: 26, classRestriction: null, statBonus: { VIT: 2 } },
   { id: "belt_golden", name: "Golden Girdle", type: "belt", cost: 30, classRestriction: null, statBonus: { STR: 2 } },
 
+  { id: "belt_shadow_sash", name: "Shadow Sash", type: "belt", cost: 20, classRestriction: ["Assassin"], statBonus: { AGI: 2 } },
+  { id: "belt_rogue_cinch", name: "Rogue Cinch", type: "belt", cost: 16, classRestriction: ["Rogue"], statBonus: { AGI: 1 } },
+  { id: "belt_sage_cord", name: "Sage Cord", type: "belt", cost: 26, classRestriction: ["Mage"], statBonus: { INT: 2 } },
+  { id: "belt_berserker_chain", name: "Berserker Chain", type: "belt", cost: 24, classRestriction: ["Warrior"], statBonus: { STR: 2 } },
+  { id: "belt_guardian", name: "Guardian Belt", type: "belt", cost: 28, classRestriction: null, statBonus: { VIT: 2 } },
+  { id: "belt_platinum", name: "Platinum Belt", type: "belt", cost: 32, classRestriction: null, statBonus: { STR: 2 } },
+
   // Rings
   { id: "ring_copper", name: "Copper Ring", type: "ring", cost: 8, classRestriction: null, statBonus: { AGI: 1 } },
   { id: "ring_silver", name: "Silver Band", type: "ring", cost: 10, classRestriction: null, statBonus: { VIT: 1 } },
@@ -87,6 +143,13 @@ const ITEMS = [
   { id: "ring_gold", name: "Golden Ring", type: "ring", cost: 25, classRestriction: null, statBonus: { AGI: 1 } },
   { id: "ring_phoenix", name: "Phoenix Signet", type: "ring", cost: 28, classRestriction: null, statBonus: { VIT: 2 } },
 
+  { id: "ring_warrior", name: "Warrior's Ring", type: "ring", cost: 26, classRestriction: ["Warrior"], statBonus: { STR: 2 } },
+  { id: "ring_mage", name: "Mage's Ring", type: "ring", cost: 24, classRestriction: ["Mage"], statBonus: { INT: 2 } },
+  { id: "ring_rogue", name: "Rogue's Ring", type: "ring", cost: 18, classRestriction: ["Rogue"], statBonus: { AGI: 1 } },
+  { id: "ring_assassin", name: "Assassin's Ring", type: "ring", cost: 22, classRestriction: ["Assassin"], statBonus: { AGI: 2 } },
+  { id: "ring_guardian", name: "Guardian Ring", type: "ring", cost: 28, classRestriction: ["Warrior"], statBonus: { VIT: 2 } },
+  { id: "ring_sorcery", name: "Ring of Sorcery", type: "ring", cost: 30, classRestriction: ["Mage"], statBonus: { INT: 3 } },
+
   // Artifacts
   { id: "art_broken_talisman", name: "Broken Talisman", type: "artifact", cost: 12, classRestriction: null, statBonus: { STR: 1 } },
   { id: "art_ancient_relic", name: "Ancient Relic", type: "artifact", cost: 15, classRestriction: null, statBonus: { INT: 1 } },
@@ -98,6 +161,13 @@ const ITEMS = [
   { id: "art_demon_horn", name: "Demon Horn", type: "artifact", cost: 32, classRestriction: null, statBonus: { STR: 1 } },
   { id: "art_timeworn_compass", name: "Timeworn Compass", type: "artifact", cost: 34, classRestriction: null, statBonus: { AGI: 1 } },
   { id: "art_golden_idol", name: "Golden Idol", type: "artifact", cost: 35, classRestriction: null, statBonus: { VIT: 2 } },
+
+  { id: "art_war_banner", name: "War Banner", type: "artifact", cost: 24, classRestriction: ["Warrior"], statBonus: { STR: 2 } },
+  { id: "art_mage_tome", name: "Mage Tome", type: "artifact", cost: 28, classRestriction: ["Mage"], statBonus: { INT: 3 } },
+  { id: "art_rogue_icon", name: "Rogue Icon", type: "artifact", cost: 20, classRestriction: ["Rogue"], statBonus: { AGI: 1 } },
+  { id: "art_assassin_dagger", name: "Assassin Dagger", type: "artifact", cost: 26, classRestriction: ["Assassin"], statBonus: { AGI: 2 } },
+  { id: "art_healing_totem", name: "Healing Totem", type: "artifact", cost: 30, classRestriction: null, statBonus: { VIT: 2 } },
+  { id: "art_mythic_gem", name: "Mythic Gem", type: "artifact", cost: 38, classRestriction: null, statBonus: { INT: 2 } },
 ];
 
 module.exports = ITEMS;
