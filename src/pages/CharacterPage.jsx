@@ -57,17 +57,19 @@ function CharacterPage({ character, onDelete, onSwitch }) {
       />
       <div className="frame">
         <div className="name">{character.name}</div>
-        <div className="portrait-wrapper">
-          <img src={portrait} alt="Character" className="portrait" />
-          <img
-            src="/assets/character/character_frame.png"
-            alt="Frame"
-            className="portrait-frame"
-          />
-        </div>
-        <div className="class-info">
-          <img src={classIcon} alt={character.class} className="class-icon" />
-          <span className="class-name">{character.class}</span>
+        <div className="header-row">
+          <div className="portrait-wrapper">
+            <img src={portrait} alt="Character" className="portrait" />
+            <img
+              src="/assets/character/character_frame.png"
+              alt="Frame"
+              className="portrait-frame"
+            />
+          </div>
+          <div className="class-info">
+            <img src={classIcon} alt={character.class} className="class-icon" />
+            <span className="class-name">{character.class}</span>
+          </div>
         </div>
         <div className="info-icons">
           <div className="stat">

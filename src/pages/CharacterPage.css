@@ -29,7 +29,7 @@
   width: 100%;
   max-width: 600px;
   height: 100%;
-  padding: 6rem 1rem 1rem 1rem;
+  padding: 3rem 1rem 1rem 1rem;
   box-sizing: border-box;
   background: url(../../public/assets/character/character_page_frame.png) no-repeat center/contain;
   display: flex;
@@ -42,7 +42,16 @@
   font-weight: 700;
   font-size: 20px;
   text-shadow: 1px 1px 2px #000;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.5rem;
+  margin-top: 8rem;
+}
+
+.header-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
 }
 
 .portrait-wrapper {
@@ -55,24 +64,26 @@
 .portrait {
   width: 100%;
   height: auto;
+  margin-top: 2rem;
 }
 
 .portrait-frame {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: -6;
+  left: -10;
+  width: 180%;
+  height: 180%;
   object-fit: contain;
   pointer-events: none;
+  margin-top: 2rem;
 }
 
 .class-info {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: 0.5rem;
   text-shadow: 1px 1px 2px #000;
+  margin-top: 2rem;
 }
 
 .class-icon {
@@ -91,35 +102,43 @@
   background-image: url('../../public/assets/character/stats_table.png');
   background-repeat: no-repeat;
   background-size: contain;
-  margin-top: 2rem;
-  display: flex;
-  flex-direction: column;
+  margin: 2rem auto 0 auto;
+  position: relative;
   justify-content: center;
-  align-items: center;
-  gap: 12px;
+
+  left: 50%;
+  transform: translateX(-50%);
   position: relative;
 }
 
 .stat-row {
-  width: 80%;
+  position: absolute;
+  width: 35%;
+  left: 30px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 0 0.5rem;
   font-size: 18px;
   font-weight: bold;
   color: #fff;
   text-shadow: 1px 1px 2px #000;
+  box-sizing: border-box;
 }
 
-.stat-str { top: 18px; }
-.stat-agi { top: 52px; }
-.stat-int { top: 86px; }
-.stat-vit { top: 120px; }
+.stat-str { top: 26px;
+ left: 30px;}
+.stat-agi { top: 60px;
+ left: 30px;}
+.stat-int { top: 96px;
+ left: 30px;}
+.stat-vit { top: 128px;
+ left: 30px;}
 
-.stat-row .value {
+.value {
   color: #ffd700;
+  min-width: 30px;
   text-align: right;
-  min-width: 40px;
 }
 
 .info-icons {
