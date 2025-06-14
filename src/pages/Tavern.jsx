@@ -244,12 +244,11 @@ function Tavern({ character, refreshCharacter, spendEnergy }) {
       <img
         src="/assets/tavern/tavernkeeper.png"
         alt="Tavernkeeper"
-        className="absolute bottom-40 right-4 w-32 sm:w-48"
+        className="absolute bottom-40 right-5 w-44 sm:w-48"
       />
 
       <div
-        className={`fixed bottom-0 left-0 w-full h-[160px] bg-no-repeat bg-cover bg-center flex items-center justify-center gap-8 z-40 transition-transform duration-300 ${isFrameOpen ? 'translate-y-0' : 'translate-y-[calc(100%-42px)]'}`}
-        style={{ backgroundImage: "url(/assets/tavern/bottom_frame.png)" }}
+        className={`fixed bottom-0 left-0 w-full h-[320px] bg-no-repeat bg-contain bg-center flex items-start justify-center gap-8 pt-[90px] z-40 transition-transform duration-300 ${isFrameOpen ? 'translate-y-0' : 'translate-y-[160px]'}`}        style={{ backgroundImage: "url(/assets/tavern/bottom_frame.png)" }}
         onClick={() => setIsFrameOpen(!isFrameOpen)}
       >
         <img
