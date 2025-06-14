@@ -12,6 +12,7 @@ function Tavern({ character, refreshCharacter, onQuestResult, spendEnergy }) {
   const [showRisky, setShowRisky] = useState(false);
   const [questResult, setQuestResult] = useState(null);
   const [isFrameOpen, setIsFrameOpen] = useState(false);
+  const [isShowingResult, setIsShowingResult] = useState(false);
 
   const startQuest = async (quest, force = false) => {
     if (character.energy < quest.energyCost) {
@@ -76,6 +77,7 @@ function Tavern({ character, refreshCharacter, onQuestResult, spendEnergy }) {
       const result = await getQuestStatus(character._id);
       if (result.questResult) {
         setQuestResult(result.questResult);
+        setIsShowingResult(true);
         onQuestResult(result.questResult);
         setActiveQuest(null);
         setTimeLeft(0);
@@ -96,6 +98,7 @@ function Tavern({ character, refreshCharacter, onQuestResult, spendEnergy }) {
             log: result.combat ? result.combat.log : null,
           };
           setQuestResult(res);
+          setIsShowingResult(true);
           onQuestResult(res);
         }
       } else if (result.quest) {
@@ -159,7 +162,7 @@ function Tavern({ character, refreshCharacter, onQuestResult, spendEnergy }) {
   const renderQuestWindow = (quests, risky, onClose) => (
     <div
       className="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-30"
-      onClick={questResult ? () => {} : onClose}
+      onClick={isShowingResult ? () => {} : onClose}
     >
       <div
         className="relative max-h-[80vh] overflow-y-auto"
@@ -170,9 +173,9 @@ function Tavern({ character, refreshCharacter, onQuestResult, spendEnergy }) {
           alt="Window"
           className="w-full h-auto"
         />
-        <div className="absolute inset-0 flex flex-col gap-4 p-4 pt-20 overflow-y-auto">
-          {questResult ? (
-            <div className="flex flex-col gap-2 text-white text-sm items-center">
+        <div className="absolute inset-0 flex flex-col gap-4 p-4 pt-24 overflow-y-auto">
+          {isShowingResult && questResult ? (
+            <div className="flex flex-col gap-2 text-white text-sm items-center mt-20">
               {questResult.log && (
                 <div className="max-h-40 overflow-y-auto flex flex-col gap-1 w-full">
                   {questResult.log.map((line, i) => (
@@ -192,11 +195,14 @@ function Tavern({ character, refreshCharacter, onQuestResult, spendEnergy }) {
                 src="/assets/tavern/continue_button.png"
                 alt="Continue"
                 className="w-28 mt-4 cursor-pointer hover:scale-105 transition-all"
-                onClick={() => setQuestResult(null)}
+                onClick={() => {
+                  setQuestResult(null);
+                  setIsShowingResult(false);
+                }}
               />
             </div>
           ) : activeQuest ? (
-            <div className="flex flex-col items-center text-white gap-2 mt-4">
+            <div className="flex flex-col items-center text-white gap-2 mt-20">
               <span className="font-bold text-lg drop-shadow-md text-center">{activeQuest.name}</span>
               <span>⏳ {timeLeft}s</span>
               <span>You can leave and return later to complete it.</span>
@@ -208,7 +214,9 @@ function Tavern({ character, refreshCharacter, onQuestResult, spendEnergy }) {
               />
             </div>
           ) : (
-            quests.map((q) => renderQuestInfo(q, risky))
+            <div className="flex flex-col gap-4 mt-20">
+              {quests.map((q) => renderQuestInfo(q, risky))}
+            </div>
           )}
         </div>
       </div>
@@ -238,7 +246,8 @@ function Tavern({ character, refreshCharacter, onQuestResult, spendEnergy }) {
       />
 
       <div
-        className={`fixed bottom-0 left-0 w-full h-[160px] bg-no-repeat bg-contain flex items-center justify-center gap-8 z-40 transition-transform duration-300 ${isFrameOpen ? 'translate-y-0' : 'translate-y-[80%]'}`}        style={{ backgroundImage: "url(/assets/tavern/bottom_frame.png)" }}
+        className={`fixed bottom-0 left-0 w-full h-[160px] bg-no-repeat bg-cover bg-center flex items-center justify-center gap-8 z-40 transition-transform duration-300 ${isFrameOpen ? 'translate-y-0' : 'translate-y-[80%]'}`}
+        style={{ backgroundImage: "url(/assets/tavern/bottom_frame.png)" }}
         onClick={() => setIsFrameOpen(!isFrameOpen)}
       >
         <img
@@ -249,6 +258,7 @@ function Tavern({ character, refreshCharacter, onQuestResult, spendEnergy }) {
             e.stopPropagation();
             setShowStandard(true);
             setQuestResult(null);
+            setIsShowingResult(false);
           }}
         />
         <img
@@ -259,6 +269,7 @@ function Tavern({ character, refreshCharacter, onQuestResult, spendEnergy }) {
             e.stopPropagation();
             setShowRisky(true);
             setQuestResult(null);
+            setIsShowingResult(false);
           }}
         />
       </div>
