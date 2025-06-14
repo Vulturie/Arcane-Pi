@@ -92,7 +92,6 @@ function App() {
               characters={characters}
               onSelect={(c) => {
                 setActiveChar(c);
-                if (c.pendingQuestResult) setQuestResult(c.pendingQuestResult);
               }}
               refresh={() => loadCharacters(username)}
             />

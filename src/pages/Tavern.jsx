@@ -7,7 +7,6 @@ function Tavern({ character, refreshCharacter, spendEnergy }) {
 
   const [activeQuest, setActiveQuest] = useState(null);
   const [timeLeft, setTimeLeft] = useState(0);
-  const [loadingQuestStatus, setLoadingQuestStatus] = useState(true);
   const [showStandard, setShowStandard] = useState(false);
   const [showRisky, setShowRisky] = useState(false);
   const [questResult, setQuestResult] = useState(null);
@@ -106,7 +105,6 @@ function Tavern({ character, refreshCharacter, spendEnergy }) {
         setActiveQuest(null);
         setTimeLeft(0);
       }
-      setLoadingQuestStatus(false);
     } catch (err) {
       console.error("Quest status check failed", err);
     }
