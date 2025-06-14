@@ -11,6 +11,7 @@ function Tavern({ character, refreshCharacter, onQuestResult, spendEnergy }) {
   const [showStandard, setShowStandard] = useState(false);
   const [showRisky, setShowRisky] = useState(false);
   const [questResult, setQuestResult] = useState(null);
+  const [isFrameOpen, setIsFrameOpen] = useState(false);
 
   const startQuest = async (quest, force = false) => {
     if (character.energy < quest.energyCost) {
@@ -150,7 +151,7 @@ function Tavern({ character, refreshCharacter, onQuestResult, spendEnergy }) {
         onClick={() => startQuest(quest)}
         src={`/assets/tavern/${risky ? "start_risky_button.png" : "start_standard_button.png"}`}
         alt="Start"
-        className="w-28 cursor-pointer transition-all hover:scale-105"
+        className="w-7 cursor-pointer transition-all hover:scale-105"
       />
     </div>
   );
@@ -158,7 +159,7 @@ function Tavern({ character, refreshCharacter, onQuestResult, spendEnergy }) {
   const renderQuestWindow = (quests, risky, onClose) => (
     <div
       className="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-30"
-      onClick={onClose}
+      onClick={questResult ? () => {} : onClose}
     >
       <div
         className="relative max-h-[80vh] overflow-y-auto"
@@ -169,8 +170,32 @@ function Tavern({ character, refreshCharacter, onQuestResult, spendEnergy }) {
           alt="Window"
           className="w-full h-auto"
         />
-        <div className="absolute inset-0 flex flex-col gap-4 p-4 overflow-y-auto">
-          {activeQuest ? (
+        <div className="absolute inset-0 flex flex-col gap-4 p-4 pt-20 overflow-y-auto">
+          {questResult ? (
+            <div className="flex flex-col gap-2 text-white text-sm items-center">
+              {questResult.log && (
+                <div className="max-h-40 overflow-y-auto flex flex-col gap-1 w-full">
+                  {questResult.log.map((line, i) => (
+                    <p key={i}>{line}</p>
+                  ))}
+                </div>
+              )}
+              <div className="text-center font-bold text-lg">
+                {questResult.outcome === "success" ? "Victory" : "Defeat"}
+              </div>
+              <div className="text-center">XP: {questResult.xp}</div>
+              <div className="text-center">Gold: {questResult.gold}</div>
+              {questResult.loot && (
+                <div className="text-center">Loot: {questResult.loot.name}</div>
+              )}
+              <img
+                src="/assets/tavern/continue_button.png"
+                alt="Continue"
+                className="w-28 mt-4 cursor-pointer hover:scale-105 transition-all"
+                onClick={() => setQuestResult(null)}
+              />
+            </div>
+          ) : activeQuest ? (
             <div className="flex flex-col items-center text-white gap-2 mt-4">
               <span className="font-bold text-lg drop-shadow-md text-center">{activeQuest.name}</span>
               <span>⏳ {timeLeft}s</span>
@@ -185,25 +210,6 @@ function Tavern({ character, refreshCharacter, onQuestResult, spendEnergy }) {
           ) : (
             quests.map((q) => renderQuestInfo(q, risky))
           )}
-          {questResult && (
-            <div className="flex flex-col gap-2 text-white mt-2 text-sm">
-              {questResult.log && (
-                <div className="max-h-40 overflow-y-auto flex flex-col gap-1">
-                  {questResult.log.map((line, i) => (
-                    <p key={i}>{line}</p>
-                  ))}
-                </div>
-              )}
-              <div className="text-center font-bold text-lg">
-                {questResult.outcome === "success" ? "Victory" : "Defeat"}
-              </div>
-              <div className="text-center">XP: {questResult.xp}</div>
-              <div className="text-center">Gold: {questResult.gold}</div>
-              {questResult.loot && (
-                <div className="text-center">Loot: {questResult.loot.name}</div>
-              )}
-            </div>
-          )}
         </div>
       </div>
     </div>
@@ -217,7 +223,7 @@ function Tavern({ character, refreshCharacter, onQuestResult, spendEnergy }) {
       <img
         src="/assets/tavern/back_button.png"
         alt="Back"
-        className="absolute top-4 left-4 w-12 cursor-pointer hover:scale-105 transition-all"
+        className="absolute top-4 left-4 w-[4.5rem] cursor-pointer hover:scale-105 transition-all"
         onClick={() => navigate("/")}
       />
       <div className="absolute top-4 right-4 flex items-center gap-2 text-white drop-shadow-md">
@@ -232,14 +238,16 @@ function Tavern({ character, refreshCharacter, onQuestResult, spendEnergy }) {
       />
 
       <div
-        className="fixed bottom-0 left-0 w-full h-[160px] bg-no-repeat bg-contain flex items-center justify-center gap-8"
+        className={`fixed bottom-0 left-0 w-full h-[160px] bg-no-repeat bg-contain flex items-center justify-center gap-8 transition-all duration-300 ${isFrameOpen ? 'translate-y-0' : 'translate-y-full'}`}
         style={{ backgroundImage: "url(/assets/tavern/bottom_frame.png)" }}
+        onClick={() => setIsFrameOpen(!isFrameOpen)}
       >
         <img
           src="/assets/tavern/standard_quest_button.png"
           alt="Standard"
-          className="w-32 cursor-pointer transition-all hover:scale-105"
-          onClick={() => {
+          className="w-16 cursor-pointer transition-all hover:scale-105"
+          onClick={(e) => {
+            e.stopPropagation();
             setShowStandard(true);
             setQuestResult(null);
           }}
@@ -247,8 +255,9 @@ function Tavern({ character, refreshCharacter, onQuestResult, spendEnergy }) {
         <img
           src="/assets/tavern/risky_quest_button.png"
           alt="Risky"
-          className="w-32 cursor-pointer transition-all hover:scale-105"
-          onClick={() => {
+          className="w-16 cursor-pointer transition-all hover:scale-105"
+          onClick={(e) => {
+            e.stopPropagation();
             setShowRisky(true);
             setQuestResult(null);
           }}
