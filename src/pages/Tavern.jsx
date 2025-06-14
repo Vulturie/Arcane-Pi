@@ -143,7 +143,7 @@ function Tavern({ character, refreshCharacter, spendEnergy }) {
           <div className="flex items-center gap-1"><img src="/assets/tavern/xp_icon.png" alt="XP" className="w-4" /><span>{quest.xp}</span></div>
           <div className="flex items-center gap-1"><img src="/assets/tavern/time_icon.png" alt="Time" className="w-4" /><span>{quest.duration}s</span></div>
           <div className="flex items-center gap-1"><img src="/assets/tavern/gold_icon.png" alt="Gold" className="w-4" /><span>{quest.gold}</span></div>
-          {quest.lootChance > 0 && <img src="/assets/tavern/loot_icon.png" alt="Loot" className="w-4" />}
+          <div className="flex items-center gap-1"><img src="/assets/tavern/energy_icon.png" alt="Energy" className="w-4" /><span className="text-red-500">-{quest.energyCost}</span></div>          {quest.lootChance > 0 && <img src="/assets/tavern/loot_icon.png" alt="Loot" className="w-4" />}
         </div>
       </div>
       <img
