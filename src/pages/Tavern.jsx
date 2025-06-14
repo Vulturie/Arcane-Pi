@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { getQuestStatus, cancelQuest } from "../services/playerService";
+import { getQuestStatus, cancelQuest, acknowledgeQuestResult } from "../services/playerService";
 
-function Tavern({ character, refreshCharacter, onQuestResult, spendEnergy }) {
+function Tavern({ character, refreshCharacter, spendEnergy }) {
   const navigate = useNavigate();
 
   const [activeQuest, setActiveQuest] = useState(null);
@@ -78,7 +78,6 @@ function Tavern({ character, refreshCharacter, onQuestResult, spendEnergy }) {
       if (result.questResult) {
         setQuestResult(result.questResult);
         setIsShowingResult(true);
-        onQuestResult(result.questResult);
         setActiveQuest(null);
         setTimeLeft(0);
         refreshCharacter();
@@ -99,7 +98,6 @@ function Tavern({ character, refreshCharacter, onQuestResult, spendEnergy }) {
           };
           setQuestResult(res);
           setIsShowingResult(true);
-          onQuestResult(res);
         }
       } else if (result.quest) {
         setActiveQuest(result.quest);
@@ -112,7 +110,7 @@ function Tavern({ character, refreshCharacter, onQuestResult, spendEnergy }) {
     } catch (err) {
       console.error("Quest status check failed", err);
     }
-  }, [character._id, activeQuest, onQuestResult, refreshCharacter]);
+  }, [character._id, activeQuest, refreshCharacter]);
 
   useEffect(() => {
     checkQuestStatus();
@@ -173,7 +171,7 @@ function Tavern({ character, refreshCharacter, onQuestResult, spendEnergy }) {
           alt="Window"
           className="w-full h-auto"
         />
-        <div className="absolute inset-0 flex flex-col gap-4 p-4 pt-24 overflow-y-auto">
+        <div className="absolute inset-0 flex flex-col gap-4 pt-24 pb-4 px-6 overflow-y-auto">
           {isShowingResult && questResult ? (
             <div className="flex flex-col gap-2 text-white text-sm items-center mt-20">
               {questResult.log && (
@@ -195,9 +193,15 @@ function Tavern({ character, refreshCharacter, onQuestResult, spendEnergy }) {
                 src="/assets/tavern/continue_button.png"
                 alt="Continue"
                 className="w-28 mt-4 cursor-pointer hover:scale-105 transition-all"
-                onClick={() => {
+                onClick={async () => {
+                  try {
+                    await acknowledgeQuestResult(character._id);
+                  } catch (err) {
+                    console.error(err);
+                  }
                   setQuestResult(null);
                   setIsShowingResult(false);
+                  refreshCharacter();
                 }}
               />
             </div>
@@ -246,7 +250,7 @@ function Tavern({ character, refreshCharacter, onQuestResult, spendEnergy }) {
       />
 
       <div
-        className={`fixed bottom-0 left-0 w-full h-[160px] bg-no-repeat bg-cover bg-center flex items-center justify-center gap-8 z-40 transition-transform duration-300 ${isFrameOpen ? 'translate-y-0' : 'translate-y-[80%]'}`}
+        className={`fixed bottom-0 left-0 w-full h-[160px] bg-no-repeat bg-cover bg-center flex items-center justify-center gap-8 z-40 transition-transform duration-300 ${isFrameOpen ? 'translate-y-0' : 'translate-y-[calc(100%-42px)]'}`}
         style={{ backgroundImage: "url(/assets/tavern/bottom_frame.png)" }}
         onClick={() => setIsFrameOpen(!isFrameOpen)}
       >

@@ -4,7 +4,6 @@ import Pi from "./piSdk";
 import {
   getCharacters,
   getCharacter,
-  acknowledgeQuestResult,
 } from "./services/playerService";
 import GameHub from "./components/GameHub";
 import CharacterPage from "./pages/CharacterPage";
@@ -16,7 +15,6 @@ import History from "./pages/History";
 import Shop from "./pages/Shop";
 import Tower from "./pages/Tower";
 import Arena from "./pages/Arena";
-import QuestResultModal from "./components/QuestResultModal";
 import LoadingScreenWrapper from "./components/LoadingScreenWrapper";
 
 function App() {
@@ -25,7 +23,6 @@ function App() {
   const [characters, setCharacters] = useState([]);
   const [activeChar, setActiveChar] = useState(null);
   const [error, setError] = useState("");
-  const [questResult, setQuestResult] = useState(null);
 
   useEffect(() => {
     Pi.authenticate({
@@ -55,9 +52,6 @@ function App() {
     try {
       const data = await getCharacter(activeChar._id);
       setActiveChar(data);
-      if (data.pendingQuestResult) {
-        setQuestResult(data.pendingQuestResult);
-      }
     } catch (err) {
       console.error("Failed to refresh character");
     }
@@ -66,18 +60,6 @@ function App() {
   const spendEnergy = useCallback((cost) => {
     setActiveChar((prev) => (prev ? { ...prev, energy: Math.max(prev.energy - cost, 0) } : prev));
   }, []);
-
-  const handleQuestResultClose = async () => {
-    if (activeChar && questResult) {
-      try {
-        await acknowledgeQuestResult(activeChar._id);
-      } catch (err) {
-        console.error(err);
-      }
-    }
-    setQuestResult(null);
-    refreshActiveCharacter();
-  };
 
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 
@@ -97,7 +79,6 @@ function App() {
               characters={characters}
               onSelect={(c) => {
                 setActiveChar(c);
-                if (c.pendingQuestResult) setQuestResult(c.pendingQuestResult);
               }}
               refresh={() => loadCharacters(username)}
             />
@@ -124,7 +105,7 @@ function App() {
       <Routes>
         <Route
           path="/tavern"
-          element={<Tavern character={activeChar} refreshCharacter={refreshActiveCharacter} onQuestResult={setQuestResult} spendEnergy={spendEnergy} />}
+          element={<Tavern character={activeChar} refreshCharacter={refreshActiveCharacter} spendEnergy={spendEnergy} />}
         />
         <Route
           path="/character"
@@ -172,7 +153,6 @@ function App() {
               characters={characters}
               onSelect={(c) => {
                 setActiveChar(c);
-                if (c.pendingQuestResult) setQuestResult(c.pendingQuestResult);
               }}
               refresh={() => loadCharacters(username)}
             />
@@ -189,9 +169,6 @@ function App() {
   return (
     <Router>
       {routes}
-      {activeChar && (
-        <QuestResultModal result={questResult} onClose={handleQuestResultClose} />
-      )}
       <LoadingScreenWrapper isInitializing={isInitializing} />
     </Router>
   );
