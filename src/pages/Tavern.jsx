@@ -238,8 +238,7 @@ function Tavern({ character, refreshCharacter, onQuestResult, spendEnergy }) {
       />
 
       <div
-        className={`fixed bottom-0 left-0 w-full h-[160px] bg-no-repeat bg-contain flex items-center justify-center gap-8 transition-all duration-300 ${isFrameOpen ? 'translate-y-0' : 'translate-y-full'}`}
-        style={{ backgroundImage: "url(/assets/tavern/bottom_frame.png)" }}
+        className={`fixed bottom-0 left-0 w-full h-[160px] bg-no-repeat bg-contain flex items-center justify-center gap-8 z-40 transition-transform duration-300 ${isFrameOpen ? 'translate-y-0' : 'translate-y-[80%]'}`}        style={{ backgroundImage: "url(/assets/tavern/bottom_frame.png)" }}
         onClick={() => setIsFrameOpen(!isFrameOpen)}
       >
         <img
