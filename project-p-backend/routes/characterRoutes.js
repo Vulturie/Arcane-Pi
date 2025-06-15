@@ -551,6 +551,22 @@ router.post("/characters/:id/sell", loadCharacter, async (req, res) => {
   });
 });
 
+// GET /characters/:id/shop
+// Return a paginated list of shop items for the character
+router.get("/characters/:id/shop", loadCharacter, (req, res) => {
+  const page = parseInt(req.query.page || "1", 10);
+  const limit = parseInt(req.query.limit || "8", 10);
+  const start = (page - 1) * limit;
+  const items = req.character.shopPool.slice(start, start + limit);
+  res.json({
+    items,
+    total: req.character.shopPool.length,
+    page,
+    limit,
+    lastShopRefresh: req.character.lastShopRefresh,
+  });
+});
+
 // POST /characters/:id/shop/refresh
 // Debug route to force a shop refresh
 router.post("/characters/:id/shop/refresh", loadCharacter, async (req, res) => {

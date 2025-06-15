@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { buyItem, getEquipment } from "../services/playerService";
+import { buyItem, getEquipment, getShopItems } from "../services/playerService";
 import { RARITY_MULTIPLIER, getRarityLabel } from "../rarity";
 
 function Shop({ character, refreshCharacter }) {
@@ -37,9 +37,16 @@ function Shop({ character, refreshCharacter }) {
   }, [character, loadEquipment]);
 
   useEffect(() => {
-    if (character && character.shopPool) {
-      setShopItems(character.shopPool);
-    }
+    const loadShop = async () => {
+      if (!character) return;
+      try {
+        const data = await getShopItems(character._id);
+        setShopItems(data.items);
+      } catch (err) {
+        console.error("Failed to load shop", err);
+      }
+    };
+    loadShop();
   }, [character]);
 
   const handleBuy = async (item) => {
@@ -124,7 +131,7 @@ function Shop({ character, refreshCharacter }) {
           >
             <img src="/assets/shop/preview_window.png" alt="Preview" className="w-full h-full" />
             <div className="absolute inset-0 flex flex-col items-center text-white text-sm p-4 pt-8 overflow-y-auto">
-              <div className="relative w-[100px] h-[100px] mx-auto mt-20">
+              <div className="relative w-[100px] h-[100px] mx-auto mt-30">
                 <img
                   src={`/assets/items/resized_256/${preview.item.id}_256.png`}
                   alt={preview.item.name}

@@ -202,6 +202,16 @@ export const forceRefreshShop = async (characterId) => {
   return data;
 };
 
+export const getShopItems = async (characterId, page = 1, limit = 8) => {
+  const params = new URLSearchParams({ page, limit });
+  const res = await fetch(
+    `http://localhost:4000/api/characters/${characterId}/shop?${params.toString()}`
+  );
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Failed to load shop items");
+  return data;
+};
+
 export const sellItem = async (characterId, itemId) => {
   const res = await fetch(`http://localhost:4000/api/characters/${characterId}/sell`, {
     method: "POST",
