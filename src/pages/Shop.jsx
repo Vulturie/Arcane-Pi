@@ -87,20 +87,20 @@ function Shop({ character, refreshCharacter }) {
       <img
         src="/assets/shop/shopkeeper.png"
         alt="Shopkeeper"
-        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] cursor-pointer"
+        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[700px] cursor-pointer"
         onClick={() => setIsWindowOpen((prev) => !prev)}
       />
 
       {isWindowOpen && (
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[500px] z-20">
           <img src="/assets/shop/shop_window.png" alt="Shop Window" className="w-full h-full" />
-          <div className="absolute inset-0 grid grid-cols-2 grid-rows-5 gap-1 p-4 pt-8">
+          <div className="absolute inset-0 grid grid-cols-2 grid-rows-5 gap-2 p-4 pt-8 justify-items-center">
             {shopItems.map((it) => (
               <div key={it.id} className="relative w-24 h-24 cursor-pointer" onClick={() => openPreview(it)}>
                 <img
                   src={`/assets/items/resized_128/${it.id}_128.png`}
                   alt={it.name}
-                  className="absolute inset-0 w-3/4 h-3/4 m-auto object-contain"
+                  className="absolute inset-3 w-[74%] h-[74%] object-contain"
                 />
                 <img
                   src={`/assets/borders/resized_128/border_${it.rarity}_128.png`}
@@ -119,16 +119,16 @@ function Shop({ character, refreshCharacter }) {
           onClick={() => setPreview(null)}
         >
           <div
-            className="relative w-[300px] h-[360px] scale-[1.45]"
+            className="relative w-[330px] h-[460px] scale-[1.25]"
             onClick={(e) => e.stopPropagation()}
           >
             <img src="/assets/shop/preview_window.png" alt="Preview" className="w-full h-full" />
-            <div className="absolute inset-0 flex flex-col items-center text-white p-4 pt-6 overflow-y-auto">
-              <div className="relative w-[256px] h-[256px] mx-auto">
+            <div className="absolute inset-0 flex flex-col items-center text-white text-sm p-4 pt-8 overflow-y-auto">
+              <div className="relative w-[100px] h-[100px] mx-auto mt-20">
                 <img
                   src={`/assets/items/resized_256/${preview.item.id}_256.png`}
                   alt={preview.item.name}
-                  className="absolute inset-0 w-full h-full object-contain"
+                  className="absolute inset-3 w-[74%] h-[74%] object-contain"
                 />
                 <img
                   src={`/assets/borders/resized_256/border_${preview.item.rarity}_256.png`}
@@ -191,7 +191,7 @@ function Shop({ character, refreshCharacter }) {
               <img
                 src="/assets/shop/buy_button.png"
                 alt="Buy"
-                className="w-[160px] h-[60px] mt-6 cursor-pointer"
+                className="w-[135px] h-[75px] mt-6 cursor-pointer"
                 onClick={() => handleBuy(preview.item)}
               />
             </div>
