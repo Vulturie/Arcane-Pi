@@ -71,7 +71,7 @@ function Shop({ character, refreshCharacter }) {
       <img
         src="/assets/shop/shop_sign.png"
         alt="Shop"
-        className="absolute top-4 left-1/2 -translate-x-1/2 w-[160px]"
+        className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[240px]"
       />
       <div className="absolute top-4 right-4 flex flex-col items-end gap-1 text-white drop-shadow-md">
         <div className="flex items-center gap-1">
@@ -87,20 +87,20 @@ function Shop({ character, refreshCharacter }) {
       <img
         src="/assets/shop/shopkeeper.png"
         alt="Shopkeeper"
-        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[250px] cursor-pointer"
+        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] cursor-pointer"
         onClick={() => setIsWindowOpen((prev) => !prev)}
       />
 
       {isWindowOpen && (
-        <div className="absolute top-[100px] left-1/2 -translate-x-1/2 w-[280px] h-[500px] z-20">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[500px] z-20">
           <img src="/assets/shop/shop_window.png" alt="Shop Window" className="w-full h-full" />
           <div className="absolute inset-0 grid grid-cols-2 grid-rows-5 gap-1 p-4 pt-8">
             {shopItems.map((it) => (
-              <div key={it.id} className="relative w-32 h-32 cursor-pointer" onClick={() => openPreview(it)}>
+              <div key={it.id} className="relative w-24 h-24 cursor-pointer" onClick={() => openPreview(it)}>
                 <img
                   src={`/assets/items/resized_128/${it.id}_128.png`}
                   alt={it.name}
-                  className="absolute inset-0 w-full h-full object-contain"
+                  className="absolute inset-0 w-3/4 h-3/4 m-auto object-contain"
                 />
                 <img
                   src={`/assets/borders/resized_128/border_${it.rarity}_128.png`}
@@ -119,7 +119,7 @@ function Shop({ character, refreshCharacter }) {
           onClick={() => setPreview(null)}
         >
           <div
-            className="relative w-[300px] h-[360px]"
+            className="relative w-[300px] h-[360px] scale-[1.45]"
             onClick={(e) => e.stopPropagation()}
           >
             <img src="/assets/shop/preview_window.png" alt="Preview" className="w-full h-full" />
@@ -191,7 +191,7 @@ function Shop({ character, refreshCharacter }) {
               <img
                 src="/assets/shop/buy_button.png"
                 alt="Buy"
-                className="w-[160px] h-[60px] mt-4 cursor-pointer"
+                className="w-[160px] h-[60px] mt-6 cursor-pointer"
                 onClick={() => handleBuy(preview.item)}
               />
             </div>
