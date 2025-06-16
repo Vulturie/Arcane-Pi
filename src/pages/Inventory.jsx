@@ -1,26 +1,28 @@
-import React, { useEffect, useState, useCallback } from "react";
-import { RARITY_MULTIPLIER, getRarityLabel } from "../rarity";
+import React, { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   getInventory,
-  addItemToInventory,
   getEquipment,
   equipItem,
   unequipItem,
   sellItem,
+  getStatsForClass,
+  getXpForNextLevel,
 } from "../services/playerService";
+import { RARITY_MULTIPLIER, getRarityLabel } from "../rarity";
 
 function Inventory({ character, refreshCharacter }) {
+  const navigate = useNavigate();
   const [items, setItems] = useState([]);
   const [equipped, setEquipped] = useState({});
-  const [slots, setSlots] = useState(0);
-  const [maxSlots, setMaxSlots] = useState(0);
   const [preview, setPreview] = useState(null);
+  const [showItems, setShowItems] = useState(false);
+  const [showStats, setShowStats] = useState(false);
 
   const getBonus = (item, stat) => {
     if (!item || !item.statBonus) return 0;
     const mult = RARITY_MULTIPLIER[item.rarity] || 1;
-    const value = (item.statBonus[stat] || 0) * mult;
-    return Math.round(value * 10) / 10;
+    return Math.round(((item.statBonus[stat] || 0) * mult) * 10) / 10;
   };
 
   const loadInventory = useCallback(async () => {
@@ -28,8 +30,6 @@ function Inventory({ character, refreshCharacter }) {
     try {
       const data = await getInventory(character._id);
       setItems(data.inventory);
-      setSlots(data.slots);
-      setMaxSlots(data.maxSlots);
     } catch (err) {
       console.error("Failed to load inventory", err);
     }
@@ -48,17 +48,7 @@ function Inventory({ character, refreshCharacter }) {
   useEffect(() => {
     loadInventory();
     loadEquipment();
-  }, [character, loadInventory, loadEquipment]);
-
-    const giveTestItem = async () => {
-        try {
-          await addItemToInventory(character._id, "sword_iron");
-          loadInventory();
-          loadEquipment();
-        } catch (err) {
-          console.error("Failed to add item", err);
-        }
-    };
+  }, [loadInventory, loadEquipment]);
 
   const handleEquip = async (id) => {
     try {
@@ -69,11 +59,6 @@ function Inventory({ character, refreshCharacter }) {
       console.error("Failed to equip item", err);
       alert(err.message);
     }
-  };
-
-  const openPreview = (item, compare = false) => {
-    const compareItem = compare ? equipped[item.type] : null;
-    setPreview({ item, compareItem });
   };
 
   const handleUnequip = async (slot) => {
@@ -87,7 +72,6 @@ function Inventory({ character, refreshCharacter }) {
   };
 
   const handleSell = async (id) => {
-    if (!character) return;
     try {
       await sellItem(character._id, id);
       loadInventory();
@@ -98,110 +82,293 @@ function Inventory({ character, refreshCharacter }) {
     }
   };
 
+  const openPreview = (item, compare = false) => {
+    const compareItem = compare ? equipped[item.type] : null;
+    setPreview({ item, compareItem });
+  };
+
+  if (!character) return null;
+
+  const portrait = `/assets/character_creation/${character.class.toLowerCase()}_${character.gender}.png`;
+  const nextXp = getXpForNextLevel(character.level);
+  const xpPercent = Math.min((character.xp / nextXp) * 100, 100);
+
+  const leftSlots = ["headpiece", "chestplate", "gloves", "footwear"];
+  const rightSlots = ["belt", "necklace", "ring", "artifact"];
+
+  const stats = (() => {
+    const base = getStatsForClass(character.class, character.level);
+    if (base) {
+      Object.values(equipped).forEach((it) => {
+        if (it && it.statBonus) {
+          Object.keys(it.statBonus).forEach((k) => {
+            base[k] = (base[k] || 0) + getBonus(it, k);
+          });
+        }
+      });
+    }
+    return base;
+  })();
+
+  const renderSlot = (slot) => {
+    const item = equipped[slot];
+    const borderRarity = item ? item.rarity : "common";
+    return (
+      <div
+        key={slot}
+        className="relative w-20 h-20 cursor-pointer"
+        onClick={() => item && openPreview(item)}
+      >
+        {item && (
+          <img
+            src={`/assets/items/resized_128/${item.id}_128.png`}
+            alt={item.name}
+            className="absolute inset-3 w-[72%] h-[72%] object-contain"
+          />
+        )}
+        <img
+          src={`/assets/borders/resized_128/border_${borderRarity}_128.png`}
+          alt="Border"
+          className="absolute inset-0 w-full h-full"
+        />
+      </div>
+    );
+  };
+
   return (
-    <div>
-      <h2>Equipped Items</h2>
-      <ul>
-        {[
-          "weapon",
-          "headpiece",
-          "chestplate",
-          "gloves",
-          "footwear",
-          "necklace",
-          "belt",
-          "ring",
-          "artifact",
-        ].map((slot) => (
-          <li key={slot}>
-            {slot}: {equipped && equipped[slot] ? (
-              <span className={`rarity-${equipped[slot].rarity}`}>{equipped[slot].name} ({getRarityLabel(equipped[slot].rarity)})</span>
-            ) : "None"}
-            {equipped && equipped[slot] && (
+    <div
+      className="relative w-screen h-screen bg-cover bg-center font-[Cinzel] text-white"
+      style={{ backgroundImage: "url(/assets/inventory/inventory_background.png)" }}
+    >
+      <img
+        src="/assets/inventory/back_button.png"
+        alt="Back"
+        className="absolute top-4 left-4 w-10 h-10 cursor-pointer"
+        onClick={() => navigate("/")}
+      />
+      <img
+        src="/assets/inventory/stats_button.png"
+        alt="Stats"
+        className="absolute top-4 right-4 w-10 h-10 cursor-pointer"
+        onClick={() => setShowStats(true)}
+      />
+      <img
+        src="/assets/inventory/items_button.png"
+        alt="Items"
+        className="absolute bottom-4 left-1/2 -translate-x-1/2 w-20 cursor-pointer"
+        onClick={() => setShowItems((p) => !p)}
+      />
+
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+        <img src={portrait} alt="Character" className="w-32 h-auto drop-shadow-md" />
+        <div className="mt-2 text-lg font-bold drop-shadow-md">{character.name}</div>
+        <div className="text-sm drop-shadow-md mb-2">
+          {equipped.weapon ? (
+            <span className={`rarity-${equipped.weapon.rarity}`}>{equipped.weapon.name}</span>
+          ) : (
+            "Unarmed"
+          )}
+        </div>
+        <div className="w-full max-w-[260px] h-8 relative rounded-xl overflow-hidden mb-2">
+          <img
+            src="/assets/game_hub/xp_bar.png"
+            alt="XP"
+            className="absolute inset-0 w-full h-full object-contain z-10 pointer-events-none"
+          />
+          <div className="absolute inset-2 z-0 overflow-hidden rounded-xl">
+            <div
+              className="h-full bg-gradient-to-r from-[#ffcf33] to-[#ffe884]"
+              style={{ width: `${xpPercent}%` }}
+            />
+          </div>
+          <div className="absolute inset-0 flex items-center justify-center z-20 text-xs font-bold text-black drop-shadow-md">
+            {`${character.xp} / ${nextXp} XP`}
+          </div>
+        </div>
+      </div>
+
+      <div className="absolute left-4 top-1/2 -translate-y-1/2 flex flex-col gap-2">
+        {leftSlots.map(renderSlot)}
+      </div>
+      <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-2">
+        {rightSlots.map(renderSlot)}
+      </div>
+
+      {showItems && (
+        <div
+          className="fixed inset-0 z-30 flex items-center justify-center bg-black bg-opacity-30"
+          onClick={() => setShowItems(false)}
+        >
+          <div
+            className="relative w-[360px] h-[200px]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img src="/assets/inventory/items_window.png" alt="Items" className="w-full h-full" />
+            <div className="absolute inset-0 grid grid-cols-5 grid-rows-2 gap-1 p-4 pt-6 justify-items-center items-start">
+              {items.slice(0, 10).map((it) => (
+                <div
+                  key={it.id}
+                  className="relative w-16 h-16 cursor-pointer"
+                  onClick={() => openPreview(it, true)}
+                >
+                  <img
+                    src={`/assets/items/resized_128/${it.id}_128.png`}
+                    alt={it.name}
+                    className="absolute inset-2 w-[80%] h-[80%] object-contain"
+                  />
+                  <img
+                    src={`/assets/borders/resized_128/border_${it.rarity}_128.png`}
+                    alt="Border"
+                    className="absolute inset-0 w-full h-full"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showStats && (
+        <div
+          className="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-30"
+          onClick={() => setShowStats(false)}
+        >
+          <div
+            className="relative w-[320px] h-[180px]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img src="/assets/inventory/stats_table.png" alt="Stats" className="w-full h-full" />
+            {stats && (
               <>
-                <button onClick={() => handleUnequip(slot)}>Unequip</button>
-                <button onClick={() => openPreview(equipped[slot])}>Preview</button>
+                <div className="absolute w-[35%] left-[30px] top-[26px] flex justify-between items-center px-2 text-lg font-bold drop-shadow-md">
+                  <span>STR</span>
+                  <span className="text-yellow-300 min-w-[30px] text-right">{stats.STR}</span>
+                </div>
+                <div className="absolute w-[35%] left-[30px] top-[60px] flex justify-between items-center px-2 text-lg font-bold drop-shadow-md">
+                  <span>AGI</span>
+                  <span className="text-yellow-300 min-w-[30px] text-right">{stats.AGI}</span>
+                </div>
+                <div className="absolute w-[35%] left-[30px] top-[96px] flex justify-between items-center px-2 text-lg font-bold drop-shadow-md">
+                  <span>INT</span>
+                  <span className="text-yellow-300 min-w-[30px] text-right">{stats.INT}</span>
+                </div>
+                <div className="absolute w-[35%] left-[30px] top-[128px] flex justify-between items-center px-2 text-lg font-bold drop-shadow-md">
+                  <span>VIT</span>
+                  <span className="text-yellow-300 min-w-[30px] text-right">{stats.VIT}</span>
+                </div>
               </>
             )}
-          </li>
-        ))}
-      </ul>
-      <h2>Inventory</h2>
-      {character && <p>Your Gold: {character.gold}</p>}
-      <p>Items: {slots} / {maxSlots}</p>
-      <button onClick={giveTestItem}>Give Test Item</button>
-      <ul>
-        {items.map((item, idx) => (
-          <li key={idx}>
-            <span className={`rarity-${item.rarity}`}>{item.name} ({getRarityLabel(item.rarity)})</span> ({item.type})
-            <button onClick={() => openPreview(item, true)}>Preview</button>
-            <button onClick={() => handleEquip(item.id)}>Equip</button>
-            {character && (
-              <button onClick={() => handleSell(item.id)}>Sell</button>
-            )}
-          </li>
-        ))}
-      </ul>
+          </div>
+        </div>
+      )}
+
       {preview && (
-        <div className="modal" onClick={() => setPreview(null)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h3 className={`rarity-${preview.item.rarity}`}>
-              {preview.item.name} ({getRarityLabel(preview.item.rarity)})
-            </h3>
-            <p>Type: {preview.item.type}</p>
-            {preview.item.classRestriction && (
-              <p className={
-                preview.item.classRestriction.includes(character.class)
-                  ? "equip-allowed"
-                  : "equip-denied"
-              }>
-                Classes: {preview.item.classRestriction.join(", ")}
-              </p>
-            )}
-            {preview.item.statBonus && (
-              <ul>
-                {Object.entries(preview.item.statBonus).map(([k]) => {
-                  const value = getBonus(preview.item, k);
-                  const current = getBonus(preview.compareItem, k);
-                  const diff = value - current;
-                  return (
-                    <li key={k}>
-                      {k}: +{value}
-                      {preview.compareItem && diff !== 0 && (
-                        <span className={diff > 0 ? "better" : "worse"}>
-                          ({diff > 0 ? "+" : ""}{diff})
-                        </span>
-                      )}
-                    </li>
-                  );
-                })}
-                {preview.compareItem &&
-                  Object.entries(preview.compareItem.statBonus || {})
-                    .filter(([k]) => !(preview.item.statBonus || {})[k])
-                  .map(([k, v]) => (
-                      <li key={k}>
-                        {k}: +0 {" "}
-                        <span className="worse">({-getBonus(preview.compareItem, k)})</span>
-                      </li>
-                    ))}
-              </ul>
-            )}
-            {preview.compareItem && (
-              <>
-                <h4>Currently Equipped</h4>
-                <p className={`rarity-${preview.compareItem.rarity}`}>
-                  {preview.compareItem.name} ({getRarityLabel(preview.compareItem.rarity)})
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30"
+          onClick={() => setPreview(null)}
+        >
+          <div
+            className="relative w-[330px] h-[560px] scale-[1.25]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img src="/assets/inventory/preview_window.png" alt="Preview" className="w-full h-full" />
+            <div className="absolute inset-0 flex flex-col items-center text-white text-sm p-2 pt-8">
+              <div className="relative w-[256px] h-[256px] mx-auto">
+                <img
+                  src={`/assets/items/resized_256/${preview.item.id}_256.png`}
+                  alt={preview.item.name}
+                  className="absolute inset-16 w-[46%] h-[46%] mt-16 ml-3"
+                />
+                <img
+                  src={`/assets/borders/resized_256/border_${preview.item.rarity}_256.png`}
+                  alt="Border"
+                  className="absolute inset-14 w-[60%] h-[60%] mt-14"
+                />
+              </div>
+              <div className="flex-1 overflow-y-auto w-full text-center mt-2">
+                <p className={`rarity-${preview.item.rarity} font-bold`}>
+                  {preview.item.name} ({getRarityLabel(preview.item.rarity)})
                 </p>
-                {preview.compareItem.statBonus && (
+                <p>Type: {preview.item.type}</p>
+                {preview.item.classRestriction && (
+                  <p
+                    className={
+                      preview.item.classRestriction.includes(character.class)
+                        ? "equip-allowed"
+                        : "equip-denied"
+                    }
+                  >
+                    Classes: {preview.item.classRestriction.join(", ")}
+                  </p>
+                )}
+                {preview.item.statBonus && (
                   <ul>
-                    {Object.entries(preview.compareItem.statBonus).map(([k, v]) => (
-                      <li key={k}>{k}: +{getBonus(preview.compareItem, k)}</li>
-                    ))}
+                    {Object.entries(preview.item.statBonus).map(([k]) => {
+                      const value = getBonus(preview.item, k);
+                      const current = getBonus(preview.compareItem, k);
+                      const diff = value - current;
+                      return (
+                        <li key={k}>
+                          {k}: +{value}
+                          {preview.compareItem && diff !== 0 && (
+                            <span className={diff > 0 ? "better" : "worse"}>
+                              ({diff > 0 ? "+" : ""}
+                              {diff})
+                            </span>
+                          )}
+                        </li>
+                      );
+                    })}
+                    {preview.compareItem &&
+                      Object.entries(preview.compareItem.statBonus || {})
+                        .filter(([k]) => !(preview.item.statBonus || {})[k])
+                        .map(([k]) => (
+                          <li key={k}>
+                            {k}: +0 <span className="worse">({-getBonus(preview.compareItem, k)})</span>
+                          </li>
+                        ))}
                   </ul>
                 )}
-              </>
-            )}
-            <button onClick={() => setPreview(null)}>Close</button>
+                {preview.compareItem && (
+                  <>
+                    <h4>Currently Equipped</h4>
+                    <p className={`rarity-${preview.compareItem.rarity}`}>
+                      {preview.compareItem.name} ({getRarityLabel(preview.compareItem.rarity)})
+                    </p>
+                    {preview.compareItem.statBonus && (
+                      <ul>
+                        {Object.entries(preview.compareItem.statBonus).map(([k]) => (
+                          <li key={k}>{k}: +{getBonus(preview.compareItem, k)}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </>
+                )}
+              </div>
+              {preview.item.id === (equipped[preview.item.type]?.id) ? (
+                <img
+                  src="/assets/inventory/unequip_button.png"
+                  alt="Unequip"
+                  className="w-[135px] h-[75px] mt-2 cursor-pointer"
+                  onClick={() => handleUnequip(preview.item.type)}
+                />
+              ) : (
+                preview.item.type && (
+                  <img
+                    src="/assets/inventory/equip_button.png"
+                    alt="Equip"
+                    className="w-[135px] h-[75px] mt-2 cursor-pointer"
+                    onClick={() => handleEquip(preview.item.id)}
+                  />
+                )
+              )}
+              <img
+                src="/assets/inventory/sell_button.png"
+                alt="Sell"
+                className="w-[135px] h-[75px] mt-2 cursor-pointer"
+                onClick={() => handleSell(preview.item.id)}
+              />
+            </div>
           </div>
         </div>
       )}
