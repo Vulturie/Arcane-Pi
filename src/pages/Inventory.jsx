@@ -21,14 +21,14 @@ function Inventory({ character, refreshCharacter }) {
   const getBonus = (item, stat) => {
     if (!item || !item.statBonus) return 0;
     const mult = RARITY_MULTIPLIER[item.rarity] || 1;
-    return Math.round(((item.statBonus[stat] || 0) * mult) * 10) / 10;
+    return Math.round((item.statBonus[stat] || 0) * mult * 10) / 10;
   };
 
   const loadInventory = useCallback(async () => {
     if (!character) return;
     try {
       const data = await getInventory(character._id);
-      setItems(data.inventory.slice(0, 10));
+      setItems(data.inventory);
     } catch (err) {
       console.error("Failed to load inventory", err);
     }
@@ -98,6 +98,13 @@ function Inventory({ character, refreshCharacter }) {
   const leftSlots = ["headpiece", "chestplate", "gloves", "footwear"];
   const rightSlots = ["belt", "necklace", "ring", "artifact"];
 
+  const equippedIds = new Set(
+    Object.values(equipped)
+      .filter(Boolean)
+      .map((it) => it.id),
+  );
+  const filteredItems = items.filter((it) => !equippedIds.has(it.id));
+
   const stats = (() => {
     const base = getStatsForClass(character.class, character.level);
     if (base) {
@@ -152,7 +159,6 @@ function Inventory({ character, refreshCharacter }) {
         onClick={() => navigate("/")}
       />
 
-
       <div className="absolute left-1/2 top-[28.55%] -translate-x-1/2 -translate-y-1/2 relative flex items-start justify-center gap-2">
         <div className="absolute left-[15px] top-[-36px] flex flex-col gap-3.5">
           {leftSlots.map(renderSlot)}
@@ -161,8 +167,14 @@ function Inventory({ character, refreshCharacter }) {
           {rightSlots.map(renderSlot)}
         </div>
         <div className="flex flex-col items-center">
-          <img src={portrait} alt="Character" className="w-32 h-auto drop-shadow-md" />
-          <div className="mt-2 text-lg font-bold drop-shadow-md">{character.name}</div>
+          <img
+            src={portrait}
+            alt="Character"
+            className="w-32 h-auto drop-shadow-md"
+          />
+          <div className="mt-2 text-lg font-bold drop-shadow-md">
+            {character.name}
+          </div>
           <div
             className="relative w-16 h-16 mt-5 mb-2 cursor-pointer"
             onClick={() => equipped.weapon && openPreview(equipped.weapon)}
@@ -209,24 +221,36 @@ function Inventory({ character, refreshCharacter }) {
           onClick={() => setShowItems((p) => !p)}
         />
         <div className="relative w-[160px] h-[160px]">
-          <img src="/assets/inventory/stats_table.png" alt="Stats" className="w-full h-full" />
+          <img
+            src="/assets/inventory/stats_table.png"
+            alt="Stats"
+            className="w-full h-full"
+          />
           {stats && (
             <>
               <div className="absolute w-[35%] left-[16px] top-[22px] flex justify-between items-center px-4 text-lg font-bold drop-shadow-md">
                 <span>STR</span>
-                <span className="text-yellow-300 min-w-[60px] text-right">{stats.STR}</span>
+                <span className="text-yellow-300 min-w-[60px] text-right">
+                  {stats.STR}
+                </span>
               </div>
               <div className="absolute w-[35%] left-[16px] top-[52px] flex justify-between items-center px-4 text-lg font-bold drop-shadow-md">
                 <span>AGI</span>
-                <span className="text-yellow-300 min-w-[60px] text-right">{stats.AGI}</span>
+                <span className="text-yellow-300 min-w-[60px] text-right">
+                  {stats.AGI}
+                </span>
               </div>
               <div className="absolute w-[35%] left-[16px] top-[82px] flex justify-between items-center px-4 text-lg font-bold drop-shadow-md">
                 <span>INT</span>
-                <span className="text-yellow-300 min-w-[60px] text-right">{stats.INT}</span>
+                <span className="text-yellow-300 min-w-[60px] text-right">
+                  {stats.INT}
+                </span>
               </div>
               <div className="absolute w-[35%] left-[16px] top-[112px] flex justify-between items-center px-4 text-lg font-bold drop-shadow-md">
                 <span>VIT</span>
-                <span className="text-yellow-300 min-w-[60px] text-right">{stats.VIT}</span>
+                <span className="text-yellow-300 min-w-[60px] text-right">
+                  {stats.VIT}
+                </span>
               </div>
             </>
           )}
@@ -242,9 +266,13 @@ function Inventory({ character, refreshCharacter }) {
             className="relative w-[360px]"
             onClick={(e) => e.stopPropagation()}
           >
-            <img src="/assets/inventory/items_window.png" alt="Items" className="w-full h-auto" />
-            <div className="absolute inset-0 grid grid-cols-5 grid-rows-2 gap-1 p-4 pt-6 justify-items-center items-start">
-              {items.slice(0, 10).map((it) => (
+            <img
+              src="/assets/inventory/items_window.png"
+              alt="Items"
+              className="w-full h-auto"
+            />
+            <div className="absolute inset-0 grid grid-cols-5 grid-rows-2 gap-2 p-6 pt-8 justify-items-center items-start">
+              {filteredItems.slice(0, 10).map((it) => (
                 <div
                   key={it.id}
                   className="relative w-16 h-16 cursor-pointer"
@@ -267,7 +295,6 @@ function Inventory({ character, refreshCharacter }) {
         </div>
       )}
 
-
       {preview && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30"
@@ -277,8 +304,12 @@ function Inventory({ character, refreshCharacter }) {
             className="relative w-[330px] h-[560px] scale-[1.25]"
             onClick={(e) => e.stopPropagation()}
           >
-            <img src="/assets/inventory/preview_window.png" alt="Preview" className="w-full h-full" />
-            <div className="absolute inset-0 flex flex-col items-center text-white text-sm p-2 pt-8">
+            <img
+              src="/assets/inventory/preview_window.png"
+              alt="Preview"
+              className="w-full h-full"
+            />
+            <div className="absolute inset-0 flex flex-col items-center text-white text-sm p-4 pt-10">
               <div className="relative w-[256px] h-[256px] mx-auto">
                 <img
                   src={`/assets/items/resized_256/${preview.item.id}_256.png`}
@@ -330,7 +361,10 @@ function Inventory({ character, refreshCharacter }) {
                         .filter(([k]) => !(preview.item.statBonus || {})[k])
                         .map(([k]) => (
                           <li key={k}>
-                            {k}: +0 <span className="worse">({-getBonus(preview.compareItem, k)})</span>
+                            {k}: +0{" "}
+                            <span className="worse">
+                              ({-getBonus(preview.compareItem, k)})
+                            </span>
                           </li>
                         ))}
                   </ul>
@@ -339,13 +373,18 @@ function Inventory({ character, refreshCharacter }) {
                   <>
                     <h4>Currently Equipped</h4>
                     <p className={`rarity-${preview.compareItem.rarity}`}>
-                      {preview.compareItem.name} ({getRarityLabel(preview.compareItem.rarity)})
+                      {preview.compareItem.name} (
+                      {getRarityLabel(preview.compareItem.rarity)})
                     </p>
                     {preview.compareItem.statBonus && (
                       <ul>
-                        {Object.entries(preview.compareItem.statBonus).map(([k]) => (
-                          <li key={k}>{k}: +{getBonus(preview.compareItem, k)}</li>
-                        ))}
+                        {Object.entries(preview.compareItem.statBonus).map(
+                          ([k]) => (
+                            <li key={k}>
+                              {k}: +{getBonus(preview.compareItem, k)}
+                            </li>
+                          ),
+                        )}
                       </ul>
                     )}
                   </>
