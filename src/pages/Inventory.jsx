@@ -156,7 +156,10 @@ function Inventory({ character, refreshCharacter }) {
       <div className="absolute left-1/2 top-[30%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
         <img src={portrait} alt="Character" className="w-32 h-auto drop-shadow-md" />
         <div className="mt-2 text-lg font-bold drop-shadow-md">{character.name}</div>
-        <div className="relative w-20 h-20 mb-1">
+        <div
+          className="relative w-20 h-20 mb-1 cursor-pointer"
+          onClick={() => equipped.weapon && openPreview(equipped.weapon)}
+        >
           {equipped.weapon && (
             <>
               <img
@@ -172,19 +175,19 @@ function Inventory({ character, refreshCharacter }) {
             </>
           )}
         </div>
-        <div className="w-full max-w-[360px] h-8 relative rounded-xl overflow-hidden mb-1">
+        <div className="w-full max-w-[300px] h-10 mt-2 relative rounded-xl overflow-hidden mb-1">
           <img
             src="/assets/game_hub/xp_bar.png"
             alt="XP"
             className="absolute inset-0 w-full h-full object-contain z-10 pointer-events-none"
           />
-          <div className="absolute inset-2 z-0 overflow-hidden rounded-xl">
+          <div className="absolute inset-3 z-0 overflow-hidden rounded-xl">
             <div
               className="h-full bg-gradient-to-r from-[#ffcf33] to-[#ffe884]"
               style={{ width: `${xpPercent}%` }}
             />
           </div>
-          <div className="absolute inset-0 flex items-center justify-center z-20 text-xs font-bold text-white drop-shadow-md">
+          <div className="absolute inset-0 flex items-center justify-center z-20 text-sm font-bold text-white drop-shadow-md">
             {`${character.xp} / ${nextXp} XP`}
           </div>
         </div>
@@ -347,29 +350,38 @@ function Inventory({ character, refreshCharacter }) {
                   </>
                 )}
               </div>
-              {preview.item.id === (equipped[preview.item.type]?.id) ? (
-                <img
-                  src="/assets/inventory/unequip_button.png"
-                  alt="Unequip"
-                  className="w-[135px] h-[75px] mt-2 cursor-pointer"
-                  onClick={() => handleUnequip(preview.item.type)}
-                />
-              ) : (
-                preview.item.type && (
-                  <img
-                    src="/assets/inventory/equip_button.png"
-                    alt="Equip"
-                    className="w-[135px] h-[75px] mt-2 cursor-pointer"
-                    onClick={() => handleEquip(preview.item.id)}
-                  />
-                )
-              )}
-              <img
-                src="/assets/inventory/sell_button.png"
-                alt="Sell"
-                className="w-[135px] h-[75px] mt-2 cursor-pointer"
-                onClick={() => handleSell(preview.item.id)}
-              />
+              {(() => {
+                const isEquipped =
+                  preview.item.id === equipped[preview.item.type]?.id;
+                if (isEquipped) {
+                  return (
+                    <img
+                      src="/assets/inventory/unequip_button.png"
+                      alt="Unequip"
+                      className="w-[135px] h-[75px] mt-2 cursor-pointer"
+                      onClick={() => handleUnequip(preview.item.type)}
+                    />
+                  );
+                }
+                return (
+                  <>
+                    {preview.item.type && (
+                      <img
+                        src="/assets/inventory/equip_button.png"
+                        alt="Equip"
+                        className="w-[135px] h-[75px] mt-2 cursor-pointer"
+                        onClick={() => handleEquip(preview.item.id)}
+                      />
+                    )}
+                    <img
+                      src="/assets/inventory/sell_button.png"
+                      alt="Sell"
+                      className="w-[135px] h-[75px] mt-2 cursor-pointer"
+                      onClick={() => handleSell(preview.item.id)}
+                    />
+                  </>
+                );
+              })()}
             </div>
           </div>
         </div>
