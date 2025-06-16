@@ -117,7 +117,7 @@ function Inventory({ character, refreshCharacter }) {
     return (
       <div
         key={slot}
-        className="relative w-20 h-20 cursor-pointer"
+        className="relative w-16 h-16 cursor-pointer"
         onClick={() => item && openPreview(item)}
       >
         {item && (
@@ -125,7 +125,7 @@ function Inventory({ character, refreshCharacter }) {
             <img
               src={`/assets/items/resized_128/${item.id}_128.png`}
               alt={item.name}
-              className="absolute inset-3 w-[72%] h-[72%] object-contain"
+              className="absolute inset-2 w-[80%] h-[80%] object-contain"
             />
             <img
               src={`/assets/borders/resized_128/border_${item.rarity}_128.png`}
@@ -153,58 +153,59 @@ function Inventory({ character, refreshCharacter }) {
       />
 
 
-      <div className="absolute left-1/2 top-[30%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
-        <img src={portrait} alt="Character" className="w-32 h-auto drop-shadow-md" />
-        <div className="mt-2 text-lg font-bold drop-shadow-md">{character.name}</div>
-        <div
-          className="relative w-20 h-20 mb-1 cursor-pointer"
-          onClick={() => equipped.weapon && openPreview(equipped.weapon)}
-        >
-          {equipped.weapon && (
-            <>
-              <img
-                src={`/assets/items/resized_128/${equipped.weapon.id}_128.png`}
-                alt={equipped.weapon.name}
-                className="absolute inset-2 w-[80%] h-[80%] object-contain"
-              />
-              <img
-                src={`/assets/borders/resized_128/border_${equipped.weapon.rarity}_128.png`}
-                alt="Border"
-                className="absolute inset-0 w-full h-full"
-              />
-            </>
-          )}
+      <div className="absolute left-1/2 top-[28.55%] -translate-x-1/2 -translate-y-1/2 relative flex items-start justify-center gap-2">
+        <div className="absolute left-[15px] top-[-36px] flex flex-col gap-3.5">
+          {leftSlots.map(renderSlot)}
         </div>
-        <div className="w-full max-w-[300px] h-10 mt-2 relative rounded-xl overflow-hidden mb-1">
-          <img
-            src="/assets/game_hub/xp_bar.png"
-            alt="XP"
-            className="absolute inset-0 w-full h-full object-contain z-10 pointer-events-none"
-          />
-          <div className="absolute inset-3 z-0 overflow-hidden rounded-xl">
-            <div
-              className="h-full bg-gradient-to-r from-[#ffcf33] to-[#ffe884]"
-              style={{ width: `${xpPercent}%` }}
+        <div className="absolute right-[15px] top-[-36px] flex flex-col gap-3.5">
+          {rightSlots.map(renderSlot)}
+        </div>
+        <div className="flex flex-col items-center">
+          <img src={portrait} alt="Character" className="w-32 h-auto drop-shadow-md" />
+          <div className="mt-2 text-lg font-bold drop-shadow-md">{character.name}</div>
+          <div
+            className="relative w-16 h-16 mt-5 mb-2 cursor-pointer"
+            onClick={() => equipped.weapon && openPreview(equipped.weapon)}
+          >
+            {equipped.weapon && (
+              <>
+                <img
+                  src={`/assets/items/resized_128/${equipped.weapon.id}_128.png`}
+                  alt={equipped.weapon.name}
+                  className="absolute inset-2 w-[80%] h-[80%] object-contain"
+                />
+                <img
+                  src={`/assets/borders/resized_128/border_${equipped.weapon.rarity}_128.png`}
+                  alt="Border"
+                  className="absolute inset-0 w-full h-full"
+                />
+              </>
+            )}
+          </div>
+          <div className="w-full max-w-[300px] h-10 mt-5 relative rounded-xl overflow-hidden mb-1">
+            <img
+              src="/assets/game_hub/xp_bar.png"
+              alt="XP"
+              className="absolute inset-0 w-full h-full object-contain z-10 pointer-events-none"
             />
-          </div>
-          <div className="absolute inset-0 flex items-center justify-center z-20 text-sm font-bold text-white drop-shadow-md">
-            {`${character.xp} / ${nextXp} XP`}
+            <div className="absolute inset-3 z-0 overflow-hidden rounded-xl">
+              <div
+                className="h-full bg-gradient-to-r from-[#ffcf33] to-[#ffe884]"
+                style={{ width: `${xpPercent}%` }}
+              />
+            </div>
+            <div className="absolute inset-0 flex items-center justify-center z-20 text-sm font-bold text-white drop-shadow-md">
+              {`${character.xp} / ${nextXp} XP`}
+            </div>
           </div>
         </div>
-      </div>
-
-      <div className="absolute left-4 top-1/2 -translate-y-1/2 flex flex-col gap-2">
-        {leftSlots.map(renderSlot)}
-      </div>
-      <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-2">
-        {rightSlots.map(renderSlot)}
       </div>
 
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center">
         <img
           src="/assets/inventory/items_button.png"
           alt="Items"
-          className="w-20 cursor-pointer mb-48"
+          className="w-20 cursor-pointer mb-56"
           onClick={() => setShowItems((p) => !p)}
         />
         <div className="relative w-[160px] h-[160px]">
@@ -238,7 +239,7 @@ function Inventory({ character, refreshCharacter }) {
           onClick={() => setShowItems(false)}
         >
           <div
-            className="relative w-[340px]"
+            className="relative w-[360px]"
             onClick={(e) => e.stopPropagation()}
           >
             <img src="/assets/inventory/items_window.png" alt="Items" className="w-full h-auto" />
