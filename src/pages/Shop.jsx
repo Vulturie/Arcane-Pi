@@ -126,79 +126,81 @@ function Shop({ character, refreshCharacter }) {
           onClick={() => setPreview(null)}
         >
           <div
-            className="relative w-[330px] h-[460px] scale-[1.25]"
+            className="relative w-[330px] h-[560px] scale-[1.25]"
             onClick={(e) => e.stopPropagation()}
           >
             <img src="/assets/shop/preview_window.png" alt="Preview" className="w-full h-full" />
-            <div className="absolute inset-0 flex flex-col items-center text-white text-sm p-4 pt-8 overflow-y-auto">
-              <div className="relative w-[100px] h-[100px] mx-auto mt-30">
+            <div className="absolute inset-0 flex flex-col items-center text-white text-sm p-2 pt-8">
+              <div className="relative w-[256px] h-[256px] mx-auto">
                 <img
                   src={`/assets/items/resized_256/${preview.item.id}_256.png`}
                   alt={preview.item.name}
-                  className="absolute inset-3 w-[74%] h-[74%] object-contain"
+                  className="absolute inset-16 w-[46%] h-[46%] mt-16 ml-3"
                 />
                 <img
                   src={`/assets/borders/resized_256/border_${preview.item.rarity}_256.png`}
                   alt="Border"
-                  className="absolute inset-0 w-full h-full"
+                  className="absolute inset-14 w-[60%] h-[60%] mt-14"
                 />
               </div>
-              <p className={`rarity-${preview.item.rarity} font-bold mt-2`}>{preview.item.name} ({getRarityLabel(preview.item.rarity)})</p>
-              <p>Type: {preview.item.type}</p>
-              {preview.item.classRestriction && (
-                <p className={
-                  preview.item.classRestriction.includes(character.class)
-                    ? "equip-allowed"
-                    : "equip-denied"
-                }>
-                  Classes: {preview.item.classRestriction.join(", ")}
-                </p>
-              )}
-              <p>Cost: {preview.item.cost} Gold</p>
-              {preview.item.statBonus && (
-                <ul>
-                  {Object.entries(preview.item.statBonus).map(([k]) => {
-                    const value = getBonus(preview.item, k);
-                    const current = getBonus(preview.compareItem, k);
-                    const diff = value - current;
-                    return (
-                      <li key={k}>
-                        {k}: +{value}
-                        {preview.compareItem && diff !== 0 && (
-                          <span className={diff > 0 ? "better" : "worse"}>
-                            ({diff > 0 ? "+" : ""}{diff})
-                          </span>
-                        )}
-                      </li>
-                    );
-                  })}
-                  {preview.compareItem &&
-                    Object.entries(preview.compareItem.statBonus || {})
-                      .filter(([k]) => !(preview.item.statBonus || {})[k])
-                      .map(([k]) => (
+              <div className="flex-1 overflow-y-auto w-full text-center mt-2">
+                <p className={`rarity-${preview.item.rarity} font-bold`}>{preview.item.name} ({getRarityLabel(preview.item.rarity)})</p>
+                <p>Type: {preview.item.type}</p>
+                {preview.item.classRestriction && (
+                  <p className={
+                    preview.item.classRestriction.includes(character.class)
+                      ? "equip-allowed"
+                      : "equip-denied"
+                  }>
+                    Classes: {preview.item.classRestriction.join(", ")}
+                  </p>
+                )}
+                <p>Cost: {preview.item.cost} Gold</p>
+                {preview.item.statBonus && (
+                  <ul>
+                    {Object.entries(preview.item.statBonus).map(([k]) => {
+                      const value = getBonus(preview.item, k);
+                      const current = getBonus(preview.compareItem, k);
+                      const diff = value - current;
+                      return (
                         <li key={k}>
-                          {k}: +0 <span className="worse">({-getBonus(preview.compareItem, k)})</span>
+                          {k}: +{value}
+                          {preview.compareItem && diff !== 0 && (
+                            <span className={diff > 0 ? "better" : "worse"}>
+                              ({diff > 0 ? "+" : ""}{diff})
+                            </span>
+                          )}
                         </li>
-                      ))}
-                </ul>
-              )}
-              {preview.compareItem && (
-                <>
-                  <h4>Currently Equipped</h4>
-                  <p className={`rarity-${preview.compareItem.rarity}`}>{preview.compareItem.name} ({getRarityLabel(preview.compareItem.rarity)})</p>
-                  {preview.compareItem.statBonus && (
-                    <ul>
-                      {Object.entries(preview.compareItem.statBonus).map(([k]) => (
-                        <li key={k}>{k}: +{getBonus(preview.compareItem, k)}</li>
-                      ))}
-                    </ul>
-                  )}
-                </>
-              )}
+                      );
+                    })}
+                    {preview.compareItem &&
+                      Object.entries(preview.compareItem.statBonus || {})
+                        .filter(([k]) => !(preview.item.statBonus || {})[k])
+                        .map(([k]) => (
+                          <li key={k}>
+                            {k}: +0 <span className="worse">({-getBonus(preview.compareItem, k)})</span>
+                          </li>
+                        ))}
+                  </ul>
+                )}
+                {preview.compareItem && (
+                  <>
+                    <h4>Currently Equipped</h4>
+                    <p className={`rarity-${preview.compareItem.rarity}`}>{preview.compareItem.name} ({getRarityLabel(preview.compareItem.rarity)})</p>
+                    {preview.compareItem.statBonus && (
+                      <ul>
+                        {Object.entries(preview.compareItem.statBonus).map(([k]) => (
+                          <li key={k}>{k}: +{getBonus(preview.compareItem, k)}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </>
+                )}
+              </div>
               <img
                 src="/assets/shop/buy_button.png"
                 alt="Buy"
-                className="w-[135px] h-[75px] mt-6 cursor-pointer"
+                className="w-[135px] h-[75px] mt-2 cursor-pointer"
                 onClick={() => handleBuy(preview.item)}
               />
             </div>
