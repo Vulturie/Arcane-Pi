@@ -126,6 +126,7 @@ router.post("/:username/quest/start", async (req, res) => {
 
   console.log("Received quest start request:", req.body);
 
+
   try {
     const player = await Player.findOne({ username });
     if (!player) return res.status(404).json({ error: "Player not found" });
