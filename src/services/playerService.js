@@ -29,14 +29,14 @@ export function getStatsForClass(className, level) {
 }
 
 export const getCharacters = async (owner) => {
-  const res = await fetch(`http://localhost:4000/api/account/${owner}/characters`);
+  const res = await fetch(`http://192.168.1.3:4000/api/account/${owner}/characters`);
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Failed to load characters");
     return data;
   };
 
 export const createCharacter = async (owner, name, className, gender) => {
-    const res = await fetch(`http://localhost:4000/api/account/${owner}/characters`, {
+    const res = await fetch(`http://192.168.1.3:4000/api/account/${owner}/characters`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, className, gender }),
@@ -47,14 +47,14 @@ export const createCharacter = async (owner, name, className, gender) => {
   };
 
 export const getCharacter = async (id) => {
-  const res = await fetch(`http://localhost:4000/api/characters/${id}`);
+  const res = await fetch(`http://192.168.1.3:4000/api/characters/${id}`);
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Failed to load character");
   return data;
 };
 
 export const rewardPlayer = async (id, reward) => {
-  const res = await fetch(`http://localhost:4000/api/characters/${id}/quest/complete`, {
+  const res = await fetch(`http://192.168.1.3:4000/api/characters/${id}/quest/complete`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -68,7 +68,7 @@ export const rewardPlayer = async (id, reward) => {
 };
 
 export const updateEnergy = async (id, newEnergy) => {
-  const res = await fetch(`http://localhost:4000/api/characters/${id}/energy`, {
+  const res = await fetch(`http://192.168.1.3:4000/api/characters/${id}/energy`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -82,7 +82,7 @@ export const updateEnergy = async (id, newEnergy) => {
 };
 
 export const getQuestStatus = async (id) => {
-  const res = await fetch(`http://localhost:4000/api/characters/${id}/quest/status`);
+  const res = await fetch(`http://192.168.1.3:4000/api/characters/${id}/quest/status`);
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Failed to get quest status");
   return data;
@@ -90,7 +90,7 @@ export const getQuestStatus = async (id) => {
 };
 
 export const cancelQuest = async (id) => {
-  const res = await fetch(`http://localhost:4000/api/characters/${id}/quest/cancel`, {
+  const res = await fetch(`http://192.168.1.3:4000/api/characters/${id}/quest/cancel`, {
     method: "POST",
   });
   const data = await res.json();
@@ -99,7 +99,7 @@ export const cancelQuest = async (id) => {
 };
 
 export const acknowledgeQuestResult = async (id) => {
-  const res = await fetch(`http://localhost:4000/api/characters/${id}/quest/result/ack`, {
+  const res = await fetch(`http://192.168.1.3:4000/api/characters/${id}/quest/result/ack`, {
     method: "POST",
   });
   const data = await res.json();
@@ -108,7 +108,7 @@ export const acknowledgeQuestResult = async (id) => {
 };
 
 export const setPlayerClass = async (id, className) => {
-  const res = await fetch(`http://localhost:4000/api/characters/${id}/class`, {
+  const res = await fetch(`http://192.168.1.3:4000/api/characters/${id}/class`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ className }),
@@ -119,7 +119,7 @@ export const setPlayerClass = async (id, className) => {
 };
 
 export const setAccountClass = async (username, className) => {
-  const res = await fetch(`http://localhost:4000/player/${username}/class`, {
+  const res = await fetch(`http://192.168.1.3:4000/player/${username}/class`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ className }),
@@ -130,7 +130,7 @@ export const setAccountClass = async (username, className) => {
 };
 
 export const deleteCharacter = async (id) => {
-  const res = await fetch(`http://localhost:4000/api/characters/${id}`, {
+  const res = await fetch(`http://192.168.1.3:4000/api/characters/${id}`, {
     method: "DELETE",
   });
   const data = await res.json();
@@ -140,7 +140,7 @@ export const deleteCharacter = async (id) => {
 
 export const getInventory = async (characterId) => {
   const res = await fetch(
-    `http://localhost:4000/api/characters/${characterId}/inventory`
+    `http://192.168.1.3:4000/api/characters/${characterId}/inventory`
   );
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Failed to load inventory");
@@ -149,7 +149,7 @@ export const getInventory = async (characterId) => {
 
 export const updateInventory = async (characterId, inventory) => {
   const res = await fetch(
-    `http://localhost:4000/api/characters/${characterId}/inventory`,
+    `http://192.168.1.3:4000/api/characters/${characterId}/inventory`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -162,7 +162,7 @@ export const updateInventory = async (characterId, inventory) => {
 };
 
 export const getItems = async () => {
-  const res = await fetch("http://localhost:4000/items");
+  const res = await fetch("http://192.168.1.3:4000/items");
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Failed to load items");
   return data;
@@ -170,7 +170,7 @@ export const getItems = async () => {
 
 export const addItemToInventory = async (characterId, itemId) => {
   const res = await fetch(
-    `http://localhost:4000/api/characters/${characterId}/inventory/add`,
+    `http://192.168.1.3:4000/api/characters/${characterId}/inventory/add`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -183,7 +183,7 @@ export const addItemToInventory = async (characterId, itemId) => {
  };
 
 export const buyItem = async (characterId, itemId) => {
-  const res = await fetch(`http://localhost:4000/api/characters/${characterId}/buy`, {
+  const res = await fetch(`http://192.168.1.3:4000/api/characters/${characterId}/buy`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ itemId }),
@@ -194,7 +194,7 @@ export const buyItem = async (characterId, itemId) => {
 };
 
 export const forceRefreshShop = async (characterId) => {
-  const res = await fetch(`http://localhost:4000/api/characters/${characterId}/shop/refresh`, {
+  const res = await fetch(`http://192.168.1.3:4000/api/characters/${characterId}/shop/refresh`, {
     method: "POST",
   });
   const data = await res.json();
@@ -205,7 +205,7 @@ export const forceRefreshShop = async (characterId) => {
 export const getShopItems = async (characterId, page = 1, limit = 8) => {
   const params = new URLSearchParams({ page, limit });
   const res = await fetch(
-    `http://localhost:4000/api/characters/${characterId}/shop?${params.toString()}`
+    `http://192.168.1.3:4000/api/characters/${characterId}/shop?${params.toString()}`
   );
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Failed to load shop items");
@@ -213,7 +213,7 @@ export const getShopItems = async (characterId, page = 1, limit = 8) => {
 };
 
 export const sellItem = async (characterId, itemId) => {
-  const res = await fetch(`http://localhost:4000/api/characters/${characterId}/sell`, {
+  const res = await fetch(`http://192.168.1.3:4000/api/characters/${characterId}/sell`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ itemId }),
@@ -225,7 +225,7 @@ export const sellItem = async (characterId, itemId) => {
 
 export const getEquipment = async (characterId) => {
   const res = await fetch(
-    `http://localhost:4000/api/characters/${characterId}/equipment`
+    `http://192.168.1.3:4000/api/characters/${characterId}/equipment`
   );
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Failed to load equipment");
@@ -233,7 +233,7 @@ export const getEquipment = async (characterId) => {
 };
 
 export const equipItem = async (characterId, itemId) => {
-  const res = await fetch(`http://localhost:4000/api/characters/${characterId}/equip`, {
+  const res = await fetch(`http://192.168.1.3:4000/api/characters/${characterId}/equip`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ itemId }),
@@ -244,7 +244,7 @@ export const equipItem = async (characterId, itemId) => {
  };
 
 export const unequipItem = async (characterId, slot) => {
-  const res = await fetch(`http://localhost:4000/api/characters/${characterId}/unequip`, {
+  const res = await fetch(`http://192.168.1.3:4000/api/characters/${characterId}/unequip`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ slot }),
@@ -255,21 +255,21 @@ export const unequipItem = async (characterId, slot) => {
 };
 
 export const getHistory = async (id) => {
-  const res = await fetch(`http://localhost:4000/api/characters/${id}/history`);
+  const res = await fetch(`http://192.168.1.3:4000/api/characters/${id}/history`);
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Failed to load history");
   return data;
 };
 
 export const getTowerStatus = async (id) => {
-  const res = await fetch(`http://localhost:4000/api/characters/${id}/tower/status`);
+  const res = await fetch(`http://192.168.1.3:4000/api/characters/${id}/tower/status`);
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Failed to load tower status");
   return data;
 };
 
 export const attemptTowerLevel = async (id) => {
-  const res = await fetch(`http://localhost:4000/api/characters/${id}/tower/attempt`, {
+  const res = await fetch(`http://192.168.1.3:4000/api/characters/${id}/tower/attempt`, {
     method: "POST",
   });
   const data = await res.json();
@@ -281,7 +281,7 @@ export const getTowerLeaderboard = async (page = 1, limit = 10, charId) => {
   const params = new URLSearchParams({ page, limit });
   if (charId) params.append("charId", charId);
   const res = await fetch(
-    `http://localhost:4000/api/leaderboard/tower?${params.toString()}`
+    `http://192.168.1.3:4000/api/leaderboard/tower?${params.toString()}`
   );
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Failed to load leaderboard");
@@ -292,7 +292,7 @@ export const getArenaLeaderboard = async (page = 1, limit = 10, charId) => {
   const params = new URLSearchParams({ page, limit });
   if (charId) params.append("charId", charId);
   const res = await fetch(
-    `http://localhost:4000/api/leaderboard/arena?${params.toString()}`
+    `http://192.168.1.3:4000/api/leaderboard/arena?${params.toString()}`
   );
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Failed to load leaderboard");
@@ -300,14 +300,14 @@ export const getArenaLeaderboard = async (page = 1, limit = 10, charId) => {
 };
 
   export const getArenaProfile = async (id) => {
-    const res = await fetch(`http://localhost:4000/arena/profile/${id}`);
+    const res = await fetch(`http://192.168.1.3:4000/arena/profile/${id}`);
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || "Failed to load arena profile");
     return data;
   };
 
 export const startArenaMatch = async (id) => {
-  const res = await fetch(`http://localhost:4000/arena/match/${id}`, {
+  const res = await fetch(`http://192.168.1.3:4000/arena/match/${id}`, {
     method: "POST",
   });
   const data = await res.json();
@@ -316,14 +316,14 @@ export const startArenaMatch = async (id) => {
 };
 
 export const getArenaOpponents = async (id) => {
-  const res = await fetch(`http://localhost:4000/arena/opponents/${id}`);
+  const res = await fetch(`http://192.168.1.3:4000/arena/opponents/${id}`);
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Failed to load opponents");
   return data;
 };
 
 export const refreshArenaOpponents = async (id) => {
-  const res = await fetch(`http://localhost:4000/arena/opponents/${id}/refresh`, {
+  const res = await fetch(`http://192.168.1.3:4000/arena/opponents/${id}/refresh`, {
     method: "POST",
   });
   const data = await res.json();
@@ -333,7 +333,7 @@ export const refreshArenaOpponents = async (id) => {
 
 export const challengeArenaOpponent = async (id, opponentId) => {
   const res = await fetch(
-    `http://localhost:4000/arena/challenge/${id}/${opponentId}`,
+    `http://192.168.1.3:4000/arena/challenge/${id}/${opponentId}`,
     {
       method: "POST",
     }

@@ -17,7 +17,6 @@ function Inventory({ character, refreshCharacter }) {
   const [equipped, setEquipped] = useState({});
   const [preview, setPreview] = useState(null);
   const [showItems, setShowItems] = useState(false);
-  const [showStats, setShowStats] = useState(false);
 
   const getBonus = (item, stat) => {
     if (!item || !item.statBonus) return 0;
@@ -29,7 +28,7 @@ function Inventory({ character, refreshCharacter }) {
     if (!character) return;
     try {
       const data = await getInventory(character._id);
-      setItems(data.inventory);
+      setItems(data.inventory.slice(0, 10));
     } catch (err) {
       console.error("Failed to load inventory", err);
     }
@@ -55,6 +54,7 @@ function Inventory({ character, refreshCharacter }) {
       await equipItem(character._id, id);
       loadInventory();
       loadEquipment();
+      setPreview(null);
     } catch (err) {
       console.error("Failed to equip item", err);
       alert(err.message);
@@ -66,6 +66,7 @@ function Inventory({ character, refreshCharacter }) {
       await unequipItem(character._id, slot);
       loadInventory();
       loadEquipment();
+      setPreview(null);
     } catch (err) {
       console.error("Failed to unequip item", err);
     }
@@ -78,6 +79,7 @@ function Inventory({ character, refreshCharacter }) {
       loadEquipment();
       if (refreshCharacter) refreshCharacter();
     } catch (err) {
+      setPreview(null);
       console.error("Failed to sell item", err);
     }
   };
@@ -112,7 +114,6 @@ function Inventory({ character, refreshCharacter }) {
 
   const renderSlot = (slot) => {
     const item = equipped[slot];
-    const borderRarity = item ? item.rarity : "common";
     return (
       <div
         key={slot}
@@ -120,56 +121,58 @@ function Inventory({ character, refreshCharacter }) {
         onClick={() => item && openPreview(item)}
       >
         {item && (
-          <img
-            src={`/assets/items/resized_128/${item.id}_128.png`}
-            alt={item.name}
-            className="absolute inset-3 w-[72%] h-[72%] object-contain"
-          />
+          <>
+            <img
+              src={`/assets/items/resized_128/${item.id}_128.png`}
+              alt={item.name}
+              className="absolute inset-3 w-[72%] h-[72%] object-contain"
+            />
+            <img
+              src={`/assets/borders/resized_128/border_${item.rarity}_128.png`}
+              alt="Border"
+              className="absolute inset-0 w-full h-full"
+            />
+          </>
         )}
-        <img
-          src={`/assets/borders/resized_128/border_${borderRarity}_128.png`}
-          alt="Border"
-          className="absolute inset-0 w-full h-full"
-        />
       </div>
     );
   };
 
   return (
-    <div
-      className="relative w-screen h-screen bg-cover bg-center font-[Cinzel] text-white"
-      style={{ backgroundImage: "url(/assets/inventory/inventory_background.png)" }}
-    >
+    <div className="relative w-screen h-screen font-[Cinzel] text-white overflow-hidden">
+      <img
+        src="/assets/inventory/inventory_background.png"
+        alt="Background"
+        className="fixed inset-0 w-full h-full object-contain object-center"
+      />
       <img
         src="/assets/inventory/back_button.png"
         alt="Back"
         className="absolute top-4 left-4 w-10 h-10 cursor-pointer"
         onClick={() => navigate("/")}
       />
-      <img
-        src="/assets/inventory/stats_button.png"
-        alt="Stats"
-        className="absolute top-4 right-4 w-10 h-10 cursor-pointer"
-        onClick={() => setShowStats(true)}
-      />
-      <img
-        src="/assets/inventory/items_button.png"
-        alt="Items"
-        className="absolute bottom-4 left-1/2 -translate-x-1/2 w-20 cursor-pointer"
-        onClick={() => setShowItems((p) => !p)}
-      />
 
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+
+      <div className="absolute left-1/2 top-[30%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
         <img src={portrait} alt="Character" className="w-32 h-auto drop-shadow-md" />
         <div className="mt-2 text-lg font-bold drop-shadow-md">{character.name}</div>
-        <div className="text-sm drop-shadow-md mb-2">
-          {equipped.weapon ? (
-            <span className={`rarity-${equipped.weapon.rarity}`}>{equipped.weapon.name}</span>
-          ) : (
-            "Unarmed"
+        <div className="relative w-20 h-20 mb-1">
+          {equipped.weapon && (
+            <>
+              <img
+                src={`/assets/items/resized_128/${equipped.weapon.id}_128.png`}
+                alt={equipped.weapon.name}
+                className="absolute inset-2 w-[80%] h-[80%] object-contain"
+              />
+              <img
+                src={`/assets/borders/resized_128/border_${equipped.weapon.rarity}_128.png`}
+                alt="Border"
+                className="absolute inset-0 w-full h-full"
+              />
+            </>
           )}
         </div>
-        <div className="w-full max-w-[260px] h-8 relative rounded-xl overflow-hidden mb-2">
+        <div className="w-full max-w-[360px] h-8 relative rounded-xl overflow-hidden mb-1">
           <img
             src="/assets/game_hub/xp_bar.png"
             alt="XP"
@@ -181,7 +184,7 @@ function Inventory({ character, refreshCharacter }) {
               style={{ width: `${xpPercent}%` }}
             />
           </div>
-          <div className="absolute inset-0 flex items-center justify-center z-20 text-xs font-bold text-black drop-shadow-md">
+          <div className="absolute inset-0 flex items-center justify-center z-20 text-xs font-bold text-white drop-shadow-md">
             {`${character.xp} / ${nextXp} XP`}
           </div>
         </div>
@@ -194,16 +197,48 @@ function Inventory({ character, refreshCharacter }) {
         {rightSlots.map(renderSlot)}
       </div>
 
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center">
+        <img
+          src="/assets/inventory/items_button.png"
+          alt="Items"
+          className="w-20 cursor-pointer mb-48"
+          onClick={() => setShowItems((p) => !p)}
+        />
+        <div className="relative w-[160px] h-[160px]">
+          <img src="/assets/inventory/stats_table.png" alt="Stats" className="w-full h-full" />
+          {stats && (
+            <>
+              <div className="absolute w-[35%] left-[16px] top-[22px] flex justify-between items-center px-4 text-lg font-bold drop-shadow-md">
+                <span>STR</span>
+                <span className="text-yellow-300 min-w-[60px] text-right">{stats.STR}</span>
+              </div>
+              <div className="absolute w-[35%] left-[16px] top-[52px] flex justify-between items-center px-4 text-lg font-bold drop-shadow-md">
+                <span>AGI</span>
+                <span className="text-yellow-300 min-w-[60px] text-right">{stats.AGI}</span>
+              </div>
+              <div className="absolute w-[35%] left-[16px] top-[82px] flex justify-between items-center px-4 text-lg font-bold drop-shadow-md">
+                <span>INT</span>
+                <span className="text-yellow-300 min-w-[60px] text-right">{stats.INT}</span>
+              </div>
+              <div className="absolute w-[35%] left-[16px] top-[112px] flex justify-between items-center px-4 text-lg font-bold drop-shadow-md">
+                <span>VIT</span>
+                <span className="text-yellow-300 min-w-[60px] text-right">{stats.VIT}</span>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
       {showItems && (
         <div
           className="fixed inset-0 z-30 flex items-center justify-center bg-black bg-opacity-30"
           onClick={() => setShowItems(false)}
         >
           <div
-            className="relative w-[360px] h-[200px]"
+            className="relative w-[340px]"
             onClick={(e) => e.stopPropagation()}
           >
-            <img src="/assets/inventory/items_window.png" alt="Items" className="w-full h-full" />
+            <img src="/assets/inventory/items_window.png" alt="Items" className="w-full h-auto" />
             <div className="absolute inset-0 grid grid-cols-5 grid-rows-2 gap-1 p-4 pt-6 justify-items-center items-start">
               {items.slice(0, 10).map((it) => (
                 <div
@@ -228,39 +263,6 @@ function Inventory({ character, refreshCharacter }) {
         </div>
       )}
 
-      {showStats && (
-        <div
-          className="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-30"
-          onClick={() => setShowStats(false)}
-        >
-          <div
-            className="relative w-[320px] h-[180px]"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <img src="/assets/inventory/stats_table.png" alt="Stats" className="w-full h-full" />
-            {stats && (
-              <>
-                <div className="absolute w-[35%] left-[30px] top-[26px] flex justify-between items-center px-2 text-lg font-bold drop-shadow-md">
-                  <span>STR</span>
-                  <span className="text-yellow-300 min-w-[30px] text-right">{stats.STR}</span>
-                </div>
-                <div className="absolute w-[35%] left-[30px] top-[60px] flex justify-between items-center px-2 text-lg font-bold drop-shadow-md">
-                  <span>AGI</span>
-                  <span className="text-yellow-300 min-w-[30px] text-right">{stats.AGI}</span>
-                </div>
-                <div className="absolute w-[35%] left-[30px] top-[96px] flex justify-between items-center px-2 text-lg font-bold drop-shadow-md">
-                  <span>INT</span>
-                  <span className="text-yellow-300 min-w-[30px] text-right">{stats.INT}</span>
-                </div>
-                <div className="absolute w-[35%] left-[30px] top-[128px] flex justify-between items-center px-2 text-lg font-bold drop-shadow-md">
-                  <span>VIT</span>
-                  <span className="text-yellow-300 min-w-[30px] text-right">{stats.VIT}</span>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      )}
 
       {preview && (
         <div
