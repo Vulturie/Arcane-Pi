@@ -121,13 +121,13 @@ function Arena({ character, refreshCharacter }) {
       <img
         src="/assets/arena/stats_button.png"
         alt="Stats"
-        className="absolute bottom-4 left-4 w-16 cursor-pointer hover:scale-105 transition-transform"
+        className="absolute bottom-4 left-4 w-20 cursor-pointer hover:scale-105 transition-transform"
         onClick={() => setShowStats(true)}
       />
       <img
         src="/assets/arena/leaderboard_button.png"
         alt="Leaderboard"
-        className="absolute bottom-4 right-4 w-16 cursor-pointer hover:scale-105 transition-transform"
+        className="absolute bottom-4 right-4 w-20 cursor-pointer hover:scale-105 transition-transform"
         onClick={() => {
           setShowLeaderboard(true);
           loadLeaderboard(1);
