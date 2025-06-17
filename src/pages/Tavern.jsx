@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
+import { API_BASE_URL } from "../config";
 import { useNavigate } from "react-router-dom";
 import { getQuestStatus, cancelQuest, acknowledgeQuestResult } from "../services/playerService";
 
@@ -20,7 +21,7 @@ function Tavern({ character, refreshCharacter, spendEnergy }) {
     }
 
     try {
-      const res = await fetch(`http://localhost:4000/api/characters/${character._id}/quest/start`, {
+      const res = await fetch(`${API_BASE_URL}/api/characters/${character._id}/quest/start`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
