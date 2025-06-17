@@ -93,9 +93,15 @@ function simulateCombat(playerStats, enemyStats) {
   // Determine who goes first based on AGI
   let playerTurn = playerStats.AGI >= enemyStats.AGI;
 
-  while (playerHP > 0 && enemyHP > 0) {
+  const DODGE_RATE = 0.02; // 2% dodge chance per AGI point
+  const MAX_DODGE = 0.9; // never reach 100% dodge
+  const MAX_ROUNDS = 1000; // safety cap to prevent infinite loops
+  let rounds = 0;
+
+  while (playerHP > 0 && enemyHP > 0 && rounds < MAX_ROUNDS) {
     if (playerTurn) {
-      if (Math.random() < enemyStats.AGI * 0.02) {
+      const dodgeChance = Math.min(enemyStats.AGI * DODGE_RATE, MAX_DODGE);
+      if (Math.random() < dodgeChance) {
         log.push(`Player attacks but ${enemyStats.name} dodges!`);
       } else {
         const dmg = calculateDamage(playerStats, enemyStats);
@@ -103,7 +109,8 @@ function simulateCombat(playerStats, enemyStats) {
         log.push(`Player hits ${enemyStats.name} for ${dmg} damage (Enemy HP: ${enemyHP})`);
       }
     } else {
-      if (Math.random() < playerStats.AGI * 0.02) {
+      const dodgeChance = Math.min(playerStats.AGI * DODGE_RATE, MAX_DODGE);
+      if (Math.random() < dodgeChance) {
         log.push(`${enemyStats.name} attacks but player dodges!`);
       } else {
         const dmg = calculateDamage(enemyStats, playerStats);
@@ -112,6 +119,7 @@ function simulateCombat(playerStats, enemyStats) {
       }
     }
     playerTurn = !playerTurn;
+    rounds += 1;
   }
 
   const result = playerHP > 0 ? "win" : "loss";
