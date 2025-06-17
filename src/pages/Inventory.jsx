@@ -315,7 +315,7 @@ function Inventory({ character, refreshCharacter }) {
           onClick={() => setPreview(null)}
         >
           <div
-            className="relative w-[330px] h-[560px]"
+            className="relative w-[330px] h-[560px] scale-[1.25]"
             onClick={(e) => e.stopPropagation()}
           >
             <img
