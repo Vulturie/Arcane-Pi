@@ -170,7 +170,7 @@ function Tavern({ character, refreshCharacter, spendEnergy }) {
           alt="Window"
           className="w-full h-auto"
         />
-        <div className="absolute inset-0 flex flex-col gap-4 pt-24 pb-4 px-8 overflow-y-auto">
+        <div className="absolute inset-0 flex flex-col gap-4 pt-24 pb-4 px-12 overflow-y-auto">
           {isShowingResult && questResult ? (
             <div className="flex flex-col gap-2 text-white text-sm items-center mt-20">
               {questResult.log && (
