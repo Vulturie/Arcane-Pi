@@ -57,9 +57,15 @@ function Inventory({ character, refreshCharacter }) {
     loadEquipment();
   }, [loadInventory, loadEquipment]);
 
-  const handleEquip = async (id) => {
+  const handleEquip = async (_id) => {
+    const item = items.find((it) => it._id === _id);
+    if (!item) {
+      alert("This item is no longer available to equip.");
+      setPreview(null);
+      return;
+    }
     try {
-      await equipItem(character._id, id);
+      await equipItem(character._id, _id);
       loadInventory();
       loadEquipment();
       setPreview(null);
@@ -80,9 +86,15 @@ function Inventory({ character, refreshCharacter }) {
     }
   };
 
-  const handleSell = async (id) => {
+  const handleSell = async (_id) => {
+    const item = items.find((it) => it._id === _id);
+    if (!item) {
+      alert("This item is no longer available to sell.");
+      setPreview(null);
+      return;
+    }
     try {
-      await sellItem(character._id, id);
+      await sellItem(character._id, _id);
       loadInventory();
       loadEquipment();
       if (refreshCharacter) refreshCharacter();
@@ -93,6 +105,10 @@ function Inventory({ character, refreshCharacter }) {
   };
 
   const openPreview = (item, source = "inventory") => {
+    if (source === "inventory" && !items.find((i) => i._id === item._id)) {
+      console.warn("Attempted to preview an item not in inventory");
+      return;
+    }
     const compareItem = source === "inventory" ? equipped[item.type] : null;
     setPreview({ item, compareItem, source });
   };
