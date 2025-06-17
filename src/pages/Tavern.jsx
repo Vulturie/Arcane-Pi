@@ -136,7 +136,7 @@ function Tavern({ character, refreshCharacter, spendEnergy }) {
   }, [activeQuest]);
 
   const renderQuestInfo = (quest, risky) => (
-    <div key={quest.id} className="flex items-center justify-between px-4">
+    <div key={quest.id} className="flex items-center justify-between px-8">
       <div className="flex flex-col text-xs text-white drop-shadow-sm">
         <span className="font-bold">{quest.name}{quest.rare ? " (Rare)" : ""}</span>
         <div className="flex gap-2 mt-1">
@@ -169,7 +169,7 @@ function Tavern({ character, refreshCharacter, spendEnergy }) {
           alt="Window"
           className="w-full h-auto"
         />
-        <div className="absolute inset-0 flex flex-col gap-4 pt-24 pb-4 px-6 overflow-y-auto">
+        <div className="absolute inset-0 flex flex-col gap-4 pt-24 pb-4 px-8 overflow-y-auto">
           {isShowingResult && questResult ? (
             <div className="flex flex-col gap-2 text-white text-sm items-center mt-20">
               {questResult.log && (
