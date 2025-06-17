@@ -169,14 +169,26 @@ async function loadCharacter(req, res, next) {
     }
     // Energy regeneration
     const now = new Date();
-    const elapsed = (now - new Date(char.lastEnergyUpdate)) / 1000;
+    const lastUpdate = new Date(char.lastEnergyUpdate);
+    const elapsed = (now - lastUpdate) / 1000;
     const ENERGY_REGEN_INTERVAL = 10;
     const MAX_ENERGY = 100;
     const energyToAdd = Math.floor(elapsed / ENERGY_REGEN_INTERVAL);
-    if (energyToAdd > 0 && char.energy < MAX_ENERGY) {
-      char.energy = Math.min(char.energy + energyToAdd, MAX_ENERGY);
-      char.lastEnergyUpdate = new Date(now - (elapsed % ENERGY_REGEN_INTERVAL) * 1000);
-      updated = true;
+
+    if (energyToAdd > 0) {
+      if (char.energy < MAX_ENERGY) {
+        char.energy = Math.min(char.energy + energyToAdd, MAX_ENERGY);
+        if (char.energy >= MAX_ENERGY) {
+          char.lastEnergyUpdate = now;
+        } else {
+          char.lastEnergyUpdate = new Date(now - (elapsed % ENERGY_REGEN_INTERVAL) * 1000);
+        }
+        updated = true;
+      } else {
+        // Energy already capped but timestamp was old
+        char.lastEnergyUpdate = now;
+        updated = true;
+      }
     }
 
     const todayUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
