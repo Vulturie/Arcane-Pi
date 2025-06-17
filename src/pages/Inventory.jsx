@@ -31,10 +31,10 @@ function Inventory({ character, refreshCharacter }) {
       const equippedIds = new Set(
         Object.values(equipped)
           .filter(Boolean)
-          .map((it) => it._id),
+          .map((it) => it.id),
       );
       const inv = data.inventory
-        .filter((it) => !equippedIds.has(it._id))
+        .filter((it) => !equippedIds.has(it.id))
         .slice(0, 10);
       setItems(inv);
     } catch (err) {
@@ -57,15 +57,15 @@ function Inventory({ character, refreshCharacter }) {
     loadEquipment();
   }, [loadInventory, loadEquipment]);
 
-  const handleEquip = async (_id) => {
-    const item = items.find((it) => it._id === _id);
+  const handleEquip = async (itemId) => {
+    const item = items.find((it) => it.id === itemId);
     if (!item) {
       alert("This item is no longer available to equip.");
       setPreview(null);
       return;
     }
     try {
-      await equipItem(character._id, _id);
+      await equipItem(character._id, itemId);
       loadInventory();
       loadEquipment();
       setPreview(null);
@@ -86,15 +86,15 @@ function Inventory({ character, refreshCharacter }) {
     }
   };
 
-  const handleSell = async (_id) => {
-    const item = items.find((it) => it._id === _id);
+  const handleSell = async (itemId) => {
+    const item = items.find((it) => it.id === itemId);
     if (!item) {
       alert("This item is no longer available to sell.");
       setPreview(null);
       return;
     }
     try {
-      await sellItem(character._id, _id);
+      await sellItem(character._id, itemId);
       loadInventory();
       loadEquipment();
       if (refreshCharacter) refreshCharacter();
@@ -105,7 +105,7 @@ function Inventory({ character, refreshCharacter }) {
   };
 
   const openPreview = (item, source = "inventory") => {
-    if (source === "inventory" && !items.find((i) => i._id === item._id)) {
+    if (source === "inventory" && !items.find((i) => i.id === item.id)) {
       console.warn("Attempted to preview an item not in inventory");
       return;
     }
@@ -295,7 +295,7 @@ function Inventory({ character, refreshCharacter }) {
             <div className="absolute inset-0 grid grid-cols-2 grid-rows-5 gap-15 p-16 pt-16 justify-items-center items-start">
               {displayItems.map((it) => (
                 <div
-                  key={it._id}
+                  key={it.id}
                   className="relative w-16 h-16 cursor-pointer"
                   onClick={() => openPreview(it, "inventory")}
                 >
@@ -425,14 +425,14 @@ function Inventory({ character, refreshCharacter }) {
                       src="/assets/inventory/equip_button.png"
                       alt="Equip"
                       className="w-[135px] h-[75px] mt-2 cursor-pointer"
-                      onClick={() => handleEquip(preview.item._id)}
+                      onClick={() => handleEquip(preview.item.id)}
                     />
                   )}
                   <img
                     src="/assets/inventory/sell_button.png"
                     alt="Sell"
                     className="w-[135px] h-[75px] mt-2 cursor-pointer"
-                    onClick={() => handleSell(preview.item._id)}
+                    onClick={() => handleSell(preview.item.id)}
                   />
                 </>
               )}
