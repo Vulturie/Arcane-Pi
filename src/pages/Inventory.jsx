@@ -28,14 +28,7 @@ function Inventory({ character, refreshCharacter }) {
     if (!character) return;
     try {
       const data = await getInventory(character._id);
-      const equippedIds = new Set(
-        Object.values(equipped)
-          .filter(Boolean)
-          .map((it) => it.id),
-      );
-      const inv = data.inventory
-        .filter((it) => !equippedIds.has(it.id))
-        .slice(0, 10);
+      const inv = data.inventory.slice(0, 10);
       setItems(inv);
     } catch (err) {
       console.error("Failed to load inventory", err);
