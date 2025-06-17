@@ -28,11 +28,17 @@ function Inventory({ character, refreshCharacter }) {
     if (!character) return;
     try {
       const data = await getInventory(character._id);
-      setItems(data.inventory);
+      const equippedIds = new Set(
+        Object.values(equipped)
+          .filter(Boolean)
+          .map((it) => it.id),
+      );
+      const inv = data.inventory.filter((it) => !equippedIds.has(it.id));
+      setItems(inv);
     } catch (err) {
       console.error("Failed to load inventory", err);
     }
-  }, [character]);
+  }, [character, equipped]);
 
   const loadEquipment = useCallback(async () => {
     if (!character) return;
@@ -78,8 +84,8 @@ function Inventory({ character, refreshCharacter }) {
       loadInventory();
       loadEquipment();
       if (refreshCharacter) refreshCharacter();
-    } catch (err) {
       setPreview(null);
+    } catch (err) {
       console.error("Failed to sell item", err);
     }
   };
@@ -98,12 +104,7 @@ function Inventory({ character, refreshCharacter }) {
   const leftSlots = ["headpiece", "chestplate", "gloves", "footwear"];
   const rightSlots = ["belt", "necklace", "ring", "artifact"];
 
-  const equippedIds = new Set(
-    Object.values(equipped)
-      .filter(Boolean)
-      .map((it) => it.id),
-  );
-  const filteredItems = items.filter((it) => !equippedIds.has(it.id));
+  const displayItems = items.slice(0, 10);
 
   const stats = (() => {
     const base = getStatsForClass(character.class, character.level);
@@ -272,7 +273,7 @@ function Inventory({ character, refreshCharacter }) {
               className="w-full h-auto"
             />
             <div className="absolute inset-0 grid grid-cols-2 grid-rows-5 gap-15 p-16 pt-16 justify-items-center items-start">
-              {filteredItems.slice(0, 10).map((it) => (
+              {displayItems.map((it) => (
                 <div
                   key={it.id}
                   className="relative w-16 h-16 cursor-pointer"
