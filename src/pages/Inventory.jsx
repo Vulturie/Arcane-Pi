@@ -271,7 +271,7 @@ function Inventory({ character, refreshCharacter }) {
               alt="Items"
               className="w-full h-auto"
             />
-            <div className="absolute inset-0 grid grid-cols-5 grid-rows-2 gap-2 p-6 pt-8 justify-items-center items-start">
+            <div className="absolute inset-0 grid grid-cols-2 grid-rows-5 gap-15 p-16 pt-16 justify-items-center items-start">
               {filteredItems.slice(0, 10).map((it) => (
                 <div
                   key={it.id}
@@ -301,7 +301,7 @@ function Inventory({ character, refreshCharacter }) {
           onClick={() => setPreview(null)}
         >
           <div
-            className="relative w-[330px] h-[560px] scale-[1.25]"
+            className="relative w-[330px] h-[560px]"
             onClick={(e) => e.stopPropagation()}
           >
             <img
