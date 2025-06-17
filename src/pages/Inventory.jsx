@@ -31,9 +31,11 @@ function Inventory({ character, refreshCharacter }) {
       const equippedIds = new Set(
         Object.values(equipped)
           .filter(Boolean)
-          .map((it) => it.id),
+          .map((it) => it._id),
       );
-      const inv = data.inventory.filter((it) => !equippedIds.has(it.id));
+      const inv = data.inventory
+        .filter((it) => !equippedIds.has(it._id))
+        .slice(0, 10);
       setItems(inv);
     } catch (err) {
       console.error("Failed to load inventory", err);
@@ -90,9 +92,9 @@ function Inventory({ character, refreshCharacter }) {
     }
   };
 
-  const openPreview = (item, compare = false) => {
-    const compareItem = compare ? equipped[item.type] : null;
-    setPreview({ item, compareItem });
+  const openPreview = (item, source = "inventory") => {
+    const compareItem = source === "inventory" ? equipped[item.type] : null;
+    setPreview({ item, compareItem, source });
   };
 
   if (!character) return null;
@@ -126,7 +128,7 @@ function Inventory({ character, refreshCharacter }) {
       <div
         key={slot}
         className="relative w-16 h-16 cursor-pointer"
-        onClick={() => item && openPreview(item)}
+        onClick={() => item && openPreview(item, "equipped")}
       >
         {item && (
           <>
@@ -178,7 +180,9 @@ function Inventory({ character, refreshCharacter }) {
           </div>
           <div
             className="relative w-16 h-16 mt-5 mb-2 cursor-pointer"
-            onClick={() => equipped.weapon && openPreview(equipped.weapon)}
+            onClick={() =>
+              equipped.weapon && openPreview(equipped.weapon, "equipped")
+            }
           >
             {equipped.weapon && (
               <>
@@ -275,9 +279,9 @@ function Inventory({ character, refreshCharacter }) {
             <div className="absolute inset-0 grid grid-cols-2 grid-rows-5 gap-15 p-16 pt-16 justify-items-center items-start">
               {displayItems.map((it) => (
                 <div
-                  key={it.id}
+                  key={it._id}
                   className="relative w-16 h-16 cursor-pointer"
-                  onClick={() => openPreview(it, true)}
+                  onClick={() => openPreview(it, "inventory")}
                 >
                   <img
                     src={`/assets/items/resized_128/${it.id}_128.png`}
@@ -391,38 +395,31 @@ function Inventory({ character, refreshCharacter }) {
                   </>
                 )}
               </div>
-              {(() => {
-                const isEquipped =
-                  preview.item.id === equipped[preview.item.type]?.id;
-                if (isEquipped) {
-                  return (
+              {preview.source === "equipped" ? (
+                <img
+                  src="/assets/inventory/unequip_button.png"
+                  alt="Unequip"
+                  className="w-[135px] h-[75px] mt-2 cursor-pointer"
+                  onClick={() => handleUnequip(preview.item.type)}
+                />
+              ) : (
+                <>
+                  {preview.item.type && (
                     <img
-                      src="/assets/inventory/unequip_button.png"
-                      alt="Unequip"
+                      src="/assets/inventory/equip_button.png"
+                      alt="Equip"
                       className="w-[135px] h-[75px] mt-2 cursor-pointer"
-                      onClick={() => handleUnequip(preview.item.type)}
+                      onClick={() => handleEquip(preview.item._id)}
                     />
-                  );
-                }
-                return (
-                  <>
-                    {preview.item.type && (
-                      <img
-                        src="/assets/inventory/equip_button.png"
-                        alt="Equip"
-                        className="w-[135px] h-[75px] mt-2 cursor-pointer"
-                        onClick={() => handleEquip(preview.item.id)}
-                      />
-                    )}
-                    <img
-                      src="/assets/inventory/sell_button.png"
-                      alt="Sell"
-                      className="w-[135px] h-[75px] mt-2 cursor-pointer"
-                      onClick={() => handleSell(preview.item.id)}
-                    />
-                  </>
-                );
-              })()}
+                  )}
+                  <img
+                    src="/assets/inventory/sell_button.png"
+                    alt="Sell"
+                    className="w-[135px] h-[75px] mt-2 cursor-pointer"
+                    onClick={() => handleSell(preview.item._id)}
+                  />
+                </>
+              )}
             </div>
           </div>
         </div>
