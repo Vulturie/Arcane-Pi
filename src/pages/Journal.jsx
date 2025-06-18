@@ -114,23 +114,23 @@ function Journal({ character }) {
         alt="Journal"
         className="absolute top-0 left-1/2 -translate-x-1/2 w-[240px] drop-shadow-md"
       />
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-6">
+      <div className="absolute bottom-4 left-1 flex gap-1">
         <img
           src="/assets/journal/tavern_journal_button.png"
           alt="Tavern"
-          className="w-20 cursor-pointer hover:scale-105 transition-transform"
+          className="w-32 cursor-pointer hover:scale-105 transition-transform"
           onClick={() => setShowTavern(true)}
         />
         <img
           src="/assets/journal/arena_journal_button.png"
           alt="Arena"
-          className="w-20 cursor-pointer hover:scale-105 transition-transform"
+          className="w-32 cursor-pointer hover:scale-105 transition-transform"
           onClick={() => setShowArena(true)}
         />
         <img
           src="/assets/journal/tower_journal_button.png"
           alt="Tower"
-          className="w-20 cursor-pointer hover:scale-105 transition-transform"
+          className="w-32 cursor-pointer hover:scale-105 transition-transform"
           onClick={() => setShowTower(true)}
         />
       </div>
