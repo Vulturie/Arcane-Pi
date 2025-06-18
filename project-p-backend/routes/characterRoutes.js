@@ -82,6 +82,20 @@ function logHistory(char, quest, combatResult, xpGain, goldGain, loot) {
   if (char.history.length > MAX_HISTORY_ENTRIES) char.history.shift();
 }
 
+function logTowerHistory(char, level, result, floorName) {
+  const entry = {
+    questName: floorName || `Floor ${level}`,
+    questType: "tower",
+    result,
+    level,
+    floorName,
+    timestamp: new Date(),
+  };
+  if (!char.history) char.history = [];
+  char.history.push(entry);
+  if (char.history.length > MAX_HISTORY_ENTRIES) char.history.shift();
+}
+
 async function grantLoot(char, isRisky) {
   const chance = isRisky ? 0.5 : 0.05;
   if (Math.random() < chance) {
@@ -667,9 +681,12 @@ router.post("/characters/:id/tower/attempt", loadCharacter, async (req, res) => 
   if (combat.result === "win") {
     char.inventory.push(reward);
     char.towerProgress = level;
+    logTowerHistory(char, level, "win");
     await char.save();
     return res.json({ result: "win", combat, reward, progress: char.towerProgress });
   }
+  logTowerHistory(char, level, "loss");
+  await char.save();
   return res.json({ result: "loss", combat, progress: char.towerProgress });
 });
 

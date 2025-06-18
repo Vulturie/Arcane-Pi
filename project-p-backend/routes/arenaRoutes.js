@@ -9,6 +9,8 @@ const {
   simulateCombat,
 } = require("../utils/combat");
 
+const MAX_HISTORY_ENTRIES = 100;
+
 function resetArenaCounters(char) {
   const now = new Date();
   const todayUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
@@ -31,6 +33,20 @@ function shuffle(arr) {
     .map((a) => [Math.random(), a])
     .sort((a, b) => a[0] - b[0])
     .map((a) => a[1]);
+}
+
+function logArenaHistory(char, opponentName, result, mmrChange) {
+  const entry = {
+    questName: "Arena Battle",
+    questType: "arena",
+    opponentName,
+    result,
+    mmrChange,
+    timestamp: new Date(),
+  };
+  if (!char.history) char.history = [];
+  char.history.push(entry);
+  if (char.history.length > MAX_HISTORY_ENTRIES) char.history.shift();
 }
 
 // Fetch arena profile for a character
@@ -195,6 +211,9 @@ router.post("/match/:id", async (req, res) => {
       opponentChar.mmr = (opponentChar.mmr || 1000) + DELTA;
       opponentChar.arenaWins = (opponentChar.arenaWins || 0) + 1;
     }
+    const mmrChange = combat.result === "win" ? DELTA : -DELTA;
+    logArenaHistory(char, opponentChar.name, combat.result, mmrChange);
+    logArenaHistory(opponentChar, char.name, combat.result === "win" ? "loss" : "win", -mmrChange);
     char.dailyArenaFights = (char.dailyArenaFights || 0) + 1;
     opponentChar.dailyArenaFights = (opponentChar.dailyArenaFights || 0) + 1;
     await char.save();
@@ -265,6 +284,9 @@ router.post("/challenge/:id/:oppId", async (req, res) => {
       opponentChar.mmr = (opponentChar.mmr || 1000) + DELTA;
       opponentChar.arenaWins = (opponentChar.arenaWins || 0) + 1;
     }
+    const mmrChange = combat.result === "win" ? DELTA : -DELTA;
+    logArenaHistory(char, opponentChar.name, combat.result, mmrChange);
+    logArenaHistory(opponentChar, char.name, combat.result === "win" ? "loss" : "win", -mmrChange);
     char.dailyArenaFights = (char.dailyArenaFights || 0) + 1;
     opponentChar.dailyArenaFights = (opponentChar.dailyArenaFights || 0) + 1;
     await char.save();
