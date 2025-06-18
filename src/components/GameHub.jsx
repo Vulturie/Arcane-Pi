@@ -61,7 +61,7 @@ function GameHub({ character, refreshCharacter, username }) {
         <Link to="/shop"><img src="/assets/game_hub/shop_button.png" alt="Shop" className={styles.icon} /></Link>
         <Link to="/tower"><img src="/assets/game_hub/tower_icon.png" alt="Tower" className={styles.icon} /></Link>
         <img src="/assets/game_hub/gate_icon.png" alt="Gate" className={styles.icon} />
-        <Link to="/journal"><img src="/assets/game_hub/journal_icon.png" alt="Journal" className={styles.icon} /></Link>
+        <Link to="/journal"><img src="/assets/game_hub/journal_button.png" alt="Journal" className={styles.icon} /></Link>
         <img src="/assets/game_hub/settings_icon.png" alt="Settings" className={styles.icon} />
       </div>
     </div>
