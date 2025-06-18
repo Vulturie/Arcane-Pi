@@ -129,6 +129,7 @@ function simulateCombat(playerStats, enemyStats) {
     log,
     playerHP,
     enemyHP,
+    rounds,
   };
 }
 

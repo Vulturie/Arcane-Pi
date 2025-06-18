@@ -1,4 +1,5 @@
 const { getStatsForClass, getEquipmentStatTotals, calculateCombatScore } = require("./combat");
+const { ENEMY_DIFFICULTY_CURVE } = require("./balanceConfig");
 
 function generateEnemy(player, difficulty = 1) {
   const baseStats = getStatsForClass(player.class, player.level);
@@ -7,7 +8,7 @@ function generateEnemy(player, difficulty = 1) {
 
   // Random factor to keep encounters varied
   const randomness = 0.9 + Math.random() * 0.2; // 0.9 - 1.1
-  const scale = difficulty * randomness;
+  const scale = difficulty * randomness * ENEMY_DIFFICULTY_CURVE;
 
   const base = Math.max(1, Math.round((combatScore / 10) * scale));
   return {

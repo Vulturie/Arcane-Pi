@@ -5,6 +5,7 @@ const { generateEnemy } = require("../utils/enemyGenerator");
 const { getPlayerStats, simulateCombat } = require("../utils/combat");
 const ITEMS = require("../data/items");
 const { SAFE_QUEST_TIERS, RISKY_QUEST_TIERS } = require("../data/quests");
+const { XP_GAIN_MULTIPLIER, GOLD_SCALING } = require("../utils/balanceConfig");
 const { getRewardForLevel, getEnemyForLevel } = require("../data/tower");
 
 function getRandomRarity() {
@@ -16,15 +17,23 @@ function getRandomRarity() {
   return "common";
 }
 
-function randomQuest(tiers, tierIndex, path) {
+function randomQuest(tiers, tierIndex, path, level) {
   const quests = tiers[tierIndex];
   const q = quests[Math.floor(Math.random() * quests.length)];
-  return { ...q, tier: tierIndex + 1, path };
+  const lvlFactor = 1 + XP_GAIN_MULTIPLIER * (level - 1);
+  const goldFactor = 1 + GOLD_SCALING * (level - 1);
+  return {
+    ...q,
+    xp: Math.round(q.xp * lvlFactor),
+    gold: Math.round(q.gold * goldFactor),
+    tier: tierIndex + 1,
+    path,
+  };
 }
 
 function initQuestPools(char) {
-  char.safeQuestPool = [0, 1, 2].map((i) => randomQuest(SAFE_QUEST_TIERS, i, "safe"));
-  char.riskyQuestPool = [0, 1, 2].map((i) => randomQuest(RISKY_QUEST_TIERS, i, "risky"));
+  char.safeQuestPool = [0, 1, 2].map((i) => randomQuest(SAFE_QUEST_TIERS, i, "safe", char.level));
+  char.riskyQuestPool = [0, 1, 2].map((i) => randomQuest(RISKY_QUEST_TIERS, i, "risky", char.level));
   char.lastQuestRefresh = new Date();
 }
 
@@ -45,7 +54,8 @@ function replaceQuest(char, type, tierIndex) {
   const quest = randomQuest(
     type === "safe" ? SAFE_QUEST_TIERS : RISKY_QUEST_TIERS,
     tierIndex,
-    type
+    type,
+    char.level
   );
   if (type === "safe") char.safeQuestPool[tierIndex] = quest;
   else char.riskyQuestPool[tierIndex] = quest;
@@ -53,7 +63,7 @@ function replaceQuest(char, type, tierIndex) {
 
 function refreshQuestPool(char, type) {
   const tiers = type === "safe" ? SAFE_QUEST_TIERS : RISKY_QUEST_TIERS;
-  const pool = [0, 1, 2].map((i) => randomQuest(tiers, i, type));
+  const pool = [0, 1, 2].map((i) => randomQuest(tiers, i, type, char.level));
   if (type === "safe") char.safeQuestPool = pool;
   else char.riskyQuestPool = pool;
 }
