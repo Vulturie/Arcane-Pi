@@ -133,10 +133,6 @@ function App() {
           element={<Shop character={activeChar} refreshCharacter={refreshActiveCharacter} />}
         />
         <Route
-          path="/history"
-          element={<History character={activeChar} />}
-        />
-        <Route
           path="/arena"
           element={<Arena character={activeChar} refreshCharacter={refreshActiveCharacter} />}
         />
