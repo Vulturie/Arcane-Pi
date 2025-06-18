@@ -38,7 +38,7 @@ function Journal({ character }) {
   }, [character]);
 
   const renderTavernEntries = () => (
-    <div className="absolute inset-0 pt-40 pb-32 px-24 overflow-y-auto text-sm space-y-1">
+    <div className="absolute inset-x-0 top-40 bottom-32 px-24 overflow-y-auto text-sm space-y-1">
       {tavernJournalEntries.map((entry, idx) => (
         <div key={idx} className="grid grid-cols-3 items-center py-1">
           <span className="font-bold text-left truncate">{entry.questName}</span>
@@ -56,7 +56,7 @@ function Journal({ character }) {
   );
 
   const renderArenaEntries = () => (
-    <div className="absolute inset-0 pt-40 pb-32 px-24 overflow-y-auto text-sm space-y-1">
+    <div className="absolute inset-x-0 top-40 bottom-32 px-24 overflow-y-auto text-sm space-y-1">
       {arenaJournalEntries.map((entry, idx) => (
         <div
           key={idx}
@@ -80,7 +80,7 @@ function Journal({ character }) {
   );
 
   const renderTowerEntries = () => (
-    <div className="absolute inset-0 pt-40 pb-10 px-28 overflow-y-auto text-sm space-y-1">
+    <div className="absolute inset-x-0 top-40 bottom-10 px-28 overflow-y-auto text-sm space-y-1">
       {towerJournalEntries.map((entry, idx) => (
         <div key={idx} className="grid grid-cols-2 items-center py-1">
           <span className="truncate">
@@ -149,7 +149,7 @@ function Journal({ character }) {
             <img
               src="/assets/journal/exit_button.png"
               alt="Close"
-              className="absolute top-6 right-6 w-6 cursor-pointer hover:scale-105 transition-transform"
+              className="absolute top-6 right-6 w-6 cursor-pointer hover:scale-105 transition-transform z-10"
               onClick={() => setShowTavern(false)}
             />
             {renderTavernEntries()}
@@ -171,7 +171,7 @@ function Journal({ character }) {
             <img
               src="/assets/journal/exit_button.png"
               alt="Close"
-              className="absolute top-6 right-6 w-6 cursor-pointer hover:scale-105 transition-transform"
+              className="absolute top-6 right-6 w-6 cursor-pointer hover:scale-105 transition-transform z-10"
               onClick={() => setShowArena(false)}
             />
             {renderArenaEntries()}
@@ -193,7 +193,7 @@ function Journal({ character }) {
             <img
               src="/assets/journal/exit_button.png"
               alt="Close"
-              className="absolute top-6 right-6 w-6 cursor-pointer hover:scale-105 transition-transform"
+              className="absolute top-6 right-6 w-6 cursor-pointer hover:scale-105 transition-transform z-10"
               onClick={() => setShowTower(false)}
             />
             {renderTowerEntries()}
