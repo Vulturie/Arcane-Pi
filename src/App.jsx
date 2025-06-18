@@ -11,10 +11,10 @@ import CharacterSelect from "./pages/CharacterSelect";
 import CharacterCreate from "./pages/CharacterCreate";
 import Tavern from "./pages/Tavern";
 import Inventory from "./pages/Inventory";
-import History from "./pages/History";
 import Shop from "./pages/Shop";
 import Tower from "./pages/Tower";
 import Arena from "./pages/Arena";
+import Journal from "./pages/Journal";
 import LoadingScreenWrapper from "./components/LoadingScreenWrapper";
 
 function App() {
@@ -143,6 +143,10 @@ function App() {
         <Route
           path="/tower"
           element={<Tower character={activeChar} refreshCharacter={refreshActiveCharacter} />}
+        />
+        <Route
+          path="/journal"
+          element={<Journal character={activeChar} />}
         />
         <Route
           path="/character-select"
