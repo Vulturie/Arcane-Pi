@@ -34,7 +34,7 @@ function Inventory({ character, refreshCharacter }) {
     } catch (err) {
       console.error("Failed to load inventory", err);
     }
-  }, [character, equipped]);
+  }, [character]);
 
   const loadEquipment = useCallback(async () => {
     if (!character) return;
