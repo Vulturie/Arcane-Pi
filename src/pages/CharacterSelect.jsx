@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { deleteCharacter } from "../services/playerService";
-import "./CharacterSelect.css";
 
 function CharacterSelect({ owner, characters, onSelect, refresh }) {
   const navigate = useNavigate();
@@ -36,72 +35,71 @@ function CharacterSelect({ owner, characters, onSelect, refresh }) {
     }
   };
 
+  const glowClass = "drop-shadow-[0_0_8px_white]";
   const addGlow = (e) => {
-    e.currentTarget.classList.add("pressed");
+    e.currentTarget.classList.add(glowClass);
   };
 
   const removeGlow = (e) => {
-    e.currentTarget.classList.remove("pressed");
+    e.currentTarget.classList.remove(glowClass);
   };
 
   return (
     <div
-      className="character-select"
+      className="relative w-screen h-screen bg-no-repeat bg-center bg-cover bg-fixed flex justify-center items-start pt-24 font-[Cinzel] text-white overflow-hidden"
       style={{
         backgroundImage: "url(/assets/ui/backgrounds/selection_background.png)",
-        backgroundRepeat: "no-repeat",
-        backgroundPosition: "center center",
-        backgroundAttachment: "fixed",
-        backgroundSize: "cover",
       }}
     >
       <img
         src="/assets/ui/buttons/back_button.png"
         alt="Back"
-        className="back-button"
+        className="absolute top-4 left-4 w-16 cursor-pointer transition-transform duration-200 ease-in-out hover:scale-105"
         onClick={() => window.location.reload()}
       />
-      <div className="character-select-wrapper">
-        <div className="character-scroll-area">
-          <ul className="character-grid">
+      <div className="relative w-full h-full flex flex-col overflow-hidden">
+        <div className="flex-1 overflow-y-auto py-6 px-4 max-h-[calc(100vh-120px)]">
+          <ul className="list-none p-0 m-auto mt-16 mb-8 w-full max-w-[600px] grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-4 justify-items-center">
             {characters.map((c) => (
               <li
                 key={c._id}
-                className={`character-item ${
-                  selected && selected._id === c._id ? "selected" : ""
-                }`}
+                className="flex flex-col items-center w-full p-2"
                 onClick={() => handleSelect(c._id)}
               >
-                <div className="character-header">
-                  <div className="portrait-wrapper">
+                <div className="flex justify-between items-center gap-3 w-full">
+                  <div
+                    className={`w-16 h-16 flex justify-center items-center ${
+                      selected && selected._id === c._id ? "drop-shadow-[0_0_8px_white]" : ""
+                    }`}
+                  >
                     <img
                       src={portraitForCharacter(c)}
                       alt={`${c.class} ${c.gender}`}
-                      className="character-portrait"
+                      className="w-full h-auto"
                     />
                   </div>
-                  <div className="character-info">
+                  <div className="flex flex-col flex-1 mr-2">
                     <span
-                      className={`character-name ${
-                        selected && selected._id === c._id ? "selected" : ""
+                      className={`font-bold text-xs drop-shadow-sm ${
+                        selected && selected._id === c._id ? "text-yellow-300" : ""
                       }`}
                     >
                       {c.name}
                     </span>
                     <span
-                      className={`character-level ${
-                        selected && selected._id === c._id ? "selected" : ""
+                      className={`text-[10px] drop-shadow-sm ${
+                        selected && selected._id === c._id ? "text-yellow-300" : ""
                       }`}
                     >
                       Lvl {c.level}
                     </span>
                   </div>
                 </div>
-                <div className="character-buttons">
+                <div className="mt-2 flex justify-center w-full">
                   <img
                     src="/assets/ui/buttons/select_button.png"
                     alt="Select"
-                    className="select-btn image-btn"
+                    className="w-[21vw] max-w-[84px] min-h-12 mx-1 cursor-pointer transition-transform duration-200 hover:scale-105 outline-none"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleSelect(c._id);
@@ -115,7 +113,7 @@ function CharacterSelect({ owner, characters, onSelect, refresh }) {
                   <img
                     src="/assets/ui/buttons/delete_button.png"
                     alt="Delete"
-                    className="delete-btn image-btn"
+                    className="w-[21vw] max-w-[84px] min-h-12 mx-1 cursor-pointer transition-transform duration-200 hover:scale-105 outline-none"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleDelete(c._id);
@@ -132,22 +130,22 @@ function CharacterSelect({ owner, characters, onSelect, refresh }) {
             ))}
           </ul>
           {characters.length < 4 && (
-            <div className="create-button-wrapper">
+            <div className="sticky bottom-0 w-full flex justify-center py-3 z-10">
               <img
                 src="/assets/character_creation/+_create_character_button.png"
                 alt="Create"
-                className="create-new-btn"
+                className="w-[120px] cursor-pointer transition-transform duration-200 hover:scale-105"
                 onClick={() => navigate("/create-character")}
               />
             </div>
           )}
         </div>
         {selected && (
-          <div className="fixed-continue-button">
+          <div className="sticky bottom-0 w-full flex justify-center py-3 z-10">
             <img
               src="/assets/ui/buttons/continue_button.png"
               alt="Continue"
-              className="continue-button"
+              className="w-[120px] cursor-pointer transition-transform duration-200 hover:scale-105"
               onClick={handleContinue}
             />
           </div>
