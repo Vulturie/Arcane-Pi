@@ -7,6 +7,7 @@ const ITEMS = require("../data/items");
 const { SAFE_QUEST_TIERS, RISKY_QUEST_TIERS } = require("../data/quests");
 const { XP_GAIN_MULTIPLIER, GOLD_SCALING } = require("../utils/balanceConfig");
 const { getRewardForLevel, getEnemyForLevel } = require("../data/tower");
+const { logStat } = require("../utils/statsLogger");
 
 function getRandomRarity() {
   const r = Math.random();
@@ -322,8 +323,9 @@ router.get("/characters/:id/quest/status", loadCharacter, async (req, res) => {
   if (elapsed >= quest.duration) {
     let combatResult = null;
     let loot = null;
+    let playerStats = null;
     if (quest.isCombat) {
-      const playerStats = getPlayerStats(char);
+      playerStats = getPlayerStats(char);
       combatResult = simulateCombat(playerStats, quest.enemy);
       if (combatResult.result === "win") {
         loot = await grantLoot(char, quest.path === "risky");
@@ -353,6 +355,32 @@ router.get("/characters/:id/quest/status", loadCharacter, async (req, res) => {
     }
 
     logHistory(char, quest, combatResult, xpGain, goldGain, loot);
+    if (quest.isCombat) {
+      const maxHP = playerStats.VIT * 10;
+      logStat({
+        type: "combat",
+        timestamp: Date.now(),
+        playerId: char._id,
+        class: char.class,
+        level: char.level,
+        win: combatResult.result === "win",
+        rounds: combatResult.rounds,
+        damageTaken: maxHP - combatResult.playerHP,
+        enemyType: quest.enemy.name,
+      });
+    }
+    logStat({
+      type: "quest",
+      timestamp: Date.now(),
+      playerId: char._id,
+      questName: quest.name,
+      questType: qType,
+      gold: goldGain,
+      xp: xpGain,
+      duration: quest.duration,
+      level: char.level,
+      result: outcome === "success" ? "win" : "fail",
+    });
 
         char.pendingQuestResult = {
           questName: quest.name,
@@ -426,8 +454,9 @@ router.post("/characters/:id/quest/complete", loadCharacter, async (req, res) =>
   }
   let combatResult = null;
   let loot = null;
+  let playerStats = null;
   if (quest.isCombat) {
-    const playerStats = getPlayerStats(char);
+    playerStats = getPlayerStats(char);
     combatResult = simulateCombat(playerStats, quest.enemy);
     if (combatResult.result === "win") {
       loot = await grantLoot(char, quest.path === "risky");
@@ -455,6 +484,32 @@ router.post("/characters/:id/quest/complete", loadCharacter, async (req, res) =>
   }
 
   logHistory(char, quest, combatResult, xpGain, goldGain, loot);
+  if (quest.isCombat) {
+    const maxHP = playerStats.VIT * 10;
+    logStat({
+      type: "combat",
+      timestamp: Date.now(),
+      playerId: char._id,
+      class: char.class,
+      level: char.level,
+      win: combatResult.result === "win",
+      rounds: combatResult.rounds,
+      damageTaken: maxHP - combatResult.playerHP,
+      enemyType: quest.enemy.name,
+    });
+  }
+  logStat({
+    type: "quest",
+    timestamp: Date.now(),
+    playerId: char._id,
+    questName: quest.name,
+    questType: qType,
+    gold: goldGain,
+    xp: xpGain,
+    duration: quest.duration,
+    level: char.level,
+    result: outcome === "success" ? "win" : "fail",
+  });
 
     char.pendingQuestResult = {
       questName: quest.name,
@@ -688,14 +743,49 @@ router.post("/characters/:id/tower/attempt", loadCharacter, async (req, res) => 
   const reward = getRewardForLevel(level);
   const playerStats = getPlayerStats(char);
   const combat = simulateCombat(playerStats, enemy);
+  logStat({
+    type: "combat",
+    timestamp: Date.now(),
+    playerId: char._id,
+    class: char.class,
+    level: char.level,
+    win: combat.result === "win",
+    rounds: combat.rounds,
+    damageTaken: playerStats.VIT * 10 - combat.playerHP,
+    enemyType: enemy.name,
+  });
   if (combat.result === "win") {
     char.inventory.push(reward);
     char.towerProgress = level;
     logTowerHistory(char, level, "win");
+    logStat({
+      type: "quest",
+      timestamp: Date.now(),
+      playerId: char._id,
+      questName: `Floor ${level}`,
+      questType: "tower",
+      gold: 0,
+      xp: 0,
+      duration: 0,
+      level: char.level,
+      result: "win",
+    });
     await char.save();
     return res.json({ result: "win", combat, reward, progress: char.towerProgress });
   }
   logTowerHistory(char, level, "loss");
+  logStat({
+    type: "quest",
+    timestamp: Date.now(),
+    playerId: char._id,
+    questName: `Floor ${level}`,
+    questType: "tower",
+    gold: 0,
+    xp: 0,
+    duration: 0,
+    level: char.level,
+    result: "fail",
+  });
   await char.save();
   return res.json({ result: "loss", combat, progress: char.towerProgress });
 });

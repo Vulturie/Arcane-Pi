@@ -8,6 +8,7 @@ const {
   calculateCombatScore,
   simulateCombat,
 } = require("../utils/combat");
+const { logStat } = require("../utils/statsLogger");
 
 const MAX_HISTORY_ENTRIES = 100;
 
@@ -198,6 +199,28 @@ router.post("/match/:id", async (req, res) => {
     if (resetArenaCounters(opponentChar)) await opponentChar.save();
     const oppStats = getPlayerStats(opponentChar);
     const combat = simulateCombat(playerStats, { ...oppStats, name: opponentChar.name });
+    logStat({
+      type: "combat",
+      timestamp: Date.now(),
+      playerId: char._id,
+      class: char.class,
+      level: char.level,
+      win: combat.result === "win",
+      rounds: combat.rounds,
+      damageTaken: playerStats.VIT * 10 - combat.playerHP,
+      enemyType: opponentChar.name,
+    });
+    logStat({
+      type: "combat",
+      timestamp: Date.now(),
+      playerId: opponentChar._id,
+      class: opponentChar.class,
+      level: opponentChar.level,
+      win: combat.result !== "win",
+      rounds: combat.rounds,
+      damageTaken: oppStats.VIT * 10 - combat.enemyHP,
+      enemyType: char.name,
+    });
 
     const DELTA = 30;
     if (combat.result === "win") {
@@ -270,6 +293,28 @@ router.post("/challenge/:id/:oppId", async (req, res) => {
     const combat = simulateCombat(playerStats, {
       ...oppStats,
       name: opponentChar.name,
+    });
+    logStat({
+      type: "combat",
+      timestamp: Date.now(),
+      playerId: char._id,
+      class: char.class,
+      level: char.level,
+      win: combat.result === "win",
+      rounds: combat.rounds,
+      damageTaken: playerStats.VIT * 10 - combat.playerHP,
+      enemyType: opponentChar.name,
+    });
+    logStat({
+      type: "combat",
+      timestamp: Date.now(),
+      playerId: opponentChar._id,
+      class: opponentChar.class,
+      level: opponentChar.level,
+      win: combat.result !== "win",
+      rounds: combat.rounds,
+      damageTaken: oppStats.VIT * 10 - combat.enemyHP,
+      enemyType: char.name,
     });
 
     const DELTA = 30;
