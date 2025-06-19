@@ -1,32 +1,3 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
-}
-
-.better {
-  color: green;
-}
-
-.worse {
-  color: red;
-}
-.equip-allowed { color: green; }
-.equip-denied { color: red; }
-.rarity-common { color: gray; }
-.rarity-uncommon { color: green; }
-.rarity-rare { color: blue; }
-.rarity-epic { color: purple; }
-.rarity-legendary { color: orange; }
