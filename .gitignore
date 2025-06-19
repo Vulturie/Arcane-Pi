@@ -4,6 +4,7 @@
 /node_modules
 /.pnp
 .pnp.js
+project-p-backend/node_modules
 
 # testing
 /coverage
@@ -21,7 +22,7 @@
 project-p-backend/.env
 
 /dist
-
+/.idea
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
