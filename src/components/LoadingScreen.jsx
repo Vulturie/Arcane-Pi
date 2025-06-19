@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import styles from "./LoadingScreen.module.css";
 
 const loadingImages = [
   "/assets/loading/loading_one.png",
@@ -16,28 +15,32 @@ function LoadingScreen({ fadingOut = false }) {
     return () => clearInterval(interval);
   }, []);
 
+  const containerClasses = `fixed inset-0 z-[9999] w-screen h-screen overflow-hidden bg-black/70 flex justify-center items-center ${fadingOut ? "opacity-0 transition-opacity duration-500 pointer-events-none" : ""}`;
+
   return (
-    <div className={`${styles.container} ${fadingOut ? styles.fadeOut : ""}`}>
+    <div className={containerClasses}>
       <img
         src="/assets/loading/background.png"
-        className={styles.background}
+        className="absolute inset-0 w-full h-full object-cover"
         alt="Loading background"
       />
-      <img
-        src="/assets/loading/logo_arcane-pi.png"
-        className={styles.logo}
-        alt="Arcane Pi logo"
-      />
-      <img
-        src={loadingImages[index]}
-        className={styles.loadingText}
-        alt="Loading"
-      />
-      <img
-        src="/assets/loading/loading_bar.png"
-        className={styles.loadingBar}
-        alt="Loading bar"
-      />
+      <div className="relative flex flex-col items-center">
+        <img
+          src="/assets/loading/logo_arcane-pi.png"
+          className="w-[60%] max-w-[300px] mb-8"
+          alt="Arcane Pi logo"
+        />
+        <img
+          src={loadingImages[index]}
+          className="w-1/2 max-w-[200px] mb-4"
+          alt="Loading"
+        />
+        <img
+          src="/assets/loading/loading_bar.png"
+          className="w-[80%] max-w-[300px]"
+          alt="Loading bar"
+        />
+      </div>
     </div>
   );
 }
