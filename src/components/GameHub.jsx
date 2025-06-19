@@ -67,13 +67,13 @@ function GameHub({ character, refreshCharacter, username }) {
         style={{ backgroundImage: `url(${process.env.PUBLIC_URL}/assets/game_hub/bottom_frame.png)` }}
         onClick={() => setDrawerOpen(!drawerOpen)}
       >
-        <Link to="/tavern"><img src="/assets/game_hub/tavern_button.png" alt="Tavern" className="w-16 sm:w-20 cursor-pointer transition-transform hover:scale-105" /></Link>
-        <Link to="/inventory"><img src="/assets/game_hub/inventory_button.png" alt="Inventory" className="w-16 sm:w-20 cursor-pointer transition-transform hover:scale-105" /></Link>
-        <Link to="/arena"><img src="/assets/game_hub/arena_button.png" alt="Arena" className="w-16 sm:w-20 cursor-pointer transition-transform hover:scale-105" /></Link>
-        <Link to="/shop"><img src="/assets/game_hub/shop_button.png" alt="Shop" className="w-16 sm:w-20 cursor-pointer transition-transform hover:scale-105" /></Link>
-        <Link to="/tower"><img src="/assets/game_hub/tower_icon.png" alt="Tower" className="w-16 sm:w-20 cursor-pointer transition-transform hover:scale-105" /></Link>
+        <Link to="/tavern" onClick={() => logStat({ type: 'ui_interaction', area: 'hub', button: 'tavern' })}><img src="/assets/game_hub/tavern_button.png" alt="Tavern" className="w-16 sm:w-20 cursor-pointer transition-transform hover:scale-105" /></Link>
+        <Link to="/inventory" onClick={() => logStat({ type: 'ui_interaction', area: 'hub', button: 'inventory' })}><img src="/assets/game_hub/inventory_button.png" alt="Inventory" className="w-16 sm:w-20 cursor-pointer transition-transform hover:scale-105" /></Link>
+        <Link to="/arena" onClick={() => logStat({ type: 'ui_interaction', area: 'hub', button: 'arena' })}><img src="/assets/game_hub/arena_button.png" alt="Arena" className="w-16 sm:w-20 cursor-pointer transition-transform hover:scale-105" /></Link>
+        <Link to="/shop" onClick={() => logStat({ type: 'ui_interaction', area: 'hub', button: 'shop' })}><img src="/assets/game_hub/shop_button.png" alt="Shop" className="w-16 sm:w-20 cursor-pointer transition-transform hover:scale-105" /></Link>
+        <Link to="/tower" onClick={() => logStat({ type: 'ui_interaction', area: 'hub', button: 'tower' })}><img src="/assets/game_hub/tower_icon.png" alt="Tower" className="w-16 sm:w-20 cursor-pointer transition-transform hover:scale-105" /></Link>
         <img src="/assets/game_hub/gate_icon.png" alt="Gate" className="w-16 sm:w-20 cursor-pointer transition-transform hover:scale-105" />
-        <Link to="/journal"><img src="/assets/game_hub/journal_button.png" alt="Journal" className="w-16 sm:w-20 cursor-pointer transition-transform hover:scale-105" /></Link>
+        <Link to="/journal" onClick={() => logStat({ type: 'ui_interaction', area: 'hub', button: 'journal' })}><img src="/assets/game_hub/journal_button.png" alt="Journal" className="w-16 sm:w-20 cursor-pointer transition-transform hover:scale-105" /></Link>
         <img src="/assets/game_hub/settings_icon.png" alt="Settings" className="w-16 sm:w-20 cursor-pointer transition-transform hover:scale-105" />
       </div>
     </div>

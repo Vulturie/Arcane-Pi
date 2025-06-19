@@ -15,6 +15,7 @@ import Shop from "./pages/Shop";
 import Tower from "./pages/Tower";
 import Arena from "./pages/Arena";
 import Journal from "./pages/Journal";
+import DevDashboard from "./pages/DevDashboard";
 import LoadingScreenWrapper from "./components/LoadingScreenWrapper";
 
 function App() {
@@ -97,6 +98,7 @@ function App() {
             />
           }
         />
+        <Route path="/dev/dashboard" element={<DevDashboard />} />
       </Routes>
     );
   } else {
@@ -161,6 +163,7 @@ function App() {
           path="/"
           element={<GameHub character={activeChar} refreshCharacter={refreshActiveCharacter} username={username} />}
         />
+        <Route path="/dev/dashboard" element={<DevDashboard />} />
       </Routes>
     );
   }

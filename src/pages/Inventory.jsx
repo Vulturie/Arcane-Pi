@@ -10,6 +10,7 @@ import {
   getXpForNextLevel,
 } from "../services/playerService";
 import { RARITY_MULTIPLIER, getRarityLabel } from "../rarity";
+import logStat from "../utils/logStat";
 
 function Inventory({ character, refreshCharacter }) {
   const navigate = useNavigate();
@@ -88,6 +89,7 @@ function Inventory({ character, refreshCharacter }) {
     }
     try {
       await sellItem(character._id, itemId);
+      logStat({ type: 'ui_interaction', area: 'inventory', button: 'sell', item: itemId });
       loadInventory();
       loadEquipment();
       if (refreshCharacter) refreshCharacter();

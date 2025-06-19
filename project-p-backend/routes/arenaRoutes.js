@@ -9,6 +9,7 @@ const {
   simulateCombat,
 } = require("../utils/combat");
 const { logStat } = require("../utils/statsLogger");
+const { flagCheat } = require("../utils/cheatDetector");
 
 const MAX_HISTORY_ENTRIES = 100;
 
@@ -235,6 +236,10 @@ router.post("/match/:id", async (req, res) => {
       opponentChar.arenaWins = (opponentChar.arenaWins || 0) + 1;
     }
     const mmrChange = combat.result === "win" ? DELTA : -DELTA;
+    if (Math.abs(mmrChange) > 200) {
+      flagCheat(char, 'MMR change too high', { change: mmrChange });
+      flagCheat(opponentChar, 'MMR change too high', { change: -mmrChange });
+    }
     logArenaHistory(char, opponentChar.name, combat.result, mmrChange);
     logArenaHistory(opponentChar, char.name, combat.result === "win" ? "loss" : "win", -mmrChange);
     char.dailyArenaFights = (char.dailyArenaFights || 0) + 1;
@@ -330,6 +335,10 @@ router.post("/challenge/:id/:oppId", async (req, res) => {
       opponentChar.arenaWins = (opponentChar.arenaWins || 0) + 1;
     }
     const mmrChange = combat.result === "win" ? DELTA : -DELTA;
+    if (Math.abs(mmrChange) > 200) {
+      flagCheat(char, 'MMR change too high', { change: mmrChange });
+      flagCheat(opponentChar, 'MMR change too high', { change: -mmrChange });
+    }
     logArenaHistory(char, opponentChar.name, combat.result, mmrChange);
     logArenaHistory(opponentChar, char.name, combat.result === "win" ? "loss" : "win", -mmrChange);
     char.dailyArenaFights = (char.dailyArenaFights || 0) + 1;

@@ -8,6 +8,7 @@ const characterRoutes = require("./routes/characterRoutes");
 const itemRoutes = require("./routes/itemRoutes");
 const arenaRoutes = require("./routes/arenaRoutes");
 const devStatsRoutes = require("./routes/devStats");
+const logRoutes = require("./routes/logRoutes");
 
 const app = express();
 app.use(cors());
@@ -30,6 +31,7 @@ app.use("/api", characterRoutes);
 app.use("/items", itemRoutes);
 app.use("/arena", arenaRoutes);
 app.use("/dev", devStatsRoutes);
+app.use("/api", logRoutes);
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });

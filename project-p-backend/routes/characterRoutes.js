@@ -8,6 +8,7 @@ const { SAFE_QUEST_TIERS, RISKY_QUEST_TIERS } = require("../data/quests");
 const { XP_GAIN_MULTIPLIER, GOLD_SCALING } = require("../utils/balanceConfig");
 const { getRewardForLevel, getEnemyForLevel } = require("../data/tower");
 const { logStat } = require("../utils/statsLogger");
+const { flagCheat } = require("../utils/cheatDetector");
 
 function getRandomRarity() {
   const r = Math.random();
@@ -446,6 +447,7 @@ router.post("/characters/:id/quest/complete", loadCharacter, async (req, res) =>
   const char = req.character;
   const quest = char.activeQuest;
   if (!quest) return res.status(400).json({ error: "No active quest" });
+  const levelBefore = char.level;
   const now = new Date();
   const startedAt = new Date(quest.startedAt);
   const timeElapsed = (now - startedAt) / 1000;
@@ -481,6 +483,14 @@ router.post("/characters/:id/quest/complete", loadCharacter, async (req, res) =>
     char.xp -= xpToLevel;
     char.level += 1;
     xpToLevel = getXpForNextLevel(char.level);
+  }
+
+  if (quest.duration < 3 && quest.isCombat) {
+    flagCheat(char, 'Quest duration too short', { quest: quest.name });
+  }
+
+  if (char.level - levelBefore > 10 && now - startedAt < 10 * 60 * 1000) {
+    flagCheat(char, 'Level jump', { before: levelBefore, after: char.level });
   }
 
   logHistory(char, quest, combatResult, xpGain, goldGain, loot);

@@ -1,14 +1,39 @@
 const express = require('express');
 const router = express.Router();
 const { StatsLog } = require('../utils/statsLogger');
+const Character = require('../models/Character');
+const CheatFlag = require('../models/CheatFlag');
 
-router.get('/stats-summary', async (req, res) => {
+function auth(req, res, next) {
+  if (req.query.token !== process.env.DEV_TOKEN) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  next();
+}
+
+router.get('/dashboard', auth, async (req, res) => {
   try {
-    const combatWinRates = await StatsLog.aggregate([
+    const topQuests = await StatsLog.aggregate([
+      { $match: { type: 'quest' } },
+      { $group: { _id: '$questName', count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $limit: 10 },
+      { $project: { _id: 0, questName: '$_id', count: 1 } },
+    ]);
+
+    const failedEnemies = await StatsLog.aggregate([
+      { $match: { type: 'combat', win: false } },
+      { $group: { _id: '$enemyType', fails: { $sum: 1 } } },
+      { $sort: { fails: -1 } },
+      { $limit: 10 },
+      { $project: { _id: 0, enemy: '$_id', fails: 1 } },
+    ]);
+
+    const classWinRates = await StatsLog.aggregate([
       { $match: { type: 'combat' } },
       {
         $group: {
-          _id: '$class',
+          _id: { class: '$class', level: '$level' },
           total: { $sum: 1 },
           wins: { $sum: { $cond: ['$win', 1, 0] } },
         },
@@ -16,47 +41,52 @@ router.get('/stats-summary', async (req, res) => {
       {
         $project: {
           _id: 0,
-          class: '$_id',
+          class: '$_id.class',
+          level: '$_id.level',
           winRate: { $cond: [{ $eq: ['$total', 0] }, 0, { $divide: ['$wins', '$total'] }] },
         },
       },
+      { $sort: { class: 1, level: 1 } },
     ]);
 
-    const goldXpPerLevel = await StatsLog.aggregate([
+    const rewardInflation = await StatsLog.aggregate([
       { $match: { type: 'quest' } },
-      {
-        $group: {
-          _id: { $floor: { $divide: ['$level', 10] } },
-          avgGold: { $avg: '$gold' },
-          avgXp: { $avg: '$xp' },
-        },
-      },
-      {
-        $project: {
-          _id: 0,
-          levelRange: {
-            $concat: [
-              { $toString: { $multiply: ['$_id', 10] } },
-              '-',
-              { $toString: { $add: [{ $multiply: [{ $add: ['$_id', 1] }, 10] }, -1] } },
-            ],
-          },
-          avgGold: 1,
-          avgXp: 1,
-        },
-      },
-      { $sort: { levelRange: 1 } },
+      { $group: { _id: '$level', avgXp: { $avg: '$xp' }, avgGold: { $avg: '$gold' } } },
+      { $sort: { _id: 1 } },
+      { $project: { _id: 0, level: '$_id', avgXp: 1, avgGold: 1 } },
     ]);
 
-    const popularQuests = await StatsLog.aggregate([
-      { $match: { type: 'quest' } },
-      { $group: { _id: '$questName', count: { $sum: 1 } } },
+    res.json({ topQuests, failedEnemies, classWinRates, rewardInflation });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+router.get('/suspicious', auth, async (req, res) => {
+  try {
+    const chars = await Character.find({ suspicious: true }).select('name class level').lean();
+    const flags = await CheatFlag.find({}).sort({ timestamp: -1 }).lean();
+    res.json({ characters: chars, flags });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+router.get('/ui-analytics', auth, async (req, res) => {
+  try {
+    const buttonCounts = await StatsLog.aggregate([
+      { $match: { type: 'ui_interaction' } },
+      { $group: { _id: { area: '$area', button: '$button' }, count: { $sum: 1 } } },
       { $sort: { count: -1 } },
-      { $limit: 5 },
-      { $project: { _id: 0, questName: '$_id', count: 1 } },
     ]);
-
-    res.json({ combatWinRates, goldXpPerLevel, popularQuests });
+    const views = await StatsLog.aggregate([
+      { $match: { type: 'ui_interaction' } },
+      { $group: { _id: '$area', count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+    ]);
+    res.json({ buttonCounts, views });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server error' });

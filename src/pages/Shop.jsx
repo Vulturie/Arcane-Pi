@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { buyItem, getEquipment, getShopItems } from "../services/playerService";
+import logStat from "../utils/logStat";
 import { RARITY_MULTIPLIER, getRarityLabel } from "../rarity";
 
 function Shop({ character, refreshCharacter }) {
@@ -52,6 +53,7 @@ function Shop({ character, refreshCharacter }) {
   const handleBuy = async (item) => {
     try {
       await buyItem(character._id, item.id);
+      logStat({ type: 'ui_interaction', area: 'shop', button: 'buy', item: item.id });
       refreshCharacter();
       alert(`Bought ${item.name}`);
     } catch (err) {
