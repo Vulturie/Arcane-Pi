@@ -36,7 +36,10 @@ function GameHub({ character, refreshCharacter, username }) {
         className="absolute inset-0 w-full h-full object-cover"
       />
 
-      <div className="absolute top-0 left-0 z-10 w-full h-[120px] flex items-center justify-start px-8 bg-[url('/assets/game_hub/top_frame.png')] bg-no-repeat bg-center bg-contain">
+      <div
+        className="absolute top-0 left-0 z-10 w-full h-[120px] flex items-center justify-start px-8 bg-no-repeat bg-center bg-contain"
+        style={{ backgroundImage: `url(${process.env.PUBLIC_URL}/assets/game_hub/top_frame.png)` }}
+      >
         <Link to="/character">
           <img src={portrait} alt="Character" className="w-16 cursor-pointer self-center mt-2" />
         </Link>
@@ -60,7 +63,8 @@ function GameHub({ character, refreshCharacter, username }) {
       </div>
 
       <div
-        className={`absolute left-0 bottom-0 z-10 w-full h-[320px] pt-[90px] bg-[url('/assets/game_hub/bottom_frame.png')] bg-no-repeat bg-center bg-contain transition-transform flex flex-wrap justify-center items-center gap-4 mb-6 ${drawerOpen ? 'translate-y-0' : 'translate-y-[160px]'}`}
+        className={`absolute left-0 bottom-0 z-10 w-full h-[320px] pt-[60px] pb-[50px] bg-no-repeat bg-center bg-contain transition-transform flex flex-wrap justify-center items-center gap-2 mb-0 ${drawerOpen ? 'translate-y-3' : 'translate-y-[160px]'}`}
+        style={{ backgroundImage: `url(${process.env.PUBLIC_URL}/assets/game_hub/bottom_frame.png)` }}
         onClick={() => setDrawerOpen(!drawerOpen)}
       >
         <Link to="/tavern"><img src="/assets/game_hub/tavern_button.png" alt="Tavern" className="w-16 sm:w-20 cursor-pointer transition-transform hover:scale-105" /></Link>
