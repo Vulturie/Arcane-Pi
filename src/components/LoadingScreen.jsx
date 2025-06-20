@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
+import PiLoginButton from "./PiLoginButton";
 
 const loadingImages = [
   "/assets/loading/loading_one.png",
   "/assets/loading/loading_two.png",
 ];
 
-function LoadingScreen({ fadingOut = false }) {
+function LoadingScreen({ fadingOut = false, showLogin = false }) {
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
@@ -30,16 +31,22 @@ function LoadingScreen({ fadingOut = false }) {
           className="w-[60%] max-w-[300px] mb-8"
           alt="Arcane Pi logo"
         />
-        <img
-          src={loadingImages[index]}
-          className="w-1/2 max-w-[200px] mb-4"
-          alt="Loading"
-        />
-        <img
-          src="/assets/loading/loading_bar.png"
-          className="w-[80%] max-w-[300px]"
-          alt="Loading bar"
-        />
+        {showLogin ? (
+          <PiLoginButton />
+        ) : (
+          <>
+            <img
+              src={loadingImages[index]}
+              className="w-1/2 max-w-[200px] mb-4"
+              alt="Loading"
+            />
+            <img
+              src="/assets/loading/loading_bar.png"
+              className="w-[80%] max-w-[300px]"
+              alt="Loading bar"
+            />
+          </>
+        )}
       </div>
     </div>
   );

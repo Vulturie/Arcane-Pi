@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useCallback, useContext } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { UserContext } from "./context/UserContext";
-import PiLoginButton from "./components/PiLoginButton";
 import {
   getCharacters,
   getCharacter,
@@ -59,14 +58,12 @@ function App() {
     }
   }, [username, loadCharacters]);
 
-  if (!username) {
-    return <PiLoginButton />;
-  }
-
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   let routes;
-  if (!activeChar) {
+  if (!username) {
+    routes = null;
+  } else if (!activeChar) {
     routes = (
       <Routes>
         <Route
@@ -172,7 +169,7 @@ function App() {
   return (
     <Router>
       {routes}
-      <LoadingScreenWrapper isInitializing={isInitializing} />
+      <LoadingScreenWrapper isInitializing={isInitializing} showLogin={!username} />
     </Router>
   );
 }

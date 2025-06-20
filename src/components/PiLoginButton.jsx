@@ -29,9 +29,14 @@ function PiLoginButton() {
   }
 
   return (
-    <div>
-      <button onClick={handleLogin}>Login with Pi</button>
-      {error && <div style={{ color: "red" }}>{error}</div>}
+    <div className="flex flex-col items-center">
+      <img
+        src="/assets/loading/sign_in_button.png"
+        alt="Login with Pi"
+        className="w-[80%] max-w-[300px] cursor-pointer"
+        onClick={handleLogin}
+      />
+      {error && <div className="text-red-500 mt-2">{error}</div>}
     </div>
   );
 }
