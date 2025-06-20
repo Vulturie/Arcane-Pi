@@ -2,26 +2,25 @@ import React, { useContext, useState } from "react";
 import { UserContext } from "../context/UserContext";
 
 function PiLoginButton() {
-  const { user, setUser } = useContext(UserContext);
+  const { user, setUser, setAccessToken } = useContext(UserContext);
   const [error, setError] = useState(null);
 
   const handleLogin = async () => {
-    if (window.Pi) {
-      try {
-        const result = await window.Pi.authenticate(["username"]);
-        console.log("Pi authentication result", result);
-        if (result && result.user) {
-          setUser(result.user);
-        }
-      } catch (err) {
-        console.log("Pi authentication failed", err);
-        setError("Login failed");
+    if (!window.Pi) {
+      console.log("Pi SDK not available");
+      setError("Pi SDK not found");
+      return;
+    }
+    try {
+      const result = await window.Pi.authenticate(["username"]);
+      console.log("Pi authentication result", result);
+      if (result && result.user) {
+        setUser(result.user);
+        setAccessToken(result.accessToken);
       }
-    } else {
-      console.log("Pi SDK not available, using fallback user");
-      const result = { user: { username: "test_user" } };
-      console.log("Fallback auth result", result);
-      setUser(result.user);
+    } catch (err) {
+      console.log("Pi authentication failed", err);
+      setError("Login failed");
     }
   };
 

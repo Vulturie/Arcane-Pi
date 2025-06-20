@@ -6,8 +6,11 @@ import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
 import { UserProvider } from './context/UserContext';
 
-if (window.Pi && process.env.NODE_ENV !== 'production') {
-  window.Pi.init({ sandbox: true });
+if (window.Pi) {
+  window.Pi.init({
+    version: "2.0",
+    sandbox: process.env.NODE_ENV !== 'production',
+  });
 }
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
