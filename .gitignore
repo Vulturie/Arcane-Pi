@@ -20,6 +20,7 @@ project-p-backend/node_modules
 .env.test.local
 .env.production.local
 project-p-backend/.env
+src/.env
 
 /dist
 /.idea

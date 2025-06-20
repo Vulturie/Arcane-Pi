@@ -5,9 +5,10 @@ import App from './App';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
 import { UserProvider } from './context/UserContext';
+import Pi from './piSdk';
 
-if (window.Pi) {
-  window.Pi.init({
+if (Pi && Pi.init) {
+  Pi.init({
     version: "2.0",
     sandbox: process.env.NODE_ENV !== 'production',
   });

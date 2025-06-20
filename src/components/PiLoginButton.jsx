@@ -1,18 +1,19 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { UserContext } from "../context/UserContext";
+import Pi from "../piSdk";
 
 function PiLoginButton() {
   const { user, setUser, setAccessToken } = useContext(UserContext);
   const [error, setError] = useState(null);
 
   const handleLogin = async () => {
-    if (!window.Pi) {
+    if (!Pi || !Pi.authenticate) {
       console.log("Pi SDK not available");
       setError("Pi SDK not found");
       return;
     }
     try {
-      const result = await window.Pi.authenticate(["username"]);
+      const result = await Pi.authenticate(["username"]);
       console.log("Pi authentication result", result);
       if (result && result.user) {
         setUser(result.user);
@@ -23,6 +24,13 @@ function PiLoginButton() {
       setError("Login failed");
     }
   };
+  // Automatically log in during development if the flag is set
+  useEffect(() => {
+    if (process.env.REACT_APP_SKIP_LOGIN) {
+      setUser({ username: "test_user" });
+      setAccessToken("mock_access_token");
+    }
+  }, [setUser, setAccessToken]);
 
   if (user) {
     return <div>Logged in as {user.username}</div>;
