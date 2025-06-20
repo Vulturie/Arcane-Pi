@@ -28,17 +28,7 @@ function App() {
   const [activeChar, setActiveChar] = useState(null);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    if (username) {
-      loadCharacters(username);
-    }
-  }, [username]);
-
-  if (!username) {
-    return <PiLoginButton />;
-  }
-
-  const loadCharacters = async (owner) => {
+  const loadCharacters = useCallback(async (owner) => {
     setIsInitializing(true);
     try {
       const data = await getCharacters(owner);
@@ -47,7 +37,7 @@ function App() {
       setError(err.message);
     }
     setIsInitializing(false);
-  };
+  }, []);
 
   const refreshActiveCharacter = useCallback(async () => {
     if (!activeChar) return;
@@ -62,6 +52,16 @@ function App() {
   const spendEnergy = useCallback((cost) => {
     setActiveChar((prev) => (prev ? { ...prev, energy: Math.max(prev.energy - cost, 0) } : prev));
   }, []);
+
+  useEffect(() => {
+    if (username) {
+      loadCharacters(username);
+    }
+  }, [username, loadCharacters]);
+
+  if (!username) {
+    return <PiLoginButton />;
+  }
 
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 
