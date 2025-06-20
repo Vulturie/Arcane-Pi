@@ -54,16 +54,17 @@ function CharacterSelect({ owner, characters, onSelect, refresh }) {
         backgroundImage: "url(/assets/ui/backgrounds/selection_background.png)",
       }}
     >
-      <img
-        src="/assets/ui/buttons/back_button.png"
-        alt="Back"
-        className="absolute top-4 left-4 w-16 cursor-pointer transition-transform duration-200 ease-in-out hover:scale-105"
-        onClick={() => window.location.reload()}
-      />
-      <div className="absolute top-12 left-1/2 -translate-x-1/2 w-full max-w-[600px] px-4 text-center pointer-events-none z-10">
-        <h2 className="text-lg sm:text-xl md:text-2xl font-bold drop-shadow-md fade-in-down">
-          {`Welcome ${username}! Choose or create a character:`}
-        </h2>
+      <div className="absolute top-6 left-1/2 -translate-x-1/2 w-[90%] max-w-[600px] pointer-events-none z-10">
+        <div className="relative w-full flex justify-center">
+          <img
+            src="/assets/ui/parchment_banner.png"
+            alt="banner"
+            className="w-full max-h-32 object-contain" />
+          <h2
+            className="absolute inset-0 flex items-center justify-center text-xl sm:text-2xl md:text-3xl font-bold text-white font-['Uncial_Antiqua'] drop-shadow-[0_0_1px_rgba(255,255,255,0.1)] fade-in-down px-4 text-center">
+            {`Welcome ${username}! Choose or create a character:`}
+          </h2>
+        </div>
       </div>
       <div className="relative w-full h-full flex flex-col overflow-hidden">
         <div className="flex-1 overflow-y-auto py-6 px-4 max-h-[calc(100vh-120px)]">
