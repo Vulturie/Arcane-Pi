@@ -11,7 +11,15 @@ const devStatsRoutes = require("./routes/devStats");
 const logRoutes = require("./routes/logRoutes");
 
 const app = express();
-app.use(cors());
+const allowedOrigins = [
+  "https://arcanepi.com/",
+  "http://localhost:3000"
+];
+
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true,
+}));
 app.use(express.json());
 
 mongoose.connect(process.env.MONGO_URI, {
