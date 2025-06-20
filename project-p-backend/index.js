@@ -13,6 +13,7 @@ const logRoutes = require("./routes/logRoutes");
 const app = express();
 const allowedOrigins = [
   "https://arcanepi.com",
+  "https://arcane-pi.onrender.com",
   "http://localhost:3000"
 ];
 
