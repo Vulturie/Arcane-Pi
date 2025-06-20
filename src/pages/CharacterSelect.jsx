@@ -1,9 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { UserContext } from "../context/UserContext";
 import { useNavigate } from "react-router-dom";
 import { deleteCharacter } from "../services/playerService";
 
 function CharacterSelect({ owner, characters, onSelect, refresh }) {
   const navigate = useNavigate();
+  const { user } = useContext(UserContext);
+  const username = user?.username || owner || "";
   const [selected, setSelected] = useState(null);
 
   const portraitForCharacter = (c) => {
@@ -57,6 +60,11 @@ function CharacterSelect({ owner, characters, onSelect, refresh }) {
         className="absolute top-4 left-4 w-16 cursor-pointer transition-transform duration-200 ease-in-out hover:scale-105"
         onClick={() => window.location.reload()}
       />
+      <div className="absolute top-12 left-1/2 -translate-x-1/2 w-full max-w-[600px] px-4 text-center pointer-events-none z-10">
+        <h2 className="text-lg sm:text-xl md:text-2xl font-bold drop-shadow-md fade-in-down">
+          {`Welcome ${username}! Choose or create a character:`}
+        </h2>
+      </div>
       <div className="relative w-full h-full flex flex-col overflow-hidden">
         <div className="flex-1 overflow-y-auto py-6 px-4 max-h-[calc(100vh-120px)]">
           <ul className="list-none p-0 m-auto mt-16 mb-8 w-full max-w-[600px] grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-4 justify-items-center">

@@ -28,7 +28,7 @@ function LoadingScreen({ fadingOut = false, showLogin = false }) {
       <div className="relative flex flex-col items-center">
         <img
           src="/assets/loading/logo_arcane-pi.png"
-          className="w-[60%] max-w-[300px] mb-8"
+          className="w-[60%] max-w-[300px] mb-64"
           alt="Arcane Pi logo"
         />
         {showLogin ? (
