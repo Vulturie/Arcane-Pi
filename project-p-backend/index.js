@@ -12,7 +12,7 @@ const logRoutes = require("./routes/logRoutes");
 
 const app = express();
 const allowedOrigins = [
-  "https://arcanepi.com/",
+  "https://arcanepi.com",
   "http://localhost:3000"
 ];
 
