@@ -4,11 +4,18 @@ import './index.css';
 import App from './App';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
+import { UserProvider } from './context/UserContext';
+
+if (window.Pi && process.env.NODE_ENV !== 'production') {
+  window.Pi.init({ sandbox: true });
+}
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <App />
+    <UserProvider>
+      <App />
+    </UserProvider>
   </React.StrictMode>
 );
 

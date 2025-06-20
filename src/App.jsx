@@ -1,6 +1,7 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useContext } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Pi from "./piSdk";
+import { UserContext } from "./context/UserContext";
+import PiLoginButton from "./components/PiLoginButton";
 import {
   getCharacters,
   getCharacter,
@@ -19,26 +20,26 @@ import DevDashboard from "./pages/DevDashboard";
 import LoadingScreenWrapper from "./components/LoadingScreenWrapper";
 
 function App() {
-  const [isInitializing, setIsInitializing] = useState(true);
-  const [username, setUsername] = useState("");
+  const { user } = useContext(UserContext);
+  const username = user?.username || "";
+
+  const [isInitializing, setIsInitializing] = useState(false);
   const [characters, setCharacters] = useState([]);
   const [activeChar, setActiveChar] = useState(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    Pi.authenticate({
-      onReady: ({ user }) => {
-        setUsername(user.username);
-        loadCharacters(user.username);
-      },
-      onError: () => {
-        setError("Login failed");
-        setIsInitializing(false);
-      },
-    });
-  }, []);
+    if (username) {
+      loadCharacters(username);
+    }
+  }, [username]);
+
+  if (!username) {
+    return <PiLoginButton />;
+  }
 
   const loadCharacters = async (owner) => {
+    setIsInitializing(true);
     try {
       const data = await getCharacters(owner);
       setCharacters(data);
