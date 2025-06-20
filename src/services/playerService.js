@@ -163,7 +163,7 @@ export const updateInventory = async (characterId, inventory) => {
 };
 
 export const getItems = async () => {
-  const res = await fetch('${API_BASE_URL}/items');
+  const res = await fetch(`${API_BASE_URL}/items`);
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Failed to load items");
   return data;

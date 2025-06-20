@@ -18,7 +18,6 @@ function Arena({ character, refreshCharacter }) {
   const [showOpponents, setShowOpponents] = useState(false);
   const [showStats, setShowStats] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
-  const [selectedOpponent, setSelectedOpponent] = useState(null);
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
 
@@ -65,7 +64,6 @@ function Arena({ character, refreshCharacter }) {
   }, [loadProfile, loadOpponents]);
 
   const handleChallenge = async (oppId) => {
-    setSelectedOpponent(oppId);
     try {
       const data = await challengeArenaOpponent(character._id, oppId);
       setResult(data);
@@ -74,8 +72,6 @@ function Arena({ character, refreshCharacter }) {
       loadOpponents();
     } catch (err) {
       setError(err.message);
-    } finally {
-      setSelectedOpponent(null);
     }
   };
 
