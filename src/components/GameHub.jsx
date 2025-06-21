@@ -59,7 +59,7 @@ function GameHub({ character, refreshCharacter, username }) {
                 alt="Gold"
                 className="w-6 mr-1"
               />
-              <span>{character.gold}</span>
+              <span className="text-white text-outline">{character.gold}</span>
             </div>
             <div className="flex items-center">
               <img
@@ -67,7 +67,7 @@ function GameHub({ character, refreshCharacter, username }) {
                 alt="Pi"
                 className="w-6 mr-1"
               />
-              <span>0</span>
+              <span className="text-white text-outline">0</span>
             </div>
             <div className="flex items-center">
               <img
@@ -83,7 +83,7 @@ function GameHub({ character, refreshCharacter, username }) {
                 alt="Energy"
                 className="w-6 mr-1"
               />
-              <span>{`${character.energy}/100`}</span>
+              <span className="text-white text-outline">{`${character.energy}/100`}</span>
             </div>
           </div>
           <div className="relative w-full h-10 mt-1 flex items-center justify-center overflow-hidden rounded-xl">
