@@ -46,7 +46,7 @@ function CharacterCreate({ owner, refresh }) {
 
   return (
     <div
-      className="relative w-screen h-screen bg-no-repeat bg-center bg-cover flex justify-center items-center text-white font-[Cinzel]"
+      className="relative w-screen h-screen bg-no-repeat bg-center bg-cover flex justify-center items-center text-white font-['SS_Homero']"
       style={{
         backgroundImage: "url(/assets/character_creation/creation_background.png)",
       }}
@@ -75,7 +75,7 @@ function CharacterCreate({ owner, refresh }) {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Name"
-            className="w-full bg-transparent border-none text-black text-center font-[Cinzel] text-base focus:outline-none"
+            className="w-full bg-transparent border-none text-black text-center font-['SS_Homero'] text-base focus:outline-none"
           />
         </div>
         <div className="flex justify-center gap-2 mb-8">

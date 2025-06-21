@@ -91,7 +91,7 @@ function Arena({ character, refreshCharacter }) {
   const classBadge = (cls) => `/assets/character_creation/${cls.toLowerCase()}_button.png`;
 
   return (
-    <div className="relative w-screen h-screen font-[Cinzel] text-white overflow-hidden">
+    <div className="relative w-screen h-screen font-['SS_Homero'] text-white overflow-hidden">
       <img
         src="/assets/arena/arena_background.png"
         alt="Background"

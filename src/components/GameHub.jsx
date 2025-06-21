@@ -30,7 +30,7 @@ function GameHub({ character, refreshCharacter, username }) {
   const xpPercent = Math.min((character.xp / nextXp) * 100, 100);
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden font-[Cinzel]">
+    <div className="relative w-screen h-screen overflow-hidden font-['SS_Homero']">
       <img
         src={background}
         alt="Background"

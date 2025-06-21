@@ -21,6 +21,7 @@ project-p-backend/node_modules
 .env.production.local
 project-p-backend/.env
 src/.env
+/public/assets/fonts/ss_homero_demo-webfont.*
 
 /dist
 /.idea

@@ -45,7 +45,7 @@ function CharacterPage({ character, onDelete, onSwitch }) {
 
   return (
     <div
-      className="w-screen h-screen relative bg-no-repeat bg-cover bg-center flex justify-center items-start font-[Cinzel] text-white"
+      className="w-screen h-screen relative bg-no-repeat bg-cover bg-center flex justify-center items-start font-['SS_Homero'] text-white"
       style={{ backgroundImage: `url(${background})` }}
     >
       <img

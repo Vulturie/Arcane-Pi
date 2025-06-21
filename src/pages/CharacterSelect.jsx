@@ -49,7 +49,7 @@ function CharacterSelect({ owner, characters, onSelect, refresh }) {
 
   return (
     <div
-      className="relative w-screen h-screen bg-no-repeat bg-center bg-cover bg-fixed flex justify-center items-start pt-24 font-[Cinzel] text-white overflow-hidden"
+      className="relative w-screen h-screen bg-no-repeat bg-center bg-cover bg-fixed flex justify-center items-start pt-24 font-['SS_Homero'] text-white overflow-hidden"
       style={{
         backgroundImage: "url(/assets/ui/backgrounds/selection_background.png)",
       }}
@@ -61,7 +61,7 @@ function CharacterSelect({ owner, characters, onSelect, refresh }) {
             alt="banner"
             className="w-full max-h-32 object-contain" />
           <h2
-            className="absolute inset-0 flex items-center justify-center text-xl sm:text-2xl md:text-3xl font-bold text-white font-['Uncial_Antiqua'] drop-shadow-[0_0_1px_rgba(255,255,255,0.1)] fade-in-down px-4 text-center">
+            className="absolute inset-0 flex items-center justify-center text-xl sm:text-2xl md:text-3xl font-bold text-white font-['SS_Homero'] drop-shadow-[0_0_6px_rgba(0,0,0,1)] fade-in-down px-4 text-center">
             {`Welcome ${username}! Choose or create a character:`}
           </h2>
         </div>
