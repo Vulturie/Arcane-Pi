@@ -66,6 +66,8 @@ const characterSchema = new mongoose.Schema({
   towerProgress: { type: Number, default: 0 },
   // Daily tower victory limit
   dailyTowerVictories: { type: Number, default: 0 },
+  // Extra tower wins purchased with Pie
+  extraTowerWins: { type: Number, default: 0 },
   towerVictoryReset: { type: Date, default: Date.now },
   // Arena ranking data
   mmr: { type: Number, default: 1000 },

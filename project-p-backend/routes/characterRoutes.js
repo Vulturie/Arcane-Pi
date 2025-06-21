@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Character = require("../models/Character");
+const Player = require("../models/Player");
 const { generateEnemy } = require("../utils/enemyGenerator");
 const { getPlayerStats, simulateCombat } = require("../utils/combat");
 const ITEMS = require("../data/items");
@@ -239,6 +240,7 @@ async function loadCharacter(req, res, next) {
 
     if (!char.towerVictoryReset || char.towerVictoryReset < todayUTC) {
       char.dailyTowerVictories = 0;
+      char.extraTowerWins = 0;
       char.towerVictoryReset = now;
       updated = true;
     }
@@ -308,6 +310,34 @@ router.post("/characters/:id/energy", loadCharacter, async (req, res) => {
     req.character.lastEnergyUpdate = new Date();
     await req.character.save();
     res.json(req.character);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// POST /characters/:id/tavern/buyEnergy
+router.post("/characters/:id/tavern/buyEnergy", loadCharacter, async (req, res) => {
+  try {
+    const char = req.character;
+    const player = await Player.findOne({ username: char.owner });
+    if (!player) return res.status(404).json({ error: "Player not found" });
+    if (player.pie < 10) return res.status(400).json({ error: "Not enough Pie" });
+
+    const MAX_ENERGY = 100;
+    player.pie -= 10;
+    char.energy = Math.min(char.energy + 50, MAX_ENERGY);
+    char.lastEnergyUpdate = new Date();
+    await Promise.all([char.save(), player.save()]);
+
+    logStat({
+      type: "transaction",
+      action: "buyEnergy",
+      playerId: char._id,
+      pieSpent: 10,
+    });
+
+    res.json({ energy: char.energy, pie: player.pie });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });
@@ -558,6 +588,110 @@ router.post("/characters/:id/quest/cancel", loadCharacter, async (req, res) => {
   res.json(char);
 });
 
+// POST /characters/:id/tavern/skip
+// Spend Pie to instantly finish the current quest
+router.post("/characters/:id/tavern/skip", loadCharacter, async (req, res) => {
+  try {
+    const char = req.character;
+    const quest = char.activeQuest;
+    if (!quest) return res.status(400).json({ error: "No active quest" });
+
+    const player = await Player.findOne({ username: char.owner });
+    if (!player) return res.status(404).json({ error: "Player not found" });
+    if (player.pie < 10) return res.status(400).json({ error: "Not enough Pie" });
+
+    player.pie -= 10;
+
+    let combatResult = null;
+    let loot = null;
+    let playerStats = null;
+    if (quest.isCombat) {
+      playerStats = getPlayerStats(char);
+      combatResult = simulateCombat(playerStats, quest.enemy);
+      if (combatResult.result === "win") {
+        loot = await grantLoot(char, quest.path === "risky");
+      }
+    } else {
+      combatResult = { result: "win", log: [] };
+    }
+
+    const qType = quest.path || (quest.isCombat ? "risky" : "safe");
+    const outcome = combatResult.result === "win" ? "success" : "failure";
+    const xpGain = outcome === "success" ? quest.xp : 0;
+    const goldGain = outcome === "success" ? quest.gold : 0;
+
+    if (outcome === "success") {
+      char.gold += quest.gold;
+      char.xp += quest.xp;
+    }
+
+    let xpToLevel = getXpForNextLevel(char.level);
+    while (char.xp >= xpToLevel) {
+      char.xp -= xpToLevel;
+      char.level += 1;
+      xpToLevel = getXpForNextLevel(char.level);
+    }
+
+    logHistory(char, quest, combatResult, xpGain, goldGain, loot);
+    if (quest.isCombat) {
+      const maxHP = playerStats.VIT * 10;
+      logStat({
+        type: "combat",
+        timestamp: Date.now(),
+        playerId: char._id,
+        class: char.class,
+        level: char.level,
+        win: combatResult.result === "win",
+        rounds: combatResult.rounds,
+        damageTaken: maxHP - combatResult.playerHP,
+        enemyType: quest.enemy.name,
+      });
+    }
+    logStat({
+      type: "quest",
+      timestamp: Date.now(),
+      playerId: char._id,
+      questName: quest.name,
+      questType: qType,
+      gold: goldGain,
+      xp: xpGain,
+      duration: quest.duration,
+      level: char.level,
+      result: outcome === "success" ? "win" : "fail",
+    });
+
+    char.pendingQuestResult = {
+      questName: quest.name,
+      questType: qType,
+      outcome,
+      xp: xpGain,
+      gold: goldGain,
+      loot,
+      message: outcome === "failure" ? "You were defeated by the enemy!" : null,
+      log: combatResult.log,
+    };
+
+    char.activeQuest = null;
+    if (!quest.isCombat || outcome === "success") {
+      refreshQuestPool(char, qType);
+    }
+
+    await Promise.all([char.save(), player.save()]);
+
+    logStat({
+      type: "transaction",
+      action: "skipQuest",
+      playerId: char._id,
+      pieSpent: 10,
+    });
+
+    res.json({ character: char, questResult: char.pendingQuestResult, pie: player.pie });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 // POST /characters/:id/quest/result/ack
 router.post("/characters/:id/quest/result/ack", loadCharacter, async (req, res) => {
   const char = req.character;
@@ -675,12 +809,35 @@ router.get("/characters/:id/shop", loadCharacter, (req, res) => {
 });
 
 // POST /characters/:id/shop/refresh
-// Debug route to force a shop refresh
+// Spend Pie to refresh shop items
 router.post("/characters/:id/shop/refresh", loadCharacter, async (req, res) => {
-  const char = req.character;
-  refreshShopPool(char);
-  await char.save();
-  res.json({ shopPool: char.shopPool, lastShopRefresh: char.lastShopRefresh });
+  try {
+    const char = req.character;
+    const player = await Player.findOne({ username: char.owner });
+    if (!player) return res.status(404).json({ error: "Player not found" });
+
+    if (player.pie < 10) return res.status(400).json({ error: "Not enough Pie" });
+
+    player.pie -= 10;
+    refreshShopPool(char);
+    await Promise.all([player.save(), char.save()]);
+
+    logStat({
+      type: "transaction",
+      action: "refreshShop",
+      playerId: char._id,
+      pieSpent: 10,
+    });
+
+    res.json({
+      shopPool: char.shopPool,
+      lastShopRefresh: char.lastShopRefresh,
+      pie: player.pie,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
 });
 
 // GET /characters/:id/equipment
@@ -752,7 +909,7 @@ router.get("/characters/:id/tower/status", loadCharacter, (req, res) => {
     reward,
     victoriesRemaining: Math.max(
       0,
-      10 - (char.dailyTowerVictories || 0)
+      10 + (char.extraTowerWins || 0) - (char.dailyTowerVictories || 0)
     ),
   });
 });
@@ -763,7 +920,7 @@ router.post("/characters/:id/tower/attempt", loadCharacter, async (req, res) => 
   if (char.level < 10) {
     return res.status(400).json({ error: "Tower locked" });
   }
-  if ((char.dailyTowerVictories || 0) >= 10) {
+  if ((char.dailyTowerVictories || 0) >= 10 + (char.extraTowerWins || 0)) {
     return res
       .status(400)
       .json({ error: "Daily tower victory limit reached" });
@@ -822,6 +979,42 @@ router.post("/characters/:id/tower/attempt", loadCharacter, async (req, res) => 
   });
   await char.save();
   return res.json({ result: "loss", combat, progress: char.towerProgress });
+});
+
+// Purchase additional tower wins using Pie
+router.post("/characters/:id/tower/addWins", loadCharacter, async (req, res) => {
+  try {
+    const char = req.character;
+    const player = await Player.findOne({ username: char.owner });
+    if (!player) return res.status(404).json({ error: "Player not found" });
+
+    const remaining = 10 + (char.extraTowerWins || 0) - (char.dailyTowerVictories || 0);
+    if (remaining > 0) {
+      return res.status(400).json({ error: "Wins available" });
+    }
+
+    if (player.pie < 10) return res.status(400).json({ error: "Not enough Pie" });
+
+    player.pie -= 10;
+    char.extraTowerWins = (char.extraTowerWins || 0) + 10;
+    await player.save();
+    await char.save();
+
+    logStat({
+      type: "transaction",
+      action: "buyTowerWins",
+      playerId: char._id,
+      pieSpent: 10,
+    });
+
+    return res.json({
+      victoriesRemaining: 10 + char.extraTowerWins - char.dailyTowerVictories,
+      pie: player.pie,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
 });
 
 // Cached leaderboard data refreshed once per UTC day

@@ -5,6 +5,9 @@ import {
   getQuestStatus,
   cancelQuest,
   acknowledgeQuestResult,
+  skipQuest,
+  buyEnergy,
+  getPlayer,
 } from "../services/playerService";
 
 function Tavern({ character, refreshCharacter, spendEnergy }) {
@@ -17,6 +20,9 @@ function Tavern({ character, refreshCharacter, spendEnergy }) {
   const [questResult, setQuestResult] = useState(null);
   const [isFrameOpen, setIsFrameOpen] = useState(false);
   const [isShowingResult, setIsShowingResult] = useState(false);
+  const [pie, setPie] = useState(0);
+  const [skipping, setSkipping] = useState(false);
+  const [buyingEnergyState, setBuyingEnergyState] = useState(false);
 
   const startQuest = async (quest, force = false) => {
     if (character.energy < quest.energyCost) {
@@ -81,6 +87,36 @@ function Tavern({ character, refreshCharacter, spendEnergy }) {
     }
   };
 
+  const handleSkipQuest = async () => {
+    if (skipping) return;
+    setSkipping(true);
+    try {
+      const data = await skipQuest(character._id);
+      setQuestResult(data.questResult);
+      setIsShowingResult(true);
+      setActiveQuest(null);
+      setTimeLeft(0);
+      setPie(data.pie);
+      refreshCharacter();
+    } catch (err) {
+      alert(err.message);
+    }
+    setSkipping(false);
+  };
+
+  const handleBuyEnergy = async () => {
+    if (buyingEnergyState) return;
+    setBuyingEnergyState(true);
+    try {
+      const data = await buyEnergy(character._id);
+      setPie(data.pie);
+      refreshCharacter();
+    } catch (err) {
+      alert(err.message);
+    }
+    setBuyingEnergyState(false);
+  };
+
   const checkQuestStatus = useCallback(async () => {
     try {
       const result = await getQuestStatus(character._id);
@@ -134,6 +170,20 @@ function Tavern({ character, refreshCharacter, spendEnergy }) {
     }, 5000); // match GameHub refresh rate
     return () => clearInterval(interval);
   }, [refreshCharacter]);
+
+  useEffect(() => {
+    const loadPie = async () => {
+      try {
+        const data = await getPlayer(character.owner);
+        setPie(data.pie);
+      } catch (err) {
+        console.error("Failed to load pie", err);
+      }
+    };
+    loadPie();
+    const pInterval = setInterval(loadPie, 5000);
+    return () => clearInterval(pInterval);
+  }, [character.owner]);
 
   useEffect(() => {
     if (!activeQuest) return;
@@ -266,10 +316,24 @@ function Tavern({ character, refreshCharacter, spendEnergy }) {
                 className="w-40 mt-4 cursor-pointer hover:scale-105 transition-all"
                 onClick={handleCancelQuest}
               />
+              <img
+                src="/assets/tavern/skip_button.png"
+                alt="Skip Quest"
+                className="w-32 mt-2 cursor-pointer hover:scale-105 transition-all"
+                onClick={handleSkipQuest}
+                style={{ opacity: skipping ? 0.5 : 1 }}
+              />
             </div>
           ) : (
             <div className="flex flex-col gap-4 mt-20">
               {quests.map((q) => renderQuestInfo(q, risky))}
+              <img
+                src="/assets/tavern/more_energy_button.png"
+                alt="More Energy"
+                className="w-32 mt-2 self-center cursor-pointer hover:scale-105 transition-all"
+                onClick={handleBuyEnergy}
+                style={{ opacity: buyingEnergyState ? 0.5 : 1 }}
+              />
             </div>
           )}
         </div>
@@ -295,6 +359,8 @@ function Tavern({ character, refreshCharacter, spendEnergy }) {
           className="w-10"
         />
         <span className="text-outline text-lg">{`${character.energy}/100`}</span>
+        <img src="/assets/pie_shop/pie_icon.png" alt="Pie" className="w-8 ml-2" />
+        <span className="text-outline text-lg">{pie}</span>
       </div>
 
       <img

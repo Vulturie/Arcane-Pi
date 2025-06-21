@@ -4,6 +4,7 @@ import {
   getTowerStatus,
   attemptTowerLevel,
   getTowerLeaderboard,
+  buyTowerWins,
 } from "../services/playerService";
 import { getRarityLabel } from "../rarity";
 
@@ -22,6 +23,7 @@ function Tower({ character, refreshCharacter }) {
     lastUpdated: null,
   });
   const [page, setPage] = useState(1);
+  const [buyingWins, setBuyingWins] = useState(false);
 
   const loadStatus = useCallback(async () => {
     if (!character || character.level < 10) return;
@@ -67,6 +69,18 @@ function Tower({ character, refreshCharacter }) {
       else if (err.message.includes("locked")) setError(err.message);
       else console.error(err);
     }
+  };
+
+  const handleBuyWins = async () => {
+    if (buyingWins) return;
+    setBuyingWins(true);
+    try {
+      const data = await buyTowerWins(character._id);
+      setStatus((prev) => ({ ...prev, victoriesRemaining: data.victoriesRemaining }));
+    } catch (err) {
+      alert(err.message);
+    }
+    setBuyingWins(false);
   };
 
   if (character.level < 10) {
@@ -139,6 +153,15 @@ function Tower({ character, refreshCharacter }) {
           loadLeaderboard(1);
         }}
       />
+      {status.victoriesRemaining === 0 && (
+        <img
+          src="/assets/tower/more_fights_button.png"
+          alt="More Wins"
+          className="absolute bottom-4 left-4 w-20 cursor-pointer hover:scale-105 transition-transform"
+          onClick={handleBuyWins}
+          style={{ opacity: buyingWins ? 0.5 : 1 }}
+        />
+      )}
 
       {showGuardian && (
         <div

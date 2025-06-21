@@ -1,6 +1,12 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { buyItem, getEquipment, getShopItems } from "../services/playerService";
+import {
+  buyItem,
+  getEquipment,
+  getShopItems,
+  refreshShop,
+  getPlayer,
+} from "../services/playerService";
 import logStat from "../utils/logStat";
 import { RARITY_MULTIPLIER, getRarityLabel } from "../rarity";
 
@@ -9,6 +15,8 @@ function Shop({ character, refreshCharacter }) {
   const [shopItems, setShopItems] = useState([]);
   const [equipped, setEquipped] = useState({});
   const [isWindowOpen, setIsWindowOpen] = useState(false);
+  const [pie, setPie] = useState(0);
+  const [refreshing, setRefreshing] = useState(false);
   const navigate = useNavigate();
 
   const getBonus = (item, stat) => {
@@ -50,6 +58,19 @@ function Shop({ character, refreshCharacter }) {
     loadShop();
   }, [character]);
 
+  useEffect(() => {
+    const loadPie = async () => {
+      if (!character) return;
+      try {
+        const data = await getPlayer(character.owner);
+        setPie(data.pie);
+      } catch (err) {
+        console.error("Failed to load pie", err);
+      }
+    };
+    loadPie();
+  }, [character]);
+
   const handleBuy = async (item) => {
     try {
       await buyItem(character._id, item.id);
@@ -59,6 +80,19 @@ function Shop({ character, refreshCharacter }) {
     } catch (err) {
       alert(err.message);
     }
+  };
+
+  const handleRefresh = async () => {
+    if (refreshing) return;
+    setRefreshing(true);
+    try {
+      const data = await refreshShop(character._id);
+      setShopItems(data.shopPool);
+      setPie(data.pie);
+    } catch (err) {
+      alert(err.message);
+    }
+    setRefreshing(false);
   };
 
   const openPreview = (item) => {
@@ -89,7 +123,7 @@ function Shop({ character, refreshCharacter }) {
         </div>
         <div className="flex items-center gap-1">
           <img src="/assets/shop/pie_icon.png" alt="Pi" className="w-6" />
-          <span className="font-bold">0</span>
+          <span className="font-bold">{pie}</span>
         </div>
       </div>
 
@@ -119,6 +153,13 @@ function Shop({ character, refreshCharacter }) {
               </div>
             ))}
           </div>
+          <img
+            src="/assets/shop/refresh_button.png"
+            alt="Refresh"
+            className="absolute bottom-4 left-1/2 -translate-x-1/2 w-24 cursor-pointer hover:scale-105 transition-all"
+            onClick={handleRefresh}
+            style={{ opacity: refreshing ? 0.5 : 1 }}
+          />
         </div>
       )}
 

@@ -82,6 +82,15 @@ export const updateEnergy = async (id, newEnergy) => {
   return data;
 };
 
+export const buyEnergy = async (id) => {
+  const res = await fetch(`${API_BASE_URL}/api/characters/${id}/tavern/buyEnergy`, {
+    method: "POST",
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Failed to buy energy");
+  return data;
+};
+
 export const getQuestStatus = async (id) => {
   const res = await fetch(`${API_BASE_URL}/api/characters/${id}/quest/status`);
   const data = await res.json();
@@ -96,6 +105,15 @@ export const cancelQuest = async (id) => {
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Failed to cancel quest");
+  return data;
+};
+
+export const skipQuest = async (id) => {
+  const res = await fetch(`${API_BASE_URL}/api/characters/${id}/tavern/skip`, {
+    method: "POST",
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Failed to skip quest");
   return data;
 };
 
@@ -194,7 +212,7 @@ export const buyItem = async (characterId, itemId) => {
   return data;
 };
 
-export const forceRefreshShop = async (characterId) => {
+export const refreshShop = async (characterId) => {
   const res = await fetch(`${API_BASE_URL}/api/characters/${characterId}/shop/refresh`, {
     method: "POST",
   });
@@ -275,6 +293,15 @@ export const attemptTowerLevel = async (id) => {
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Failed to attempt tower level");
+  return data;
+};
+
+export const buyTowerWins = async (id) => {
+  const res = await fetch(`${API_BASE_URL}/api/characters/${id}/tower/addWins`, {
+    method: "POST",
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Failed to buy wins");
   return data;
 };
 
