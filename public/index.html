@@ -22,6 +22,20 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>Arcane Pi</title>
+    <!-- Preload custom fonts and define the font-face here so Webpack doesn't
+         try to bundle missing font files. The actual files are expected to be
+         provided at runtime under `/public/assets/fonts`. -->
+    <link rel="preload" href="%PUBLIC_URL%/assets/fonts/ss_homero_demo-webfont.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="%PUBLIC_URL%/assets/fonts/ss_homero_demo-webfont.woff" as="font" type="font/woff" crossorigin />
+    <style>
+      @font-face {
+        font-family: 'SS Homero';
+        src: url('%PUBLIC_URL%/assets/fonts/ss_homero_demo-webfont.woff2') format('woff2'),
+             url('%PUBLIC_URL%/assets/fonts/ss_homero_demo-webfont.woff') format('woff');
+        font-weight: normal;
+        font-style: normal;
+      }
+    </style>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>

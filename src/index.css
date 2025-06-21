@@ -2,13 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@font-face {
-  font-family: 'SS Homero';
-  src: url('../public/assets/fonts/ss_homero_demo-webfont.woff2') format('woff2'),
-       url('../public/assets/fonts/ss_homero_demo-webfont.woff') format('woff');
-  font-weight: normal;
-  font-style: normal;
-}
 
 body {
   font-family: 'SS Homero', sans-serif;
