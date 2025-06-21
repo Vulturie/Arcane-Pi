@@ -34,4 +34,20 @@ body {
       -2px 0 0 #000,
       2px 0 0 #000;
   }
+
+  .equip-allowed {
+    @apply text-green-500;
+  }
+
+  .equip-denied {
+    @apply text-red-500;
+  }
+
+  .better {
+    @apply text-green-500;
+  }
+
+  .worse {
+    @apply text-red-500;
+  }
 }

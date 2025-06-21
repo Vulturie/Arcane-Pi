@@ -207,10 +207,10 @@ function Shop({ character, refreshCharacter }) {
                       const diff = value - current;
                       return (
                         <li key={k}>
-                          {k}: +{value}
+                          {k}: +{value.toFixed(2)}
                           {preview.compareItem && diff !== 0 && (
                             <span className={diff > 0 ? "better" : "worse"}>
-                              ({diff > 0 ? "+" : ""}{diff})
+                              ({diff > 0 ? "+" : ""}{diff.toFixed(2)})
                             </span>
                           )}
                         </li>
@@ -221,7 +221,7 @@ function Shop({ character, refreshCharacter }) {
                         .filter(([k]) => !(preview.item.statBonus || {})[k])
                         .map(([k]) => (
                           <li key={k}>
-                            {k}: +0 <span className="worse">({-getBonus(preview.compareItem, k)})</span>
+                            {k}: +0 <span className="worse">({-getBonus(preview.compareItem, k).toFixed(2)})</span>
                           </li>
                         ))}
                   </ul>
@@ -233,7 +233,7 @@ function Shop({ character, refreshCharacter }) {
                     {preview.compareItem.statBonus && (
                       <ul>
                         {Object.entries(preview.compareItem.statBonus).map(([k]) => (
-                          <li key={k}>{k}: +{getBonus(preview.compareItem, k)}</li>
+                          <li key={k}>{k}: +{getBonus(preview.compareItem, k).toFixed(2)}</li>
                         ))}
                       </ul>
                     )}

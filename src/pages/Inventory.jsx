@@ -250,25 +250,25 @@ function Inventory({ character, refreshCharacter }) {
               <div className="absolute w-[35%] left-[16px] top-[22px] flex justify-between items-center px-4 text-lg font-bold drop-shadow-md">
                 <span>STR</span>
                 <span className="text-yellow-300 min-w-[60px] text-right">
-                  {stats.STR}
+                  {stats.STR.toFixed(2)}
                 </span>
               </div>
               <div className="absolute w-[35%] left-[16px] top-[52px] flex justify-between items-center px-4 text-lg font-bold drop-shadow-md">
                 <span>AGI</span>
                 <span className="text-yellow-300 min-w-[60px] text-right">
-                  {stats.AGI}
+                  {stats.AGI.toFixed(2)}
                 </span>
               </div>
               <div className="absolute w-[35%] left-[16px] top-[82px] flex justify-between items-center px-4 text-lg font-bold drop-shadow-md">
                 <span>INT</span>
                 <span className="text-yellow-300 min-w-[60px] text-right">
-                  {stats.INT}
+                  {stats.INT.toFixed(2)}
                 </span>
               </div>
               <div className="absolute w-[35%] left-[16px] top-[112px] flex justify-between items-center px-4 text-lg font-bold drop-shadow-md">
                 <span>VIT</span>
                 <span className="text-yellow-300 min-w-[60px] text-right">
-                  {stats.VIT}
+                  {stats.VIT.toFixed(2)}
                 </span>
               </div>
             </>
@@ -365,11 +365,11 @@ function Inventory({ character, refreshCharacter }) {
                       const diff = value - current;
                       return (
                         <li key={k}>
-                          {k}: +{value}
+                          {k}: +{value.toFixed(2)}
                           {preview.compareItem && diff !== 0 && (
                             <span className={diff > 0 ? "better" : "worse"}>
                               ({diff > 0 ? "+" : ""}
-                              {diff})
+                              {diff.toFixed(2)})
                             </span>
                           )}
                         </li>
@@ -382,7 +382,7 @@ function Inventory({ character, refreshCharacter }) {
                           <li key={k}>
                             {k}: +0{" "}
                             <span className="worse">
-                              ({-getBonus(preview.compareItem, k)})
+                              ({-getBonus(preview.compareItem, k).toFixed(2)})
                             </span>
                           </li>
                         ))}
@@ -400,7 +400,7 @@ function Inventory({ character, refreshCharacter }) {
                         {Object.entries(preview.compareItem.statBonus).map(
                           ([k]) => (
                             <li key={k}>
-                              {k}: +{getBonus(preview.compareItem, k)}
+                              {k}: +{getBonus(preview.compareItem, k).toFixed(2)}
                             </li>
                           ),
                         )}
