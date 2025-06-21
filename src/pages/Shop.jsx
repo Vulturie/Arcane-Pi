@@ -190,12 +190,19 @@ function Shop({ character, refreshCharacter }) {
                 <p className={`rarity-${preview.item.rarity} font-bold`}>{preview.item.name} ({getRarityLabel(preview.item.rarity)})</p>
                 <p>Type: {preview.item.type}</p>
                 {preview.item.classRestriction && (
-                  <p className={
-                    preview.item.classRestriction.includes(character.class)
-                      ? "equip-allowed"
-                      : "equip-denied"
-                  }>
-                    Classes: {preview.item.classRestriction.join(", ")}
+                  <p>
+                    Classes:{" "}
+                    {preview.item.classRestriction.map((cls, i) => (
+                      <span
+                        key={cls}
+                        className={
+                          cls === character.class ? "equip-allowed" : "equip-denied"
+                        }
+                      >
+                        {cls}
+                        {i < preview.item.classRestriction.length - 1 ? ", " : ""}
+                      </span>
+                    ))}
                   </p>
                 )}
                 <p>Cost: {preview.item.cost} Gold</p>
@@ -208,8 +215,12 @@ function Shop({ character, refreshCharacter }) {
                       return (
                         <li key={k}>
                           {k}: +{value.toFixed(2)}
-                          {preview.compareItem && diff !== 0 && (
-                            <span className={diff > 0 ? "better" : "worse"}>
+                          {preview.compareItem && (
+                            <span
+                              className={
+                                diff > 0 ? "better" : diff < 0 ? "worse" : "neutral"
+                              }
+                            >
                               ({diff > 0 ? "+" : ""}{diff.toFixed(2)})
                             </span>
                           )}

@@ -50,4 +50,8 @@ body {
   .worse {
     @apply text-red-500;
   }
+
+  .neutral {
+    @apply text-gray-400;
+  }
 }
