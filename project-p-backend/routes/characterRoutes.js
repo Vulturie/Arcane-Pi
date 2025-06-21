@@ -237,6 +237,12 @@ async function loadCharacter(req, res, next) {
       updated = true;
     }
 
+    if (!char.towerVictoryReset || char.towerVictoryReset < todayUTC) {
+      char.dailyTowerVictories = 0;
+      char.towerVictoryReset = now;
+      updated = true;
+    }
+
     if (!char.arenaRefreshReset || char.arenaRefreshReset < todayUTC) {
       char.dailyArenaRefreshes = 0;
       char.arenaRefreshReset = now;
@@ -739,12 +745,29 @@ router.get("/characters/:id/tower/status", loadCharacter, (req, res) => {
   const nextLevel = (char.towerProgress || 0) + 1;
   const enemy = getEnemyForLevel(nextLevel);
   const reward = getRewardForLevel(nextLevel);
-  res.json({ progress: char.towerProgress || 0, nextLevel, enemy, reward });
+  res.json({
+    progress: char.towerProgress || 0,
+    nextLevel,
+    enemy,
+    reward,
+    victoriesRemaining: Math.max(
+      0,
+      10 - (char.dailyTowerVictories || 0)
+    ),
+  });
 });
 
 // Attempt the next tower level
 router.post("/characters/:id/tower/attempt", loadCharacter, async (req, res) => {
   const char = req.character;
+  if (char.level < 10) {
+    return res.status(400).json({ error: "Tower locked" });
+  }
+  if ((char.dailyTowerVictories || 0) >= 10) {
+    return res
+      .status(400)
+      .json({ error: "Daily tower victory limit reached" });
+  }
   if (char.inventory.length >= char.maxInventorySlots) {
     return res.status(400).json({ error: "Inventory full" });
   }
@@ -767,6 +790,7 @@ router.post("/characters/:id/tower/attempt", loadCharacter, async (req, res) => 
   if (combat.result === "win") {
     char.inventory.push(reward);
     char.towerProgress = level;
+    char.dailyTowerVictories = (char.dailyTowerVictories || 0) + 1;
     logTowerHistory(char, level, "win");
     logStat({
       type: "quest",

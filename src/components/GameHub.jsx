@@ -14,6 +14,7 @@ function GameHub({ character, refreshCharacter, username }) {
   const [background, setBackground] = useState(getBackground());
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [pie, setPie] = useState(0);
+  const [lockedFeature, setLockedFeature] = useState(null);
 
   useEffect(() => {
     const bgInterval = setInterval(() => setBackground(getBackground()), 60000);
@@ -43,6 +44,24 @@ function GameHub({ character, refreshCharacter, username }) {
   const portrait = `/assets/character_creation/${character.class.toLowerCase()}_${character.gender}.png`;
   const nextXp = getXpForNextLevel(character.level);
   const xpPercent = Math.min((character.xp / nextXp) * 100, 100);
+
+  const handleArenaClick = (e) => {
+    if (character.level < 20) {
+      e.preventDefault();
+      setLockedFeature('arena');
+      return;
+    }
+    logStat({ type: 'ui_interaction', area: 'hub', button: 'arena' });
+  };
+
+  const handleTowerClick = (e) => {
+    if (character.level < 10) {
+      e.preventDefault();
+      setLockedFeature('tower');
+      return;
+    }
+    logStat({ type: 'ui_interaction', area: 'hub', button: 'tower' });
+  };
 
   return (
     <div className="relative w-screen h-screen overflow-hidden font-['SS_Homero']">
@@ -154,12 +173,7 @@ function GameHub({ character, refreshCharacter, username }) {
             className="w-16 sm:w-20 cursor-pointer transition-transform hover:scale-105"
           />
         </Link>
-        <Link
-          to="/arena"
-          onClick={() =>
-            logStat({ type: "ui_interaction", area: "hub", button: "arena" })
-          }
-        >
+        <Link to="/arena" onClick={handleArenaClick}>
           <img
             src="/assets/game_hub/arena_button.png"
             alt="Arena"
@@ -178,12 +192,7 @@ function GameHub({ character, refreshCharacter, username }) {
             className="w-16 sm:w-20 cursor-pointer transition-transform hover:scale-105"
           />
         </Link>
-        <Link
-          to="/tower"
-          onClick={() =>
-            logStat({ type: "ui_interaction", area: "hub", button: "tower" })
-          }
-        >
+        <Link to="/tower" onClick={handleTowerClick}>
           <img
             src="/assets/game_hub/tower_icon.png"
             alt="Tower"
@@ -220,6 +229,30 @@ function GameHub({ character, refreshCharacter, username }) {
           className="w-16 sm:w-20 cursor-pointer transition-transform hover:scale-105"
         />
       </div>
+
+      {lockedFeature && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40"
+          onClick={() => setLockedFeature(null)}
+        >
+          <div
+            className="bg-gray-800 p-4 rounded text-center border-4 border-yellow-600"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="mb-4">
+              {lockedFeature === 'tower'
+                ? 'The Tower unlocks at level 10.'
+                : 'The Arena unlocks at level 20.'}
+            </p>
+            <button
+              className="px-3 py-1 bg-gray-700 rounded hover:bg-gray-600"
+              onClick={() => setLockedFeature(null)}
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

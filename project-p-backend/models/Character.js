@@ -64,6 +64,9 @@ const characterSchema = new mongoose.Schema({
   shopPool: { type: [mongoose.Schema.Types.Mixed], default: [] },
   // Highest completed Tower level
   towerProgress: { type: Number, default: 0 },
+  // Daily tower victory limit
+  dailyTowerVictories: { type: Number, default: 0 },
+  towerVictoryReset: { type: Date, default: Date.now },
   // Arena ranking data
   mmr: { type: Number, default: 1000 },
   arenaWins: { type: Number, default: 0 },

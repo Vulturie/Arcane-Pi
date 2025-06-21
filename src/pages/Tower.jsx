@@ -62,15 +62,40 @@ function Tower({ character, refreshCharacter }) {
       loadStatus();
     } catch (err) {
       if (err.message.includes("Inventory full")) setError("Inventory full");
+      else if (err.message.includes("Daily"))
+        setError(
+          "You\u2019ve reached the daily limit of 10 Tower victories. Try again tomorrow!"
+        );
+      else if (err.message.includes("locked")) setError(err.message);
       else console.error(err);
     }
   };
 
   if (character.level < 10) {
     return (
-      <div>
-        <h2>The Tower</h2>
-        <p>Unlocks at level 10</p>
+      <div className="relative w-screen h-screen font-['SS_Homero'] text-white overflow-hidden">
+        <img
+          src="/assets/tower/tower_background.png"
+          alt="Background"
+          className="absolute inset-0 w-full h-full object-cover -z-10"
+        />
+        <img
+          src="/assets/tower/back_button.png"
+          alt="Back"
+          className="absolute top-4 left-4 w-16 cursor-pointer hover:scale-105 transition-transform"
+          onClick={() => navigate("/")}
+        />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-gray-800 p-4 rounded text-center border-4 border-yellow-600" onClick={(e) => e.stopPropagation()}>
+            <p className="mb-4">The Tower unlocks at level 10.</p>
+            <button
+              className="px-3 py-1 bg-gray-700 rounded hover:bg-gray-600"
+              onClick={() => navigate("/")}
+            >
+              OK
+            </button>
+          </div>
+        </div>
       </div>
     );
   }

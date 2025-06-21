@@ -56,6 +56,9 @@ router.get("/profile/:id", async (req, res) => {
   try {
     const char = await Character.findById(req.params.id);
     if (!char) return res.status(404).json({ error: "Character not found" });
+    if (char.level < 20) {
+      return res.status(400).json({ error: "Arena locked" });
+    }
     let updated = resetArenaCounters(char);
     if (!char.hasEnteredArena) {
       char.hasEnteredArena = true;
@@ -84,6 +87,9 @@ router.get("/opponents/:id", async (req, res) => {
   try {
     const char = await Character.findById(req.params.id);
     if (!char) return res.status(404).json({ error: "Character not found" });
+    if (char.level < 20) {
+      return res.status(400).json({ error: "Arena locked" });
+    }
     if (resetArenaCounters(char)) await char.save();
 
     const mmr = char.mmr || 1000;
@@ -126,6 +132,9 @@ router.post("/opponents/:id/refresh", async (req, res) => {
   try {
     const char = await Character.findById(req.params.id);
     if (!char) return res.status(404).json({ error: "Character not found" });
+    if (char.level < 20) {
+      return res.status(400).json({ error: "Arena locked" });
+    }
     if (resetArenaCounters(char)) await char.save();
     if ((char.dailyArenaRefreshes || 0) >= 3) {
       return res.status(400).json({ error: "No more refreshes today" });
@@ -171,6 +180,9 @@ router.post("/match/:id", async (req, res) => {
   try {
     const char = await Character.findById(req.params.id);
     if (!char) return res.status(404).json({ error: "Character not found" });
+    if (char.level < 20) {
+      return res.status(400).json({ error: "Arena locked" });
+    }
     if (resetArenaCounters(char)) await char.save();
     if ((char.dailyArenaFights || 0) >= 5) {
       return res.status(400).json({ error: "Daily arena fight limit reached" });
@@ -283,6 +295,9 @@ router.post("/challenge/:id/:oppId", async (req, res) => {
     const opponentChar = await Character.findById(req.params.oppId);
     if (!char || !opponentChar)
       return res.status(404).json({ error: "Character not found" });
+    if (char.level < 20) {
+      return res.status(400).json({ error: "Arena locked" });
+    }
     if (resetArenaCounters(char)) await char.save();
     if (resetArenaCounters(opponentChar)) await opponentChar.save();
     if ((char.dailyArenaFights || 0) >= 5) {
