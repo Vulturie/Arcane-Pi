@@ -13,6 +13,7 @@ function Tower({ character, refreshCharacter }) {
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
   const [showGuardian, setShowGuardian] = useState(false);
+  const [limitReached, setLimitReached] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [boardData, setBoardData] = useState({
     results: [],
@@ -62,10 +63,7 @@ function Tower({ character, refreshCharacter }) {
       loadStatus();
     } catch (err) {
       if (err.message.includes("Inventory full")) setError("Inventory full");
-      else if (err.message.includes("Daily"))
-        setError(
-          "You\u2019ve reached the daily limit of 10 Tower victories. Try again tomorrow!"
-        );
+      else if (err.message.includes("Daily")) setLimitReached(true);
       else if (err.message.includes("locked")) setError(err.message);
       else console.error(err);
     }
@@ -124,7 +122,13 @@ function Tower({ character, refreshCharacter }) {
         src="/assets/tower/tower_keeper.png"
         alt="Tower Keeper"
         className="absolute bottom-20 left-0 w-52 sm:w-64 md:w-80 cursor-pointer hover:scale-105 transition-transform"
-        onClick={() => setShowGuardian(true)}
+        onClick={() => {
+          if (status.victoriesRemaining === 0) {
+            setLimitReached(true);
+          } else {
+            setShowGuardian(true);
+          }
+        }}
       />
       <img
         src="/assets/tower/leaderboard_button.png"
@@ -168,6 +172,19 @@ function Tower({ character, refreshCharacter }) {
                 handleFight();
               }}
             />
+            <div
+              className="absolute flex items-center"
+              style={{ bottom: "100px", left: "calc(50% + 70px)" }}
+            >
+              <img
+                src="/assets/tower/remaining_wins_icon.png"
+                alt="Wins Remaining"
+                className="w-6 mr-1"
+              />
+              <span className="text-outline text-lg">
+                {status.victoriesRemaining}/10
+              </span>
+            </div>
             <div className="absolute bottom-11 left-1/2 -translate-x-1/2 text-outline">
               Tower Guardian
             </div>
@@ -309,6 +326,29 @@ function Tower({ character, refreshCharacter }) {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {limitReached && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40"
+          onClick={() => setLimitReached(false)}
+        >
+          <div
+            className="bg-gray-800 p-4 rounded text-center border-4 border-yellow-600"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="mb-4">
+              You've reached the daily limit of 10 Tower victories. Try again
+              tomorrow!
+            </p>
+            <button
+              className="px-3 py-1 bg-gray-700 rounded hover:bg-gray-600"
+              onClick={() => setLimitReached(false)}
+            >
+              OK
+            </button>
           </div>
         </div>
       )}
