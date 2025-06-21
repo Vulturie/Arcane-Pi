@@ -90,8 +90,8 @@ function PieShop({ username }) {
               className="w-40 cursor-pointer hover:scale-105 transition-transform"
               onClick={() => handleBuy(pack)}
             />
-            <div className="absolute top-1/2 right-[-60px] -translate-y-1/2 flex items-center gap-1 text-white">
-              <img src="/assets/pie_shop/pi_logo.png" alt="Pi" className="w-6" />
+            <div className="absolute top-24 right-[-50px] -translate-y-1/2 flex items-center gap-2 text-white">
+              <img src="/assets/pie_shop/pi_logo.png" alt="Pi" className="w-10" />
               <span>{calcPrice(pack.amount)}</span>
             </div>
           </div>

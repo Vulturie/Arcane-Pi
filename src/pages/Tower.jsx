@@ -157,7 +157,7 @@ function Tower({ character, refreshCharacter }) {
         <img
           src="/assets/tower/more_fights_button.png"
           alt="More Wins"
-          className="absolute bottom-4 left-4 w-20 cursor-pointer hover:scale-105 transition-transform"
+          className="absolute bottom-4 left-4 w-24 cursor-pointer hover:scale-105 transition-transform"
           onClick={handleBuyWins}
           style={{ opacity: buyingWins ? 0.5 : 1 }}
         />
