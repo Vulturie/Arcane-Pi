@@ -322,10 +322,16 @@ router.post("/characters/:id/tavern/buyEnergy", loadCharacter, async (req, res) 
     const char = req.character;
     const player = await Player.findOne({ username: char.owner });
     if (!player) return res.status(404).json({ error: "Player not found" });
-    if (player.pie < 10) return res.status(400).json({ error: "Not enough Pie" });
-
     const MAX_ENERGY = 100;
-    player.pie -= 10;
+    const COST = 25;
+
+    if (char.energy >= MAX_ENERGY) {
+      return res.status(400).json({ error: "Energy already full" });
+    }
+
+    if (player.pie < COST) return res.status(400).json({ error: "Not enough Pie" });
+
+    player.pie -= COST;
     char.energy = Math.min(char.energy + 50, MAX_ENERGY);
     char.lastEnergyUpdate = new Date();
     await Promise.all([char.save(), player.save()]);
@@ -334,7 +340,7 @@ router.post("/characters/:id/tavern/buyEnergy", loadCharacter, async (req, res) 
       type: "transaction",
       action: "buyEnergy",
       playerId: char._id,
-      pieSpent: 10,
+      pieSpent: COST,
     });
 
     res.json({ energy: char.energy, pie: player.pie });

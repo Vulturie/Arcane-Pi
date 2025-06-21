@@ -23,6 +23,7 @@ function Tavern({ character, refreshCharacter, spendEnergy }) {
   const [pie, setPie] = useState(0);
   const [skipping, setSkipping] = useState(false);
   const [buyingEnergyState, setBuyingEnergyState] = useState(false);
+  const [showEnergyFull, setShowEnergyFull] = useState(false);
 
   const startQuest = async (quest, force = false) => {
     if (character.energy < quest.energyCost) {
@@ -106,13 +107,21 @@ function Tavern({ character, refreshCharacter, spendEnergy }) {
 
   const handleBuyEnergy = async () => {
     if (buyingEnergyState) return;
+    if (character.energy >= 100) {
+      setShowEnergyFull(true);
+      return;
+    }
     setBuyingEnergyState(true);
     try {
       const data = await buyEnergy(character._id);
       setPie(data.pie);
       refreshCharacter();
     } catch (err) {
-      alert(err.message);
+      if (err.message.includes("Energy already full")) {
+        setShowEnergyFull(true);
+      } else {
+        alert(err.message);
+      }
     }
     setBuyingEnergyState(false);
   };
@@ -406,6 +415,25 @@ function Tavern({ character, refreshCharacter, spendEnergy }) {
         renderQuestWindow(character.riskyQuestPool, true, () =>
           setShowRisky(false),
         )}
+      {showEnergyFull && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40"
+          onClick={() => setShowEnergyFull(false)}
+        >
+          <div
+            className="bg-gray-800 p-4 rounded text-center border-4 border-yellow-600"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="mb-4">You are already at full energy!</p>
+            <button
+              className="px-3 py-1 bg-gray-700 rounded hover:bg-gray-600"
+              onClick={() => setShowEnergyFull(false)}
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
