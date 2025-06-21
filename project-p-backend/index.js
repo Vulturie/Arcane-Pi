@@ -12,6 +12,7 @@ const devStatsRoutes = require("./routes/devStats");
 const logRoutes = require("./routes/logRoutes");
 const piPriceRoutes = require("./routes/piPriceRoutes");
 const PiPrice = require("./models/PiPrice");
+const { fetchPiPriceUSD } = require("./services/piPriceService");
 
 const app = express();
 const allowedOrigins = [
@@ -49,14 +50,8 @@ app.use("/api", piPriceRoutes);
 
 async function updatePiPrice() {
   try {
-    const res = await fetch(
-      "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=PI&convert=USD",
-      {
-        headers: { "X-CMC_PRO_API_KEY": process.env.CMC_API_KEY },
-      }
-    );
-    const data = await res.json();
-    const priceUSD = data?.data?.PI?.quote?.USD?.price;
+    const priceUSD = await fetchPiPriceUSD();
+
     if (priceUSD) {
       await PiPrice.findOneAndUpdate(
         {},
@@ -64,9 +59,11 @@ async function updatePiPrice() {
         { upsert: true }
       );
       console.log(`Updated Pi price: ${priceUSD}`);
+    } else {
+      console.warn('No PI price returned from CoinGecko');
     }
   } catch (err) {
-    console.error("Failed to fetch Pi price", err);
+    console.error('Failed to fetch Pi price', err);
   }
 }
 
