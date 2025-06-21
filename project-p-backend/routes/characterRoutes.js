@@ -10,15 +10,10 @@ const { XP_GAIN_MULTIPLIER, GOLD_SCALING } = require("../utils/balanceConfig");
 const { getRewardForLevel, getEnemyForLevel } = require("../data/tower");
 const { logStat } = require("../utils/statsLogger");
 const { flagCheat } = require("../utils/cheatDetector");
-
-function getRandomRarity() {
-  const r = Math.random();
-  if (r < 0.005) return "legendary";
-  if (r < 0.03) return "epic"; // 0.005 + 0.025
-  if (r < 0.115) return "rare"; // +0.085
-  if (r < 0.34) return "uncommon"; // +0.225
-  return "common";
-}
+const {
+  getRarityByPlayerLevel,
+  calculateRarityDistribution,
+} = require("../utils/rarityUtils");
 
 function randomQuest(tiers, tierIndex, path, level) {
   const quests = tiers[tierIndex];
@@ -42,10 +37,9 @@ function initQuestPools(char) {
 
 function initShopPool(char) {
   const shuffled = [...ITEMS].sort(() => 0.5 - Math.random());
-  char.shopPool = shuffled.slice(0, Math.min(8, ITEMS.length));
   char.shopPool = shuffled
     .slice(0, Math.min(8, ITEMS.length))
-    .map((it) => ({ ...it, rarity: "common" }));
+    .map((it) => ({ ...it, rarity: getRarityByPlayerLevel(char.level) }));
 }
 
 function refreshShopPool(char) {
@@ -114,7 +108,7 @@ async function grantLoot(char, isRisky) {
   if (Math.random() < chance) {
     if (char.inventory.length < char.maxInventorySlots) {
       const base = ITEMS[Math.floor(Math.random() * ITEMS.length)];
-      const rarity = getRandomRarity();
+      const rarity = getRarityByPlayerLevel(char.level);
       const item = { ...base, rarity };
       char.inventory.push(item);
       await char.save();
