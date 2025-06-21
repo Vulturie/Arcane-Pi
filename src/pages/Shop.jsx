@@ -156,7 +156,7 @@ function Shop({ character, refreshCharacter }) {
           <img
             src="/assets/shop/refresh_button.png"
             alt="Refresh"
-            className="absolute bottom-4 left-1/2 -translate-x-1/2 w-24 cursor-pointer hover:scale-105 transition-all"
+            className="absolute bottom-8 left-1/2 -translate-x-1/2 w-32 cursor-pointer hover:scale-155 transition-all"
             onClick={handleRefresh}
             style={{ opacity: refreshing ? 0.5 : 1 }}
           />
