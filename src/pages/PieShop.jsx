@@ -69,7 +69,7 @@ function PieShop({ username }) {
       <img
         src="/assets/pie_shop/back_button.png"
         alt="Back"
-        className="absolute top-4 left-4 w-12 h-12 cursor-pointer"
+        className="absolute top-4 left-4 w-16 cursor-pointer z-10"
         onClick={() => navigate("/")}
       />
       <div className="absolute top-4 right-4 flex items-center gap-1 text-white drop-shadow-md">
