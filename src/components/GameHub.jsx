@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { getXpForNextLevel } from "../services/playerService";
+import { getXpForNextLevel, getPlayer } from "../services/playerService";
 import logStat from "../utils/logStat";
 
 function getBackground() {
