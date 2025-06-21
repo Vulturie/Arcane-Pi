@@ -551,4 +551,22 @@ router.post("/:username/unequip", async (req, res) => {
   }
 });
 
+// POST /player/:username/pie/add
+router.post("/:username/pie/add", async (req, res) => {
+  const { username } = req.params;
+  const { amount } = req.body;
+  try {
+    const player = await Player.findOneAndUpdate(
+      { username },
+      { $inc: { pie: amount } },
+      { new: true }
+    );
+    if (!player) return res.status(404).json({ error: "Player not found" });
+    res.json({ pie: player.pie });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 module.exports = router;

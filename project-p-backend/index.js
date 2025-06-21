@@ -3,12 +3,15 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const cron = require("node-cron");
 const playerRoutes = require("./routes/playerRoutes");
 const characterRoutes = require("./routes/characterRoutes");
 const itemRoutes = require("./routes/itemRoutes");
 const arenaRoutes = require("./routes/arenaRoutes");
 const devStatsRoutes = require("./routes/devStats");
 const logRoutes = require("./routes/logRoutes");
+const piPriceRoutes = require("./routes/piPriceRoutes");
+const PiPrice = require("./models/PiPrice");
 
 const app = express();
 const allowedOrigins = [
@@ -42,6 +45,34 @@ app.use("/items", itemRoutes);
 app.use("/arena", arenaRoutes);
 app.use("/dev", devStatsRoutes);
 app.use("/api", logRoutes);
+app.use("/api", piPriceRoutes);
+
+async function updatePiPrice() {
+  try {
+    const res = await fetch(
+      "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=PI&convert=USD",
+      {
+        headers: { "X-CMC_PRO_API_KEY": process.env.CMC_API_KEY },
+      }
+    );
+    const data = await res.json();
+    const priceUSD = data?.data?.PI?.quote?.USD?.price;
+    if (priceUSD) {
+      await PiPrice.findOneAndUpdate(
+        {},
+        { priceUSD, fetchedAt: new Date() },
+        { upsert: true }
+      );
+      console.log(`Updated Pi price: ${priceUSD}`);
+    }
+  } catch (err) {
+    console.error("Failed to fetch Pi price", err);
+  }
+}
+
+cron.schedule("*/15 * * * *", updatePiPrice);
+updatePiPrice();
+
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });

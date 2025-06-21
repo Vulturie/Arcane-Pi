@@ -16,6 +16,7 @@ import Tower from "./pages/Tower";
 import Arena from "./pages/Arena";
 import Journal from "./pages/Journal";
 import DevDashboard from "./pages/DevDashboard";
+import PieShop from "./pages/PieShop";
 import LoadingScreenWrapper from "./components/LoadingScreenWrapper";
 
 function App() {
@@ -144,6 +145,7 @@ function App() {
           path="/journal"
           element={<Journal character={activeChar} />}
         />
+        <Route path="/pie-shop" element={<PieShop username={username} />} />
         <Route
           path="/character-select"
           element={

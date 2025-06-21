@@ -13,6 +13,7 @@ function getBackground() {
 function GameHub({ character, refreshCharacter, username }) {
   const [background, setBackground] = useState(getBackground());
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [pie, setPie] = useState(0);
 
   useEffect(() => {
     const bgInterval = setInterval(() => setBackground(getBackground()), 60000);
@@ -22,6 +23,20 @@ function GameHub({ character, refreshCharacter, username }) {
       clearInterval(refreshInterval);
     };
   }, [refreshCharacter]);
+
+  useEffect(() => {
+    const loadPlayer = async () => {
+      try {
+        const data = await getPlayer(username);
+        setPie(data.pie);
+      } catch (err) {
+        console.error("Failed to load player");
+      }
+    };
+    loadPlayer();
+    const interval = setInterval(loadPlayer, 5000);
+    return () => clearInterval(interval);
+  }, [username]);
 
   if (!character) return null;
 
@@ -67,7 +82,7 @@ function GameHub({ character, refreshCharacter, username }) {
                 alt="Pi"
                 className="w-6 mr-1"
               />
-              <span className="text-white text-outline">0</span>
+              <span className="text-white text-outline">{pie}</span>
             </div>
             <div className="flex items-center">
               <img
@@ -189,6 +204,13 @@ function GameHub({ character, refreshCharacter, username }) {
           <img
             src="/assets/game_hub/journal_button.png"
             alt="Journal"
+            className="w-16 sm:w-20 cursor-pointer transition-transform hover:scale-105"
+          />
+        </Link>
+        <Link to="/pie-shop">
+          <img
+            src="/assets/game_hub/pie_shop_button.png"
+            alt="Pie Shop"
             className="w-16 sm:w-20 cursor-pointer transition-transform hover:scale-105"
           />
         </Link>

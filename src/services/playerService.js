@@ -343,3 +343,28 @@ export const challengeArenaOpponent = async (id, opponentId) => {
   if (!res.ok) throw new Error(data.error || "Failed to start match");
   return data;
 };
+
+export const getPlayer = async (username) => {
+  const res = await fetch(`${API_BASE_URL}/player/${username}`);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Failed to load player");
+  return data;
+};
+
+export const addPie = async (username, amount) => {
+  const res = await fetch(`${API_BASE_URL}/player/${username}/pie/add`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ amount }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Failed to add pie");
+  return data;
+};
+
+export const getPiPrice = async () => {
+  const res = await fetch(`${API_BASE_URL}/api/pi-price`);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Failed to get price");
+  return data;
+};

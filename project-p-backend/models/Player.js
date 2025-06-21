@@ -21,6 +21,7 @@ const playerSchema = new mongoose.Schema({
   level: { type: Number, default: 1 },
   xp: { type: Number, default: 0 },
   gold: { type: Number, default: 0 },
+  pie: { type: Number, default: 0 },
   // Player class/job. Default to 'Novice' so front-end always has a value
   class: { type: String, default: "Novice" },
   energy: { type: Number, default: 100 },
