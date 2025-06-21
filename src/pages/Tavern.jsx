@@ -1,7 +1,11 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { API_BASE_URL } from "../config";
 import { useNavigate } from "react-router-dom";
-import { getQuestStatus, cancelQuest, acknowledgeQuestResult } from "../services/playerService";
+import {
+  getQuestStatus,
+  cancelQuest,
+  acknowledgeQuestResult,
+} from "../services/playerService";
 
 function Tavern({ character, refreshCharacter, spendEnergy }) {
   const navigate = useNavigate();
@@ -16,18 +20,23 @@ function Tavern({ character, refreshCharacter, spendEnergy }) {
 
   const startQuest = async (quest, force = false) => {
     if (character.energy < quest.energyCost) {
-      alert(`Not enough energy! You need ${quest.energyCost}, but have ${character.energy}.`);
+      alert(
+        `Not enough energy! You need ${quest.energyCost}, but have ${character.energy}.`,
+      );
       return;
     }
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/characters/${character._id}/quest/start`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const res = await fetch(
+        `${API_BASE_URL}/api/characters/${character._id}/quest/start`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ ...quest, force }),
         },
-        body: JSON.stringify({ ...quest, force }),
-      });
+      );
 
       const data = await res.json();
 
@@ -139,12 +148,46 @@ function Tavern({ character, refreshCharacter, spendEnergy }) {
   const renderQuestInfo = (quest, risky) => (
     <div key={quest.id} className="flex items-center justify-between px-8">
       <div className="flex flex-col text-xs text-white drop-shadow-sm">
-        <span className="font-bold">{quest.name}{quest.rare ? " (Rare)" : ""}</span>
+        <span className="text-outline text-xs">
+          {quest.name}
+          {quest.rare ? " (Rare)" : ""}
+        </span>
         <div className="flex gap-2 mt-1">
-          <div className="flex items-center gap-1"><img src="/assets/tavern/xp_icon.png" alt="XP" className="w-4" /><span>{quest.xp}</span></div>
-          <div className="flex items-center gap-1"><img src="/assets/tavern/time_icon.png" alt="Time" className="w-4" /><span>{quest.duration}s</span></div>
-          <div className="flex items-center gap-1"><img src="/assets/tavern/gold_icon.png" alt="Gold" className="w-4" /><span>{quest.gold}</span></div>
-          <div className="flex items-center gap-1"><img src="/assets/tavern/energy_icon.png" alt="Energy" className="w-4" /><span className="text-red-500">-{quest.energyCost}</span></div>          {quest.lootChance > 0 && <img src="/assets/tavern/loot_icon.png" alt="Loot" className="w-4" />}
+          <div className="flex items-center gap-1">
+            <img src="/assets/tavern/xp_icon.png" alt="XP" className="w-4" />
+            <span>{quest.xp}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <img
+              src="/assets/tavern/time_icon.png"
+              alt="Time"
+              className="w-4"
+            />
+            <span>{quest.duration}s</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <img
+              src="/assets/tavern/gold_icon.png"
+              alt="Gold"
+              className="w-4"
+            />
+            <span>{quest.gold}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <img
+              src="/assets/tavern/energy_icon.png"
+              alt="Energy"
+              className="w-4"
+            />
+            <span className="text-red-500">-{quest.energyCost}</span>
+          </div>{" "}
+          {quest.lootChance > 0 && (
+            <img
+              src="/assets/tavern/loot_icon.png"
+              alt="Loot"
+              className="w-4"
+            />
+          )}
         </div>
       </div>
       <img
@@ -180,13 +223,19 @@ function Tavern({ character, refreshCharacter, spendEnergy }) {
                   ))}
                 </div>
               )}
-              <div className="text-center font-bold text-lg">
+              <div className="text-center text-outline text-lg">
                 {questResult.outcome === "success" ? "Victory" : "Defeat"}
               </div>
-              <div className="text-center">XP: {questResult.xp}</div>
-              <div className="text-center">Gold: {questResult.gold}</div>
+              <div className="text-center text-outline">
+                XP: {questResult.xp}
+              </div>
+              <div className="text-center text-outline">
+                Gold: {questResult.gold}
+              </div>
               {questResult.loot && (
-                <div className="text-center">Loot: {questResult.loot.name}</div>
+                <div className="text-center text-outline">
+                  Loot: {questResult.loot.name}
+                </div>
               )}
               <img
                 src="/assets/tavern/continue_button.png"
@@ -205,8 +254,10 @@ function Tavern({ character, refreshCharacter, spendEnergy }) {
               />
             </div>
           ) : activeQuest ? (
-            <div className="flex flex-col items-center text-white gap-2 mt-20">
-              <span className="font-bold text-lg drop-shadow-md text-center">{activeQuest.name}</span>
+            <div className="flex flex-col items-center gap-2 mt-20 text-white">
+              <span className="text-outline text-lg text-center">
+                {activeQuest.name}
+              </span>
               <span>⏳ {timeLeft}s</span>
               <span>You can leave and return later to complete it.</span>
               <img
@@ -237,9 +288,13 @@ function Tavern({ character, refreshCharacter, spendEnergy }) {
         className="absolute top-4 left-4 w-[4.5rem] cursor-pointer hover:scale-105 transition-all"
         onClick={() => navigate("/")}
       />
-      <div className="absolute top-4 right-4 flex items-center gap-2 text-white drop-shadow-md">
-        <img src="/assets/tavern/energy_icon.png" alt="Energy" className="w-10" />
-        <span className="font-bold text-lg">{`${character.energy}/100`}</span>
+      <div className="absolute top-4 right-4 flex items-center gap-2 drop-shadow-md">
+        <img
+          src="/assets/tavern/energy_icon.png"
+          alt="Energy"
+          className="w-10"
+        />
+        <span className="text-outline text-lg">{`${character.energy}/100`}</span>
       </div>
 
       <img
@@ -249,7 +304,8 @@ function Tavern({ character, refreshCharacter, spendEnergy }) {
       />
 
       <div
-        className={`fixed bottom-0 left-0 w-full h-[320px] bg-no-repeat bg-contain bg-center flex items-start justify-center gap-8 pt-[90px] z-40 transition-transform duration-300 ${isFrameOpen ? 'translate-y-0' : 'translate-y-[160px]'}`}        style={{ backgroundImage: "url(/assets/tavern/bottom_frame.png)" }}
+        className={`fixed bottom-0 left-0 w-full h-[320px] bg-no-repeat bg-contain bg-center flex items-start justify-center gap-8 pt-[90px] z-40 transition-transform duration-300 ${isFrameOpen ? "translate-y-0" : "translate-y-[160px]"}`}
+        style={{ backgroundImage: "url(/assets/tavern/bottom_frame.png)" }}
         onClick={() => setIsFrameOpen(!isFrameOpen)}
       >
         <img
@@ -277,9 +333,13 @@ function Tavern({ character, refreshCharacter, spendEnergy }) {
       </div>
 
       {showStandard &&
-        renderQuestWindow(character.safeQuestPool, false, () => setShowStandard(false))}
+        renderQuestWindow(character.safeQuestPool, false, () =>
+          setShowStandard(false),
+        )}
       {showRisky &&
-        renderQuestWindow(character.riskyQuestPool, true, () => setShowRisky(false))}
+        renderQuestWindow(character.riskyQuestPool, true, () =>
+          setShowRisky(false),
+        )}
     </div>
   );
 }

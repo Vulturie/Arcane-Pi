@@ -27,7 +27,6 @@ function CharacterSelect({ owner, characters, onSelect, refresh }) {
     }
   };
 
-
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this character?")) return;
     try {
@@ -59,9 +58,9 @@ function CharacterSelect({ owner, characters, onSelect, refresh }) {
           <img
             src="/assets/ui/parchment_banner.png"
             alt="banner"
-            className="w-full max-h-32 object-contain" />
-          <h2
-            className="absolute inset-0 flex items-center justify-center text-xl sm:text-2xl md:text-3xl font-bold text-white font-['SS_Homero'] drop-shadow-[0_0_6px_rgba(0,0,0,1)] fade-in-down px-4 text-center">
+            className="w-full max-h-32 object-contain"
+          />
+          <h2 className="absolute inset-0 flex items-center justify-center text-outline text-xl sm:text-2xl md:text-3xl fade-in-down px-4 text-center">
             {`Welcome ${username}! Choose or create a character:`}
           </h2>
         </div>
@@ -78,7 +77,9 @@ function CharacterSelect({ owner, characters, onSelect, refresh }) {
                 <div className="flex justify-between items-center gap-3 w-full">
                   <div
                     className={`w-16 h-16 flex justify-center items-center ${
-                      selected && selected._id === c._id ? "drop-shadow-[0_0_8px_white]" : ""
+                      selected && selected._id === c._id
+                        ? "drop-shadow-[0_0_8px_white]"
+                        : ""
                     }`}
                   >
                     <img
@@ -88,18 +89,8 @@ function CharacterSelect({ owner, characters, onSelect, refresh }) {
                     />
                   </div>
                   <div className="flex flex-col flex-1 mr-2">
-                    <span
-                      className={`font-bold text-xs drop-shadow-sm ${
-                        selected && selected._id === c._id ? "text-yellow-300" : ""
-                      }`}
-                    >
-                      {c.name}
-                    </span>
-                    <span
-                      className={`text-[10px] drop-shadow-sm ${
-                        selected && selected._id === c._id ? "text-yellow-300" : ""
-                      }`}
-                    >
+                    <span className="text-outline text-xs">{c.name}</span>
+                    <span className="text-outline text-[10px]">
                       Lvl {c.level}
                     </span>
                   </div>

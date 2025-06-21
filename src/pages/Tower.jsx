@@ -14,7 +14,12 @@ function Tower({ character, refreshCharacter }) {
   const [error, setError] = useState("");
   const [showGuardian, setShowGuardian] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
-  const [boardData, setBoardData] = useState({ results: [], total: 0, myRank: null, lastUpdated: null });
+  const [boardData, setBoardData] = useState({
+    results: [],
+    total: 0,
+    myRank: null,
+    lastUpdated: null,
+  });
   const [page, setPage] = useState(1);
 
   const loadStatus = useCallback(async () => {
@@ -27,16 +32,19 @@ function Tower({ character, refreshCharacter }) {
     }
   }, [character]);
 
-  const loadLeaderboard = useCallback(async (p = page) => {
-    if (!character) return;
-    try {
-      const data = await getTowerLeaderboard(p, 10, character._id);
-      setBoardData(data);
-      setPage(p);
-    } catch (err) {
-      console.error("Failed to load leaderboard", err);
-    }
-  }, [character, page]);
+  const loadLeaderboard = useCallback(
+    async (p = page) => {
+      if (!character) return;
+      try {
+        const data = await getTowerLeaderboard(p, 10, character._id);
+        setBoardData(data);
+        setPage(p);
+      } catch (err) {
+        console.error("Failed to load leaderboard", err);
+      }
+    },
+    [character, page],
+  );
 
   useEffect(() => {
     if (character.level >= 10) {
@@ -108,15 +116,22 @@ function Tower({ character, refreshCharacter }) {
           className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40"
           onClick={() => setShowGuardian(false)}
         >
-          <div className="relative w-[660px] sm:w-[620px]" onClick={(e) => e.stopPropagation()}>
-            <img src="/assets/tower/tower_guardian.png" alt="Guardian" className="w-full h-auto" />
+          <div
+            className="relative w-[660px] sm:w-[620px]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src="/assets/tower/tower_guardian.png"
+              alt="Guardian"
+              className="w-full h-auto"
+            />
             <img
               src="/assets/tower/exit_button.png"
               alt="Close"
               className="absolute top-8 right-8 w-6 cursor-pointer hover:scale-105 transition-transform"
               onClick={() => setShowGuardian(false)}
             />
-            <div className="absolute top-5 left-1/2 -translate-x-1/2 text-xl font-bold">
+            <div className="absolute top-5 left-1/2 -translate-x-1/2 text-outline text-xl">
               {status.nextLevel}
             </div>
             <img
@@ -128,7 +143,9 @@ function Tower({ character, refreshCharacter }) {
                 handleFight();
               }}
             />
-            <div className="absolute bottom-11 left-1/2 -translate-x-1/2 font-bold">Tower Guardian</div>
+            <div className="absolute bottom-11 left-1/2 -translate-x-1/2 text-outline">
+              Tower Guardian
+            </div>
           </div>
         </div>
       )}
@@ -138,8 +155,13 @@ function Tower({ character, refreshCharacter }) {
           className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40"
           onClick={() => setResult(null)}
         >
-          <div className="bg-gray-800 p-4 rounded" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-lg font-bold mb-2">{result.result === "win" ? "Victory" : "Defeat"}</h3>
+          <div
+            className="bg-gray-800 p-4 rounded"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-outline text-lg mb-2">
+              {result.result === "win" ? "Victory" : "Defeat"}
+            </h3>
             <ul className="text-xs list-disc pl-5 my-2 max-h-40 overflow-y-auto">
               {result.combat.log.map((line, i) => (
                 <li key={i}>{line}</li>
@@ -147,21 +169,36 @@ function Tower({ character, refreshCharacter }) {
             </ul>
             {result.result === "win" && (
               <p>
-                You received: <span className={`rarity-${result.reward.rarity}`}>{result.reward.name} ({getRarityLabel(result.reward.rarity)})</span>
+                You received:{" "}
+                <span className={`rarity-${result.reward.rarity}`}>
+                  {result.reward.name} ({getRarityLabel(result.reward.rarity)})
+                </span>
               </p>
             )}
             {result.result === "loss" && (
               <div className="space-x-2">
-                <button className="px-3 py-1 bg-gray-700 rounded hover:bg-gray-600" onClick={() => { setResult(null); handleFight(); }}>
+                <button
+                  className="px-3 py-1 bg-gray-700 rounded hover:bg-gray-600"
+                  onClick={() => {
+                    setResult(null);
+                    handleFight();
+                  }}
+                >
                   Retry
                 </button>
-                <button className="px-3 py-1 bg-gray-700 rounded hover:bg-gray-600" onClick={() => setResult(null)}>
+                <button
+                  className="px-3 py-1 bg-gray-700 rounded hover:bg-gray-600"
+                  onClick={() => setResult(null)}
+                >
                   Quit
                 </button>
               </div>
             )}
             {result.result === "win" && (
-              <button className="mt-2 px-3 py-1 bg-gray-700 rounded hover:bg-gray-600" onClick={() => setResult(null)}>
+              <button
+                className="mt-2 px-3 py-1 bg-gray-700 rounded hover:bg-gray-600"
+                onClick={() => setResult(null)}
+              >
                 Continue
               </button>
             )}
@@ -174,8 +211,15 @@ function Tower({ character, refreshCharacter }) {
           className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40"
           onClick={() => setShowLeaderboard(false)}
         >
-          <div className="relative w-[680px] sm:w-[420px]" onClick={(e) => e.stopPropagation()}>
-            <img src="/assets/tower/leaderboard_window.png" alt="Leaderboard" className="w-full h-auto" />
+          <div
+            className="relative w-[680px] sm:w-[420px]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src="/assets/tower/leaderboard_window.png"
+              alt="Leaderboard"
+              className="w-full h-auto"
+            />
             <img
               src="/assets/tower/exit_button.png"
               alt="Close"
@@ -198,7 +242,12 @@ function Tower({ character, refreshCharacter }) {
                       const rank = (page - 1) * 10 + idx + 1;
                       const highlight = entry._id === character._id;
                       return (
-                        <tr key={entry._id} className={highlight ? "text-yellow-300 font-bold" : ""}>
+                        <tr
+                          key={entry._id}
+                          className={
+                            highlight ? "text-yellow-300 font-bold" : ""
+                          }
+                        >
                           <td className="py-1">{rank}</td>
                           <td>{entry.name}</td>
                           <td>{entry.class}</td>
@@ -240,7 +289,9 @@ function Tower({ character, refreshCharacter }) {
       )}
 
       {error && (
-        <p className="absolute bottom-4 left-1/2 -translate-x-1/2 text-red-500 drop-shadow-md">{error}</p>
+        <p className="absolute bottom-4 left-1/2 -translate-x-1/2 text-red-500 drop-shadow-md">
+          {error}
+        </p>
       )}
     </div>
   );

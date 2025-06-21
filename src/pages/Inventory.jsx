@@ -89,7 +89,12 @@ function Inventory({ character, refreshCharacter }) {
     }
     try {
       await sellItem(character._id, itemId);
-      logStat({ type: 'ui_interaction', area: 'inventory', button: 'sell', item: itemId });
+      logStat({
+        type: "ui_interaction",
+        area: "inventory",
+        button: "sell",
+        item: itemId,
+      });
       loadInventory();
       loadEquipment();
       if (refreshCharacter) refreshCharacter();
@@ -186,9 +191,7 @@ function Inventory({ character, refreshCharacter }) {
             alt="Character"
             className="w-32 h-auto drop-shadow-md"
           />
-          <div className="mt-2 text-lg font-bold drop-shadow-md">
-            {character.name}
-          </div>
+          <div className="mt-2 text-lg text-outline">{character.name}</div>
           <div
             className="relative w-16 h-16 mt-5 mb-2 cursor-pointer"
             onClick={() =>
@@ -222,7 +225,7 @@ function Inventory({ character, refreshCharacter }) {
                 style={{ width: `${xpPercent}%` }}
               />
             </div>
-            <div className="absolute inset-0 flex items-center justify-center z-20 text-sm font-bold text-white drop-shadow-md">
+            <div className="absolute inset-0 flex items-center justify-center z-20 text-outline text-sm">
               {`${character.xp} / ${nextXp} XP`}
             </div>
           </div>

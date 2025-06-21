@@ -2,9 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-
 body {
-  font-family: 'SS Homero', sans-serif;
+  font-family: "SS Homero", sans-serif;
 }
 
 @keyframes fadeInDown {
@@ -20,4 +19,19 @@ body {
 
 .fade-in-down {
   animation: fadeInDown 0.5s ease-out both;
+}
+
+@layer utilities {
+  .text-outline {
+    @apply text-yellow-300 font-bold;
+    text-shadow:
+      -2px -2px 0 #000,
+      2px -2px 0 #000,
+      -2px 2px 0 #000,
+      2px 2px 0 #000,
+      0 -2px 0 #000,
+      0 2px 0 #000,
+      -2px 0 0 #000,
+      2px 0 0 #000;
+  }
 }
