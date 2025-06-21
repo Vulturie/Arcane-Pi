@@ -136,6 +136,8 @@ const characterSchema = new mongoose.Schema({
       enemyName: String,
       opponentName: String,
       mmrChange: Number,
+      oldMMR: Number,
+      newMMR: Number,
       floorName: String,
       level: Number,
       timestamp: { type: Date, default: Date.now },

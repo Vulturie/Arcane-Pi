@@ -37,13 +37,15 @@ function shuffle(arr) {
     .map((a) => a[1]);
 }
 
-function logArenaHistory(char, opponentName, result, mmrChange) {
+function logArenaHistory(char, opponentName, result, mmrChange, oldMMR, newMMR) {
   const entry = {
     questName: "Arena Battle",
     questType: "arena",
     opponentName,
     result,
     mmrChange,
+    oldMMR,
+    newMMR,
     timestamp: new Date(),
   };
   if (!char.history) char.history = [];
@@ -235,25 +237,34 @@ router.post("/match/:id", async (req, res) => {
       enemyType: char.name,
     });
 
-    const DELTA = 30;
+    const playerOldMMR = char.mmr || 1000;
+    const opponentOldMMR = opponentChar.mmr || 1000;
+    const kFactor = 30;
+    const expectedScore = 1 / (1 + Math.pow(10, (opponentOldMMR - playerOldMMR) / 400));
+    const actualScore = combat.result === "win" ? 1 : 0;
+    const mmrChange = Math.round(kFactor * (actualScore - expectedScore));
+    char.mmr = Math.max(800, playerOldMMR + mmrChange);
+    opponentChar.mmr = Math.max(800, opponentOldMMR - mmrChange);
     if (combat.result === "win") {
-      char.mmr = (char.mmr || 1000) + DELTA;
       char.arenaWins = (char.arenaWins || 0) + 1;
-      opponentChar.mmr = (opponentChar.mmr || 1000) - DELTA;
       opponentChar.arenaLosses = (opponentChar.arenaLosses || 0) + 1;
     } else {
-      char.mmr = (char.mmr || 1000) - DELTA;
       char.arenaLosses = (char.arenaLosses || 0) + 1;
-      opponentChar.mmr = (opponentChar.mmr || 1000) + DELTA;
       opponentChar.arenaWins = (opponentChar.arenaWins || 0) + 1;
     }
-    const mmrChange = combat.result === "win" ? DELTA : -DELTA;
     if (Math.abs(mmrChange) > 200) {
       flagCheat(char, 'MMR change too high', { change: mmrChange });
       flagCheat(opponentChar, 'MMR change too high', { change: -mmrChange });
     }
-    logArenaHistory(char, opponentChar.name, combat.result, mmrChange);
-    logArenaHistory(opponentChar, char.name, combat.result === "win" ? "loss" : "win", -mmrChange);
+    logArenaHistory(char, opponentChar.name, combat.result, mmrChange, playerOldMMR, char.mmr);
+    logArenaHistory(
+      opponentChar,
+      char.name,
+      combat.result === "win" ? "loss" : "win",
+      -mmrChange,
+      opponentOldMMR,
+      opponentChar.mmr
+    );
     char.dailyArenaFights = (char.dailyArenaFights || 0) + 1;
     opponentChar.dailyArenaFights = (opponentChar.dailyArenaFights || 0) + 1;
     await char.save();
@@ -337,25 +348,34 @@ router.post("/challenge/:id/:oppId", async (req, res) => {
       enemyType: char.name,
     });
 
-    const DELTA = 30;
+    const playerOldMMR = char.mmr || 1000;
+    const opponentOldMMR = opponentChar.mmr || 1000;
+    const kFactor = 30;
+    const expectedScore = 1 / (1 + Math.pow(10, (opponentOldMMR - playerOldMMR) / 400));
+    const actualScore = combat.result === "win" ? 1 : 0;
+    const mmrChange = Math.round(kFactor * (actualScore - expectedScore));
+    char.mmr = Math.max(800, playerOldMMR + mmrChange);
+    opponentChar.mmr = Math.max(800, opponentOldMMR - mmrChange);
     if (combat.result === "win") {
-      char.mmr = (char.mmr || 1000) + DELTA;
       char.arenaWins = (char.arenaWins || 0) + 1;
-      opponentChar.mmr = (opponentChar.mmr || 1000) - DELTA;
       opponentChar.arenaLosses = (opponentChar.arenaLosses || 0) + 1;
     } else {
-      char.mmr = (char.mmr || 1000) - DELTA;
       char.arenaLosses = (char.arenaLosses || 0) + 1;
-      opponentChar.mmr = (opponentChar.mmr || 1000) + DELTA;
       opponentChar.arenaWins = (opponentChar.arenaWins || 0) + 1;
     }
-    const mmrChange = combat.result === "win" ? DELTA : -DELTA;
     if (Math.abs(mmrChange) > 200) {
       flagCheat(char, 'MMR change too high', { change: mmrChange });
       flagCheat(opponentChar, 'MMR change too high', { change: -mmrChange });
     }
-    logArenaHistory(char, opponentChar.name, combat.result, mmrChange);
-    logArenaHistory(opponentChar, char.name, combat.result === "win" ? "loss" : "win", -mmrChange);
+    logArenaHistory(char, opponentChar.name, combat.result, mmrChange, playerOldMMR, char.mmr);
+    logArenaHistory(
+      opponentChar,
+      char.name,
+      combat.result === "win" ? "loss" : "win",
+      -mmrChange,
+      opponentOldMMR,
+      opponentChar.mmr
+    );
     char.dailyArenaFights = (char.dailyArenaFights || 0) + 1;
     opponentChar.dailyArenaFights = (opponentChar.dailyArenaFights || 0) + 1;
     await char.save();
