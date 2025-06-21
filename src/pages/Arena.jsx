@@ -21,30 +21,6 @@ function Arena({ character, refreshCharacter }) {
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
 
-  if (character && character.level < 20) {
-    return (
-      <div className="relative w-screen h-screen font-['SS_Homero'] text-white overflow-hidden">
-        <img
-          src="/assets/arena/arena_background.png"
-          alt="Background"
-          className="absolute inset-0 w-full h-full object-cover -z-10"
-        />
-        <img
-          src="/assets/arena/back_button.png"
-          alt="Back"
-          className="absolute top-4 left-4 w-16 cursor-pointer"
-          onClick={() => navigate("/")}
-        />
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-gray-800 p-4 rounded text-center border-4 border-yellow-600" onClick={(e) => e.stopPropagation()}>
-            <p className="mb-4">The Arena unlocks at level 20.</p>
-            <button className="px-3 py-1 bg-gray-700 rounded hover:bg-gray-600" onClick={() => navigate("/")}>OK</button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   const loadProfile = useCallback(async () => {
     if (!character) return;
     try {
@@ -113,6 +89,30 @@ function Arena({ character, refreshCharacter }) {
   };
 
   const classBadge = (cls) => `/assets/character_creation/${cls.toLowerCase()}_button.png`;
+
+  if (character && character.level < 20) {
+    return (
+      <div className="relative w-screen h-screen font-['SS_Homero'] text-white overflow-hidden">
+        <img
+          src="/assets/arena/arena_background.png"
+          alt="Background"
+          className="absolute inset-0 w-full h-full object-cover -z-10"
+        />
+        <img
+          src="/assets/arena/back_button.png"
+          alt="Back"
+          className="absolute top-4 left-4 w-16 cursor-pointer"
+          onClick={() => navigate("/")}
+        />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-gray-800 p-4 rounded text-center border-4 border-yellow-600" onClick={(e) => e.stopPropagation()}>
+            <p className="mb-4">The Arena unlocks at level 20.</p>
+            <button className="px-3 py-1 bg-gray-700 rounded hover:bg-gray-600" onClick={() => navigate("/")}>OK</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative w-screen h-screen font-['SS_Homero'] text-white overflow-hidden">
