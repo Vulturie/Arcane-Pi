@@ -6,6 +6,7 @@ import {
   getXpForNextLevel,
 } from "../services/playerService";
 import NotificationModal from "../components/NotificationModal";
+import ConfirmationModal from "../components/ConfirmationModal";
 
 function getBackground() {
   const hour = new Date().getHours();
@@ -19,6 +20,7 @@ function CharacterPage({ character, onDelete, onSwitch }) {
   const [background, setBackground] = useState(getBackground());
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState("");
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => setBackground(getBackground()), 60000);
@@ -33,8 +35,11 @@ function CharacterPage({ character, onDelete, onSwitch }) {
   const nextXp = getXpForNextLevel(character.level);
   const xpPercent = Math.min((character.xp / nextXp) * 100, 100);
 
-  const handleDelete = async () => {
-    if (!window.confirm("Delete this character?")) return;
+  const handleDelete = () => {
+    setConfirmDelete(true);
+  };
+
+  const confirmDeleteAction = async () => {
     try {
       await deleteCharacter(character._id);
       if (onDelete) await onDelete();
@@ -44,6 +49,7 @@ function CharacterPage({ character, onDelete, onSwitch }) {
       setNotificationMessage("Failed to delete profile");
       setShowNotification(true);
     }
+    setConfirmDelete(false);
   };
 
   const handleSwitch = () => {
@@ -192,6 +198,12 @@ function CharacterPage({ character, onDelete, onSwitch }) {
         message={notificationMessage}
         visible={showNotification}
         onClose={() => setShowNotification(false)}
+      />
+      <ConfirmationModal
+        message="Delete this character?"
+        visible={confirmDelete}
+        onConfirm={confirmDeleteAction}
+        onCancel={() => setConfirmDelete(false)}
       />
     </div>
   );

@@ -10,6 +10,7 @@ import {
   getPlayer,
 } from "../services/playerService";
 import NotificationModal from "../components/NotificationModal";
+import ConfirmationModal from "../components/ConfirmationModal";
 
 function Tavern({ character, refreshCharacter, spendEnergy }) {
   const navigate = useNavigate();
@@ -27,6 +28,7 @@ function Tavern({ character, refreshCharacter, spendEnergy }) {
   const [showEnergyFull, setShowEnergyFull] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState("");
+  const [confirmation, setConfirmation] = useState(null);
 
   const startQuest = async (quest, force = false) => {
     if (character.energy < quest.energyCost) {
@@ -67,9 +69,10 @@ function Tavern({ character, refreshCharacter, spendEnergy }) {
         if (spendEnergy) spendEnergy(quest.energyCost);
         refreshCharacter();
       } else if (data.inventoryFull && !force) {
-        if (window.confirm("Inventory is full. Start quest anyway?")) {
-          startQuest(quest, true);
-        }
+        setConfirmation({
+          message: "Inventory is full. Start quest anyway?",
+          onConfirm: () => startQuest(quest, true),
+        });
       } else {
         setNotificationMessage(`❌ ${data.error}`);
         setShowNotification(true);
@@ -81,18 +84,22 @@ function Tavern({ character, refreshCharacter, spendEnergy }) {
     }
   };
 
-  const handleCancelQuest = async () => {
-    if (!window.confirm("Are you sure you want to cancel the quest?")) return;
-    try {
-      await cancelQuest(character._id);
-      setActiveQuest(null);
-      setTimeLeft(0);
-      refreshCharacter();
-    } catch (err) {
-      console.error("Failed to cancel quest:", err);
-      setNotificationMessage("Server error cancelling quest.");
-      setShowNotification(true);
-    }
+  const handleCancelQuest = () => {
+    setConfirmation({
+      message: "Are you sure you want to cancel the quest?",
+      onConfirm: async () => {
+        try {
+          await cancelQuest(character._id);
+          setActiveQuest(null);
+          setTimeLeft(0);
+          refreshCharacter();
+        } catch (err) {
+          console.error("Failed to cancel quest:", err);
+          setNotificationMessage("Server error cancelling quest.");
+          setShowNotification(true);
+        }
+      },
+    });
   };
 
   const handleSkipQuest = async () => {
@@ -447,6 +454,17 @@ function Tavern({ character, refreshCharacter, spendEnergy }) {
         message={notificationMessage}
         visible={showNotification}
         onClose={() => setShowNotification(false)}
+      />
+      <ConfirmationModal
+        message={confirmation?.message}
+        visible={!!confirmation}
+        onConfirm={async () => {
+          if (confirmation?.onConfirm) {
+            await confirmation.onConfirm();
+          }
+          setConfirmation(null);
+        }}
+        onCancel={() => setConfirmation(null)}
       />
     </div>
   );

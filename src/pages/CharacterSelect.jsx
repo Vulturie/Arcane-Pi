@@ -3,6 +3,7 @@ import { UserContext } from "../context/UserContext";
 import { useNavigate } from "react-router-dom";
 import { deleteCharacter } from "../services/playerService";
 import NotificationModal from "../components/NotificationModal";
+import ConfirmationModal from "../components/ConfirmationModal";
 
 function CharacterSelect({ owner, characters, onSelect, refresh }) {
   const navigate = useNavigate();
@@ -11,6 +12,7 @@ function CharacterSelect({ owner, characters, onSelect, refresh }) {
   const [selected, setSelected] = useState(null);
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState("");
+  const [deleteId, setDeleteId] = useState(null);
 
   const portraitForCharacter = (c) => {
     const cls = c.class ? c.class.toLowerCase() : "novice";
@@ -30,15 +32,19 @@ function CharacterSelect({ owner, characters, onSelect, refresh }) {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Delete this character?")) return;
+  const handleDelete = (id) => {
+    setDeleteId(id);
+  };
+
+  const confirmDelete = async () => {
     try {
-      await deleteCharacter(id);
+      await deleteCharacter(deleteId);
       refresh();
     } catch (err) {
       setNotificationMessage("Failed to delete character");
       setShowNotification(true);
     }
+    setDeleteId(null);
   };
 
   const glowClass = "drop-shadow-[0_0_8px_white]";
@@ -159,6 +165,12 @@ function CharacterSelect({ owner, characters, onSelect, refresh }) {
         message={notificationMessage}
         visible={showNotification}
         onClose={() => setShowNotification(false)}
+      />
+      <ConfirmationModal
+        message="Delete this character?"
+        visible={deleteId !== null}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteId(null)}
       />
     </div>
   );
