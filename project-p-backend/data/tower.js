@@ -1,8 +1,9 @@
+const crypto = require('crypto');
 const ITEMS = require('./items');
 const { getRarityByTowerLevel } = require('../utils/rarityUtils');
 
 function getRewardForLevel(level) {
-  const base = ITEMS[level % ITEMS.length];
+  const base = ITEMS[crypto.randomInt(ITEMS.length)];
   return {
     ...base,
     name: `${base.name} of the Tower`,
