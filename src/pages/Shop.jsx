@@ -9,6 +9,7 @@ import {
 } from "../services/playerService";
 import logStat from "../utils/logStat";
 import { RARITY_MULTIPLIER, getRarityLabel } from "../rarity";
+import NotificationModal from "../components/NotificationModal";
 
 function Shop({ character, refreshCharacter }) {
   const [preview, setPreview] = useState(null);
@@ -17,6 +18,8 @@ function Shop({ character, refreshCharacter }) {
   const [isWindowOpen, setIsWindowOpen] = useState(false);
   const [pie, setPie] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
+  const [showNotification, setShowNotification] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState("");
   const navigate = useNavigate();
 
   const getBonus = (item, stat) => {
@@ -76,9 +79,11 @@ function Shop({ character, refreshCharacter }) {
       await buyItem(character._id, item.id);
       logStat({ type: 'ui_interaction', area: 'shop', button: 'buy', item: item.id });
       refreshCharacter();
-      alert(`Bought ${item.name}`);
+      setNotificationMessage(`Bought ${item.name}`);
+      setShowNotification(true);
     } catch (err) {
-      alert(err.message);
+      setNotificationMessage(err.message);
+      setShowNotification(true);
     }
   };
 
@@ -90,7 +95,8 @@ function Shop({ character, refreshCharacter }) {
       setShopItems(data.shopPool);
       setPie(data.pie);
     } catch (err) {
-      alert(err.message);
+      setNotificationMessage(err.message);
+      setShowNotification(true);
     }
     setRefreshing(false);
   };
@@ -261,6 +267,11 @@ function Shop({ character, refreshCharacter }) {
           </div>
         </div>
       )}
+      <NotificationModal
+        message={notificationMessage}
+        visible={showNotification}
+        onClose={() => setShowNotification(false)}
+      />
     </div>
   );
 }

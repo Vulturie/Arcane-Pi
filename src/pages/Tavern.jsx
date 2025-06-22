@@ -9,6 +9,7 @@ import {
   buyEnergy,
   getPlayer,
 } from "../services/playerService";
+import NotificationModal from "../components/NotificationModal";
 
 function Tavern({ character, refreshCharacter, spendEnergy }) {
   const navigate = useNavigate();
@@ -24,12 +25,15 @@ function Tavern({ character, refreshCharacter, spendEnergy }) {
   const [skipping, setSkipping] = useState(false);
   const [buyingEnergyState, setBuyingEnergyState] = useState(false);
   const [showEnergyFull, setShowEnergyFull] = useState(false);
+  const [showNotification, setShowNotification] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState("");
 
   const startQuest = async (quest, force = false) => {
     if (character.energy < quest.energyCost) {
-      alert(
+      setNotificationMessage(
         `Not enough energy! You need ${quest.energyCost}, but have ${character.energy}.`,
       );
+      setShowNotification(true);
       return;
     }
 
@@ -67,11 +71,13 @@ function Tavern({ character, refreshCharacter, spendEnergy }) {
           startQuest(quest, true);
         }
       } else {
-        alert(`❌ ${data.error}`);
+        setNotificationMessage(`❌ ${data.error}`);
+        setShowNotification(true);
       }
     } catch (err) {
       console.error("Failed to start quest:", err);
-      alert("Server error starting quest.");
+      setNotificationMessage("Server error starting quest.");
+      setShowNotification(true);
     }
   };
 
@@ -84,7 +90,8 @@ function Tavern({ character, refreshCharacter, spendEnergy }) {
       refreshCharacter();
     } catch (err) {
       console.error("Failed to cancel quest:", err);
-      alert("Server error cancelling quest.");
+      setNotificationMessage("Server error cancelling quest.");
+      setShowNotification(true);
     }
   };
 
@@ -100,7 +107,8 @@ function Tavern({ character, refreshCharacter, spendEnergy }) {
       setPie(data.pie);
       refreshCharacter();
     } catch (err) {
-      alert(err.message);
+      setNotificationMessage(err.message);
+      setShowNotification(true);
     }
     setSkipping(false);
   };
@@ -120,7 +128,8 @@ function Tavern({ character, refreshCharacter, spendEnergy }) {
       if (err.message.includes("Energy already full")) {
         setShowEnergyFull(true);
       } else {
-        alert(err.message);
+        setNotificationMessage(err.message);
+        setShowNotification(true);
       }
     }
     setBuyingEnergyState(false);
@@ -434,6 +443,11 @@ function Tavern({ character, refreshCharacter, spendEnergy }) {
           </div>
         </div>
       )}
+      <NotificationModal
+        message={notificationMessage}
+        visible={showNotification}
+        onClose={() => setShowNotification(false)}
+      />
     </div>
   );
 }

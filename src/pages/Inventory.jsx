@@ -11,6 +11,7 @@ import {
 } from "../services/playerService";
 import { RARITY_MULTIPLIER, getRarityLabel } from "../rarity";
 import logStat from "../utils/logStat";
+import NotificationModal from "../components/NotificationModal";
 
 function Inventory({ character, refreshCharacter }) {
   const navigate = useNavigate();
@@ -18,6 +19,8 @@ function Inventory({ character, refreshCharacter }) {
   const [equipped, setEquipped] = useState({});
   const [preview, setPreview] = useState(null);
   const [showItems, setShowItems] = useState(false);
+  const [showNotification, setShowNotification] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState("");
 
   const getBonus = (item, stat) => {
     if (!item || !item.statBonus) return 0;
@@ -54,7 +57,8 @@ function Inventory({ character, refreshCharacter }) {
   const handleEquip = async (itemId) => {
     const item = items.find((it) => it.id === itemId);
     if (!item) {
-      alert("This item is no longer available to equip.");
+      setNotificationMessage("This item is no longer available to equip.");
+      setShowNotification(true);
       setPreview(null);
       return;
     }
@@ -65,7 +69,8 @@ function Inventory({ character, refreshCharacter }) {
       setPreview(null);
     } catch (err) {
       console.error("Failed to equip item", err);
-      alert(err.message);
+      setNotificationMessage(err.message);
+      setShowNotification(true);
     }
   };
 
@@ -83,7 +88,8 @@ function Inventory({ character, refreshCharacter }) {
   const handleSell = async (itemId) => {
     const item = items.find((it) => it.id === itemId);
     if (!item) {
-      alert("This item is no longer available to sell.");
+      setNotificationMessage("This item is no longer available to sell.");
+      setShowNotification(true);
       setPreview(null);
       return;
     }
@@ -448,6 +454,11 @@ function Inventory({ character, refreshCharacter }) {
           </div>
         </div>
       )}
+      <NotificationModal
+        message={notificationMessage}
+        visible={showNotification}
+        onClose={() => setShowNotification(false)}
+      />
     </div>
   );
 }

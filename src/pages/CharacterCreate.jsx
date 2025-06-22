@@ -1,21 +1,29 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createCharacter } from "../services/playerService";
+import NotificationModal from "../components/NotificationModal";
 
 function CharacterCreate({ owner, refresh }) {
   const [gender, setGender] = useState("male");
   const [cls, setCls] = useState("Warrior");
   const [name, setName] = useState("");
+  const [showNotification, setShowNotification] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState("");
   const navigate = useNavigate();
 
   const handleCreate = async () => {
-    if (!name) return alert("Enter a name");
+    if (!name) {
+      setNotificationMessage("Enter a name");
+      setShowNotification(true);
+      return;
+    }
     try {
       await createCharacter(owner, name, cls, gender);
       refresh();
       navigate("/");
     } catch (err) {
-      alert(err.message);
+      setNotificationMessage(err.message);
+      setShowNotification(true);
     }
   };
 
@@ -96,6 +104,11 @@ function CharacterCreate({ owner, refresh }) {
           onClick={handleCreate}
         />
       </div>
+      <NotificationModal
+        message={notificationMessage}
+        visible={showNotification}
+        onClose={() => setShowNotification(false)}
+      />
     </div>
   );
 }

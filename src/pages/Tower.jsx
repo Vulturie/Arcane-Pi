@@ -7,6 +7,7 @@ import {
   buyTowerWins,
 } from "../services/playerService";
 import { getRarityLabel } from "../rarity";
+import NotificationModal from "../components/NotificationModal";
 
 function Tower({ character, refreshCharacter }) {
   const navigate = useNavigate();
@@ -24,6 +25,8 @@ function Tower({ character, refreshCharacter }) {
   });
   const [page, setPage] = useState(1);
   const [buyingWins, setBuyingWins] = useState(false);
+  const [showNotification, setShowNotification] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState("");
 
   const loadStatus = useCallback(async () => {
     if (!character || character.level < 10) return;
@@ -78,7 +81,8 @@ function Tower({ character, refreshCharacter }) {
       const data = await buyTowerWins(character._id);
       setStatus((prev) => ({ ...prev, victoriesRemaining: data.victoriesRemaining }));
     } catch (err) {
-      alert(err.message);
+      setNotificationMessage(err.message);
+      setShowNotification(true);
     }
     setBuyingWins(false);
   };
@@ -381,6 +385,11 @@ function Tower({ character, refreshCharacter }) {
           {error}
         </p>
       )}
+      <NotificationModal
+        message={notificationMessage}
+        visible={showNotification}
+        onClose={() => setShowNotification(false)}
+      />
     </div>
   );
 }

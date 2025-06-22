@@ -5,6 +5,7 @@ import {
   deleteCharacter,
   getXpForNextLevel,
 } from "../services/playerService";
+import NotificationModal from "../components/NotificationModal";
 
 function getBackground() {
   const hour = new Date().getHours();
@@ -16,6 +17,8 @@ function getBackground() {
 function CharacterPage({ character, onDelete, onSwitch }) {
   const navigate = useNavigate();
   const [background, setBackground] = useState(getBackground());
+  const [showNotification, setShowNotification] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState("");
 
   useEffect(() => {
     const interval = setInterval(() => setBackground(getBackground()), 60000);
@@ -38,7 +41,8 @@ function CharacterPage({ character, onDelete, onSwitch }) {
       navigate("/character-select");
     } catch (err) {
       console.error(err);
-      alert("Failed to delete profile");
+      setNotificationMessage("Failed to delete profile");
+      setShowNotification(true);
     }
   };
 
@@ -184,6 +188,11 @@ function CharacterPage({ character, onDelete, onSwitch }) {
           />
         </div>
       </div>
+      <NotificationModal
+        message={notificationMessage}
+        visible={showNotification}
+        onClose={() => setShowNotification(false)}
+      />
     </div>
   );
 }

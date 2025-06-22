@@ -1,12 +1,15 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { getPiPrice, addPie, getPlayer } from "../services/playerService";
+import NotificationModal from "../components/NotificationModal";
 
 function PieShop({ username }) {
   const navigate = useNavigate();
   const [priceUSD, setPriceUSD] = useState(null);
   const [loading, setLoading] = useState(false);
   const [pie, setPie] = useState(0);
+  const [showNotification, setShowNotification] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState("");
 
   const loadPlayer = useCallback(async () => {
     try {
@@ -52,7 +55,8 @@ function PieShop({ username }) {
     if (!priceUSD) return;
     const totalUSD = pack.amount / 100;
     const pi = totalUSD / priceUSD;
-    alert(`You purchased ${pack.amount} Pie for ${pi.toFixed(4)} \u03C0`);
+    setNotificationMessage(`You purchased ${pack.amount} Pie for ${pi.toFixed(4)} \u03C0`);
+    setShowNotification(true);
     try {
       await addPie(username, pack.amount);
       loadPlayer();
@@ -97,6 +101,11 @@ function PieShop({ username }) {
           </div>
         ))}
       </div>
+      <NotificationModal
+        message={notificationMessage}
+        visible={showNotification}
+        onClose={() => setShowNotification(false)}
+      />
     </div>
   );
 }

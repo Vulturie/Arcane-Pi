@@ -2,12 +2,15 @@ import React, { useState, useContext } from "react";
 import { UserContext } from "../context/UserContext";
 import { useNavigate } from "react-router-dom";
 import { deleteCharacter } from "../services/playerService";
+import NotificationModal from "../components/NotificationModal";
 
 function CharacterSelect({ owner, characters, onSelect, refresh }) {
   const navigate = useNavigate();
   const { user } = useContext(UserContext);
   const username = user?.username || owner || "";
   const [selected, setSelected] = useState(null);
+  const [showNotification, setShowNotification] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState("");
 
   const portraitForCharacter = (c) => {
     const cls = c.class ? c.class.toLowerCase() : "novice";
@@ -33,7 +36,8 @@ function CharacterSelect({ owner, characters, onSelect, refresh }) {
       await deleteCharacter(id);
       refresh();
     } catch (err) {
-      alert("Failed to delete character");
+      setNotificationMessage("Failed to delete character");
+      setShowNotification(true);
     }
   };
 
@@ -151,6 +155,11 @@ function CharacterSelect({ owner, characters, onSelect, refresh }) {
           </div>
         )}
       </div>
+      <NotificationModal
+        message={notificationMessage}
+        visible={showNotification}
+        onClose={() => setShowNotification(false)}
+      />
     </div>
   );
 }
