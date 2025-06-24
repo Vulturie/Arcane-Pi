@@ -230,11 +230,13 @@ function GameHub({ character, refreshCharacter, username }) {
             className="w-16 sm:w-20 cursor-pointer transition-transform hover:scale-105"
           />
         </Link>
-        <img
-          src="/assets/game_hub/settings_icon.png"
-          alt="Settings"
-          className="w-16 sm:w-20 cursor-pointer transition-transform hover:scale-105"
-        />
+        <Link to="/settings">
+          <img
+            src="/assets/game_hub/settings_button.png"
+            alt="Settings"
+            className="w-16 sm:w-20 cursor-pointer transition-transform hover:scale-105"
+          />
+        </Link>
       </div>
 
       {lockedFeature && (

@@ -18,6 +18,7 @@ import Journal from "./pages/Journal";
 import DevDashboard from "./pages/DevDashboard";
 import PieShop from "./pages/PieShop";
 import SpiritGrove from "./pages/SpiritGrove";
+import SettingsPage from "./pages/SettingsPage";
 import LoadingScreenWrapper from "./components/LoadingScreenWrapper";
 
 function App() {
@@ -99,6 +100,7 @@ function App() {
           }
         />
         <Route path="/dev/dashboard" element={<DevDashboard />} />
+        <Route path="/settings" element={<SettingsPage />} />
       </Routes>
     );
   } else {
@@ -150,6 +152,7 @@ function App() {
           path="/spirit-grove"
           element={<SpiritGrove character={activeChar} refreshCharacter={refreshActiveCharacter} />}
         />
+        <Route path="/settings" element={<SettingsPage />} />
         <Route path="/pie-shop" element={<PieShop username={username} />} />
         <Route
           path="/character-select"
