@@ -52,16 +52,21 @@ router.get("/:username", async (req, res) => {
         username,
         loginLog: { lastLogin: now, logins: [now], uniqueDays: [today] },
       });
+      await PlayerActivityLog.create({ username, loginAt: now, loginDate: today });
     } else {
       if (!player.loginLog) player.loginLog = { logins: [], uniqueDays: [] };
       player.loginLog.lastLogin = now;
-      player.loginLog.logins.push(now);
-      if (!player.loginLog.uniqueDays.includes(today)) {
+
+      const loggedToday = player.loginLog.uniqueDays.includes(today);
+      if (!loggedToday) {
+        player.loginLog.logins.push(now);
         player.loginLog.uniqueDays.push(today);
+        const existingLog = await PlayerActivityLog.findOne({ username, loginDate: today });
+        if (!existingLog) {
+          await PlayerActivityLog.create({ username, loginAt: now, loginDate: today });
+        }
       }
     }
-
-    await PlayerActivityLog.create({ username, loginAt: now, loginDate: today });
 
     // Energy regeneration
     const elapsed = (now - new Date(player.lastEnergyUpdate)) / 1000;
