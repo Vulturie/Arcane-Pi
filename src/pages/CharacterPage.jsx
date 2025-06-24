@@ -7,6 +7,7 @@ import {
 } from "../services/playerService";
 import NotificationModal from "../components/NotificationModal";
 import ConfirmationModal from "../components/ConfirmationModal";
+import PETS from "../petData";
 
 function getBackground() {
   const hour = new Date().getHours();
@@ -146,14 +147,30 @@ function CharacterPage({ character, onDelete, onSwitch }) {
           </div>
 
           {/* XP text */}
-          <div className="absolute inset-0 flex items-center justify-center z-20 text-sm font-bold text-black drop-shadow-md">
-            {`${character.xp} / ${nextXp} XP`}
-          </div>
+        <div className="absolute inset-0 flex items-center justify-center z-20 text-sm font-bold text-black drop-shadow-md">
+          {`${character.xp} / ${nextXp} XP`}
         </div>
-        <div
-          className="w-full max-w-[320px] h-[180px] bg-no-repeat bg-contain mt-8 mx-auto relative"
-          style={{ backgroundImage: "url(/assets/character/stats_table.png)" }}
-        >
+      </div>
+      {character.pet && (
+        (() => {
+          const info = PETS.find((p) => p.id === character.pet.id);
+          return (
+            <div className="mt-4 flex flex-col items-center gap-1 text-white drop-shadow-md">
+              <img src={`/assets/spirit_grove/${character.pet.id}.png`} alt="Pet" className="w-16" />
+              <span className="text-outline text-sm capitalize">{info?.name || character.pet.id}</span>
+              {info && (
+                <span className="text-xs text-center">
+                  +{info.boosts.gold * 100}% Gold / +{info.boosts.xp * 100}% XP
+                </span>
+              )}
+            </div>
+          );
+        })()
+      )}
+      <div
+        className="w-full max-w-[320px] h-[180px] bg-no-repeat bg-contain mt-8 mx-auto relative"
+        style={{ backgroundImage: "url(/assets/character/stats_table.png)" }}
+      >
           <div className="absolute w-[35%] left-[30px] flex justify-between items-center px-2 text-lg font-bold text-white drop-shadow-md top-[26px]">
             <span>STR</span>
             <span className="text-yellow-300 min-w-[30px] text-right">

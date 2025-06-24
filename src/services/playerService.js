@@ -212,6 +212,17 @@ export const buyItem = async (characterId, itemId) => {
   return data;
 };
 
+export const buyPet = async (characterId, petId) => {
+  const res = await fetch(`${API_BASE_URL}/api/characters/${characterId}/pet/buy`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ petId }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Failed to buy pet");
+  return data;
+};
+
 export const refreshShop = async (characterId) => {
   const res = await fetch(`${API_BASE_URL}/api/characters/${characterId}/shop/refresh`, {
     method: "POST",

@@ -5,6 +5,7 @@ const Player = require("../models/Player");
 const { generateEnemy } = require("../utils/enemyGenerator");
 const { getPlayerStats, simulateCombat } = require("../utils/combat");
 const ITEMS = require("../data/items");
+const PETS = require("../data/pets");
 const { SAFE_QUEST_TIERS, RISKY_QUEST_TIERS } = require("../data/quests");
 const { XP_GAIN_MULTIPLIER, GOLD_SCALING } = require("../utils/balanceConfig");
 const { getRewardForLevel, getEnemyForLevel } = require("../data/tower");
@@ -252,6 +253,11 @@ async function loadCharacter(req, res, next) {
 
     if (!char.shopPool || char.shopPool.length === 0) {
       initShopPool(char);
+      updated = true;
+    }
+
+    if (char.pet && char.pet.expires && now > char.pet.expires) {
+      char.pet = null;
       updated = true;
     }
 
@@ -790,6 +796,33 @@ router.post("/characters/:id/sell", loadCharacter, async (req, res) => {
     slots: char.inventory.length,
     maxSlots: char.maxInventorySlots,
   });
+});
+
+// POST /characters/:id/pet/buy
+router.post("/characters/:id/pet/buy", loadCharacter, async (req, res) => {
+  const { petId } = req.body;
+  const char = req.character;
+  const pet = PETS.find((p) => p.id === petId);
+  if (!pet) return res.status(400).json({ error: "Invalid pet" });
+
+  let player = null;
+  if (pet.currency === "gold") {
+    if (char.gold < pet.cost)
+      return res.status(400).json({ error: "Not enough gold" });
+    char.gold -= pet.cost;
+  } else {
+    player = await Player.findOne({ username: char.owner });
+    if (!player) return res.status(404).json({ error: "Player not found" });
+    if (player.pie < pet.cost)
+      return res.status(400).json({ error: "Not enough Pie" });
+    player.pie -= pet.cost;
+  }
+
+  char.pet = { id: pet.id, expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) };
+  await char.save();
+  if (player) await player.save();
+
+  res.json({ pet: char.pet, gold: char.gold, pie: player ? player.pie : undefined });
 });
 
 // GET /characters/:id/shop

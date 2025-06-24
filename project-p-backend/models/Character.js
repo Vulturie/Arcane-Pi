@@ -62,6 +62,14 @@ const characterSchema = new mongoose.Schema({
   riskyQuestPool: { type: [mongoose.Schema.Types.Mixed], default: [] },
   // Items currently offered in the shop for this character
   shopPool: { type: [mongoose.Schema.Types.Mixed], default: [] },
+  // Currently active pet
+  pet: {
+    type: {
+      id: String,
+      expires: Date,
+    },
+    default: null,
+  },
   // Highest completed Tower level
   towerProgress: { type: Number, default: 0 },
   // Daily tower victory limit

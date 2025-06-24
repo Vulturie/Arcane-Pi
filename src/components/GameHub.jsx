@@ -199,6 +199,13 @@ function GameHub({ character, refreshCharacter, username }) {
             className="w-16 sm:w-20 cursor-pointer transition-transform hover:scale-105"
           />
         </Link>
+        <Link to="/spirit-grove">
+          <img
+            src="/assets/game_hub/spirit_grove_button.png"
+            alt="Spirit Grove"
+            className="w-16 sm:w-20 cursor-pointer transition-transform hover:scale-105"
+          />
+        </Link>
         <img
           src="/assets/game_hub/gate_icon.png"
           alt="Gate"
