@@ -85,7 +85,7 @@ function PieShop({ username }) {
           <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin" />
         </div>
       )}
-      <div className="absolute inset-0 flex flex-col items-center justify-center gap-6">
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 ml-[-90px]">
         {packages.map((pack) => (
           <div key={pack.amount} className="relative">
             <img
@@ -94,7 +94,7 @@ function PieShop({ username }) {
               className="w-40 cursor-pointer hover:scale-105 transition-transform"
               onClick={() => handleBuy(pack)}
             />
-            <div className="absolute top-24 right-[-50px] -translate-y-1/2 flex items-center gap-2 text-white">
+            <div className="absolute top-24 right-[-100px] -translate-y-1/2 flex items-center gap-2 text-white">
               <img src="/assets/pie_shop/pi_logo.png" alt="Pi" className="w-10" />
               <span>{calcPrice(pack.amount)}</span>
             </div>
