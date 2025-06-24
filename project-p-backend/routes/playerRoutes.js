@@ -4,6 +4,7 @@ const Player = require("../models/Player");
 const Character = require("../models/Character");
 const PiRevenueLog = require("../models/PiRevenueLog");
 const RevenueSnapshot = require("../models/RevenueSnapshot");
+const PlayerActivityLog = require("../models/PlayerActivityLog");
 const { generateEnemy } = require("../utils/enemyGenerator");
 const { getPlayerStats, simulateCombat } = require("../utils/combat");
 const ITEMS = require("../data/items");
@@ -42,14 +43,27 @@ router.get("/:username", async (req, res) => {
 
   try {
     let player = await Player.findOne({ username });
+    const now = new Date();
+    const today = now.toISOString().slice(0, 10);
 
     if (!player) {
       // Auto-create player if not found
-      player = await Player.create({ username });
+      player = await Player.create({
+        username,
+        loginLog: { lastLogin: now, logins: [now], uniqueDays: [today] },
+      });
+    } else {
+      if (!player.loginLog) player.loginLog = { logins: [], uniqueDays: [] };
+      player.loginLog.lastLogin = now;
+      player.loginLog.logins.push(now);
+      if (!player.loginLog.uniqueDays.includes(today)) {
+        player.loginLog.uniqueDays.push(today);
+      }
     }
 
+    await PlayerActivityLog.create({ username, loginAt: now, loginDate: today });
+
     // Energy regeneration
-    const now = new Date();
     const elapsed = (now - new Date(player.lastEnergyUpdate)) / 1000;
     const ENERGY_REGEN_INTERVAL = 10; // seconds per 1 energy
     const MAX_ENERGY = 100;
@@ -59,8 +73,8 @@ router.get("/:username", async (req, res) => {
       console.log(`⚡ Regenerating ${energyToAdd} energy for ${username}`);
       player.energy = Math.min(player.energy + energyToAdd, MAX_ENERGY);
       player.lastEnergyUpdate = new Date(now - (elapsed % ENERGY_REGEN_INTERVAL) * 1000);
-      await player.save();
     }
+    await player.save();
 
     res.json(player);
   } catch (err) {

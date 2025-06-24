@@ -3,6 +3,7 @@ const router = express.Router();
 const { StatsLog } = require('../utils/statsLogger');
 const Character = require('../models/Character');
 const CheatFlag = require('../models/CheatFlag');
+const PlayerActivityLog = require('../models/PlayerActivityLog');
 
 function auth(req, res, next) {
   if (req.query.token !== process.env.DEV_TOKEN) {
@@ -87,6 +88,28 @@ router.get('/ui-analytics', auth, async (req, res) => {
       { $sort: { count: -1 } },
     ]);
     res.json({ buttonCounts, views });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+router.get('/daily-active', auth, async (req, res) => {
+  const days = parseInt(req.query.days || '7', 10);
+  const from = new Date();
+  from.setUTCHours(0, 0, 0, 0);
+  from.setDate(from.getDate() - (days - 1));
+
+  try {
+    const stats = await PlayerActivityLog.aggregate([
+      { $match: { loginAt: { $gte: from } } },
+      { $group: { _id: { date: '$loginDate', user: '$username' } } },
+      { $group: { _id: '$_id.date', count: { $sum: 1 } } },
+      { $project: { _id: 0, date: '$_id', activePlayers: '$count' } },
+      { $sort: { date: 1 } },
+    ]);
+
+    res.json(stats);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server error' });

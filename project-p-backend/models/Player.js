@@ -16,6 +16,15 @@ const inventoryItemSchema = new mongoose.Schema(
   { _id: false }
 );
 
+const loginLogSchema = new mongoose.Schema(
+  {
+    lastLogin: Date,
+    logins: [Date],
+    uniqueDays: [String],
+  },
+  { _id: false }
+);
+
 const playerSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   level: { type: Number, default: 1 },
@@ -28,6 +37,8 @@ const playerSchema = new mongoose.Schema({
   lastEnergyUpdate: { type: Date, default: Date.now },
   // Maximum number of items that can be stored in the inventory
   maxInventorySlots: { type: Number, default: 10 },
+
+  loginLog: { type: loginLogSchema, default: { logins: [], uniqueDays: [] } },
 
 // Array of items in the player's inventory
   inventory: {
