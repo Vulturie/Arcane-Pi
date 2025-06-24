@@ -849,6 +849,18 @@ router.post("/characters/:id/shop/refresh", loadCharacter, async (req, res) => {
     const player = await Player.findOne({ username: char.owner });
     if (!player) return res.status(404).json({ error: "Player not found" });
 
+    const now = new Date();
+    const todayUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+    if (player.lastShopRefresh && player.lastShopRefresh >= todayUTC) {
+      if ((player.shopRefreshesToday || 0) >= 3) {
+        return res.status(400).json({ error: "You have reached today's refresh limit." });
+      }
+      player.shopRefreshesToday = (player.shopRefreshesToday || 0) + 1;
+    } else {
+      player.shopRefreshesToday = 1;
+      player.lastShopRefresh = now;
+    }
+
     if (player.pie < 10) return res.status(400).json({ error: "Not enough Pie" });
 
     player.pie -= 10;

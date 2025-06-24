@@ -40,6 +40,9 @@ const playerSchema = new mongoose.Schema({
 
   loginLog: { type: loginLogSchema, default: { logins: [], uniqueDays: [] } },
 
+  shopRefreshesToday: { type: Number, default: 0 },
+  lastShopRefresh: { type: Date },
+
 // Array of items in the player's inventory
   inventory: {
     type: [inventoryItemSchema],
