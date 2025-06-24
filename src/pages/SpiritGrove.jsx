@@ -72,29 +72,37 @@ function SpiritGrove({ character, refreshCharacter }) {
         </div>
       </div>
 
-      <div className="absolute bottom-20 left-1/2 -translate-x-1/2 flex gap-10">
-        {PETS.map((p) => (
+      {PETS.map((p) => {
+        const positions = {
+          dustpaw:
+            "absolute left-4 bottom-[25%] sm:left-32 sm:bottom-10 hover:scale-105",
+          emberfang:
+            "absolute left-[40%] bottom-[50%] sm:bottom-28 hover:scale-105",
+          auraflare:
+            "absolute right-8 top-[20%] sm:right-16 sm:top-12 hover:scale-105",
+        };
+        return (
           <img
             key={p.id}
             src={`/assets/spirit_grove/${p.id}.png`}
             alt={p.name}
-            className="w-24 sm:w-32 cursor-pointer hover:scale-105 transition-transform"
+            className={`w-24 sm:w-32 cursor-pointer transition-transform ${positions[p.id]}`}
             onClick={() => setSelected(p)}
           />
-        ))}
-      </div>
+        );
+      })}
 
       {selected && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40"
           onClick={closeModal}
         >
-          <div className="relative w-[330px] h-[560px]" onClick={(e) => e.stopPropagation()}>
+          <div className="relative w-[430px] h-[660px]" onClick={(e) => e.stopPropagation()}>
             <img src="/assets/spirit_grove/spirit_grove_window.png" alt="Window" className="w-full h-full" />
             <img
               src="/assets/spirit_grove/exit_button.png"
               alt="Close"
-              className="absolute top-4 right-4 w-8 h-8 cursor-pointer"
+              className="absolute top-4 right-4 w-8 h-8 cursor-pointer z-10"
               onClick={closeModal}
             />
             <div className="absolute inset-0 flex flex-col items-center text-white p-4 pt-16">
@@ -116,7 +124,14 @@ function SpiritGrove({ character, refreshCharacter }) {
               </div>
               <p className="text-center text-sm mt-2 px-2 flex-1 overflow-y-auto">{selected.flavor}</p>
               <div className="flex flex-col items-center mt-auto mb-2">
-                <span className="text-lg mb-1">{`${selected.cost} ${selected.currency === 'gold' ? 'Gold' : 'Pie'}`}</span>
+                <div className="flex items-center justify-center gap-1 mb-1">
+                  <img
+                    src={`/assets/spirit_grove/${selected.currency}_icon.png`}
+                    alt={selected.currency}
+                    className="w-6"
+                  />
+                  <span className="text-lg">{selected.cost}</span>
+                </div>
                 <img
                   src="/assets/spirit_grove/buy_button.png"
                   alt="Buy"

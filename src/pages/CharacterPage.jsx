@@ -151,26 +151,11 @@ function CharacterPage({ character, onDelete, onSwitch }) {
           {`${character.xp} / ${nextXp} XP`}
         </div>
       </div>
-      {character.pet && (
-        (() => {
-          const info = PETS.find((p) => p.id === character.pet.id);
-          return (
-            <div className="mt-4 flex flex-col items-center gap-1 text-white drop-shadow-md">
-              <img src={`/assets/spirit_grove/${character.pet.id}.png`} alt="Pet" className="w-16" />
-              <span className="text-outline text-sm capitalize">{info?.name || character.pet.id}</span>
-              {info && (
-                <span className="text-xs text-center">
-                  +{info.boosts.gold * 100}% Gold / +{info.boosts.xp * 100}% XP
-                </span>
-              )}
-            </div>
-          );
-        })()
-      )}
-      <div
-        className="w-full max-w-[320px] h-[180px] bg-no-repeat bg-contain mt-8 mx-auto relative"
-        style={{ backgroundImage: "url(/assets/character/stats_table.png)" }}
-      >
+      <div className="mt-8 flex flex-col sm:flex-row justify-center items-start gap-4 w-full">
+        <div
+          className="w-full max-w-[320px] h-[180px] bg-no-repeat bg-contain mx-auto relative"
+          style={{ backgroundImage: "url(/assets/character/stats_table.png)" }}
+        >
           <div className="absolute w-[35%] left-[30px] flex justify-between items-center px-2 text-lg font-bold text-white drop-shadow-md top-[26px]">
             <span>STR</span>
             <span className="text-yellow-300 min-w-[30px] text-right">
@@ -196,7 +181,22 @@ function CharacterPage({ character, onDelete, onSwitch }) {
             </span>
           </div>
         </div>
-        <div className="mt-auto flex flex-row items-center justify-center gap-3">
+        {character.pet && (() => {
+          const info = PETS.find((p) => p.id === character.pet.id);
+          return (
+            <div className="flex flex-col items-center gap-1 text-white drop-shadow-md mx-auto sm:mx-0">
+              <img src={`/assets/spirit_grove/${character.pet.id}.png`} alt="Pet" className="w-16" />
+              <span className="text-outline text-sm capitalize">{info?.name || character.pet.id}</span>
+              {info && (
+                <span className="text-xs text-center">
+                  +{info.boosts.gold * 100}% Gold / +{info.boosts.xp * 100}% XP
+                </span>
+              )}
+            </div>
+          );
+        })()}
+      </div>
+      <div className="mt-auto flex flex-row items-center justify-center gap-3">
           <img
             src="/assets/character/switch_character_button.png"
             alt="Switch"
