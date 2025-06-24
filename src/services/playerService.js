@@ -389,11 +389,11 @@ export const getPlayer = async (username) => {
   return data;
 };
 
-export const addPie = async (username, amount) => {
+export const addPie = async (username, amount, piAmount, buyOption, txId) => {
   const res = await fetch(`${API_BASE_URL}/player/${username}/pie/add`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ amount }),
+    body: JSON.stringify({ amount, piAmount, buyOption, tx_id: txId }),
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Failed to add pie");

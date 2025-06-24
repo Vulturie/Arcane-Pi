@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const Player = require("../models/Player");
 const Character = require("../models/Character");
+const PiRevenueLog = require("../models/PiRevenueLog");
+const RevenueSnapshot = require("../models/RevenueSnapshot");
 const { generateEnemy } = require("../utils/enemyGenerator");
 const { getPlayerStats, simulateCombat } = require("../utils/combat");
 const ITEMS = require("../data/items");
@@ -554,14 +556,58 @@ router.post("/:username/unequip", async (req, res) => {
 // POST /player/:username/pie/add
 router.post("/:username/pie/add", async (req, res) => {
   const { username } = req.params;
-  const { amount } = req.body;
+  const { amount, piAmount, buyOption, tx_id } = req.body;
+
   try {
     const player = await Player.findOneAndUpdate(
       { username },
       { $inc: { pie: amount } },
       { new: true }
     );
+
     if (!player) return res.status(404).json({ error: "Player not found" });
+
+    if (piAmount) {
+      try {
+        await PiRevenueLog.create({
+          username,
+          amount: piAmount,
+          timestamp: new Date(),
+          buyOption,
+          tx_id,
+        });
+
+        const cycle = new Date().toISOString().slice(0, 7);
+        const existing = await RevenueSnapshot.findOne({ cycle });
+        const updateBreakdown = (total) => ({
+          player_rewards: total * 0.35,
+          development: total * 0.30,
+          creator: total * 0.20,
+          marketing: total * 0.10,
+          ecosystem_reserve: total * 0.05,
+        });
+
+        if (existing) {
+          const totalPi = existing.totalPi + piAmount;
+          existing.totalPi = totalPi;
+          existing.breakdown = updateBreakdown(totalPi);
+          existing.status = "ready";
+          await existing.save();
+        } else {
+          const totalPi = piAmount;
+          await RevenueSnapshot.create({
+            cycle,
+            totalPi,
+            breakdown: updateBreakdown(totalPi),
+            status: "ready",
+            createdAt: new Date(),
+          });
+        }
+      } catch (logErr) {
+        console.error("Failed to log Pi revenue", logErr);
+      }
+    }
+
     res.json({ pie: player.pie });
   } catch (err) {
     console.error(err);

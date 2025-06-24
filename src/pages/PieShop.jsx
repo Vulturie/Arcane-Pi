@@ -58,7 +58,13 @@ function PieShop({ username }) {
     setNotificationMessage(`You purchased ${pack.amount} Pie for ${pi.toFixed(4)} \u03C0`);
     setShowNotification(true);
     try {
-      await addPie(username, pack.amount);
+      await addPie(
+        username,
+        pack.amount,
+        pi,
+        `Buy ${pack.amount}`,
+        null
+      );
       loadPlayer();
     } catch (err) {
       console.error(err);
