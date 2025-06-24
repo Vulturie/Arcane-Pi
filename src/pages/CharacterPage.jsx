@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  getStatsForClass,
   deleteCharacter,
   getXpForNextLevel,
 } from "../services/playerService";
@@ -30,7 +29,6 @@ function CharacterPage({ character, onDelete, onSwitch }) {
 
   if (!character) return null;
 
-  const stats = getStatsForClass(character.class, character.level);
   const portrait = `/assets/character_creation/${character.class.toLowerCase()}_${character.gender}.png`;
   const classIcon = `/assets/character_creation/${character.class.toLowerCase()}_button.png`;
   const nextXp = getXpForNextLevel(character.level);
@@ -152,35 +150,6 @@ function CharacterPage({ character, onDelete, onSwitch }) {
         </div>
       </div>
       <div className="mt-8 flex flex-col sm:flex-row justify-center items-start gap-4 w-full">
-        <div
-          className="w-full max-w-[320px] h-[180px] bg-no-repeat bg-contain mx-auto relative"
-          style={{ backgroundImage: "url(/assets/character/stats_table.png)" }}
-        >
-          <div className="absolute w-[35%] left-[30px] flex justify-between items-center px-2 text-lg font-bold text-white drop-shadow-md top-[26px]">
-            <span>STR</span>
-            <span className="text-yellow-300 min-w-[30px] text-right">
-              {stats.STR}
-            </span>
-          </div>
-          <div className="absolute w-[35%] left-[30px] flex justify-between items-center px-2 text-lg font-bold text-white drop-shadow-md top-[60px]">
-            <span>AGI</span>
-            <span className="text-yellow-300 min-w-[30px] text-right">
-              {stats.AGI}
-            </span>
-          </div>
-          <div className="absolute w-[35%] left-[30px] flex justify-between items-center px-2 text-lg font-bold text-white drop-shadow-md top-[96px]">
-            <span>INT</span>
-            <span className="text-yellow-300 min-w-[30px] text-right">
-              {stats.INT}
-            </span>
-          </div>
-          <div className="absolute w-[35%] left-[30px] flex justify-between items-center px-2 text-lg font-bold text-white drop-shadow-md top-[128px]">
-            <span>VIT</span>
-            <span className="text-yellow-300 min-w-[30px] text-right">
-              {stats.VIT}
-            </span>
-          </div>
-        </div>
         {character.pet && (() => {
           const info = PETS.find((p) => p.id === character.pet.id);
           return (
