@@ -10,7 +10,7 @@ function getBackground() {
     : "/assets/game_hub/hub_night_background.png";
 }
 
-function GameHub({ character, refreshCharacter, username }) {
+function GameHub({ character, refreshCharacter, username, accessToken }) {
   const [background, setBackground] = useState(getBackground());
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [pie, setPie] = useState(0);
@@ -32,7 +32,7 @@ function GameHub({ character, refreshCharacter, username }) {
   useEffect(() => {
     const loadPlayer = async () => {
       try {
-        const data = await getPlayer(username);
+        const data = await getPlayer(username, accessToken);
         setPie(data.pie);
       } catch (err) {
         console.error("Failed to load player");
@@ -43,7 +43,7 @@ function GameHub({ character, refreshCharacter, username }) {
       if (document.visibilityState === 'visible') loadPlayer();
     }, 10000);
     return () => clearInterval(interval);
-  }, [username]);
+  }, [username, accessToken]);
 
   if (!character) return null;
 

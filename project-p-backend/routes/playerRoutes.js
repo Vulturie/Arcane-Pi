@@ -589,12 +589,18 @@ router.post("/:username/pie/add", async (req, res) => {
 
     if (piAmount) {
       try {
+        const existingTx = tx_id ? await PiRevenueLog.findOne({ tx_id }) : null;
+        if (existingTx) {
+          return res.status(400).json({ error: 'Transaction already processed' });
+        }
         await PiRevenueLog.create({
           username,
           amount: piAmount,
           timestamp: new Date(),
           buyOption,
           tx_id,
+          payment_id: req.body.payment_id,
+          metadata: req.body.metadata,
         });
 
         const cycle = new Date().toISOString().slice(0, 7);

@@ -11,7 +11,7 @@ import logStat from "../utils/logStat";
 import { RARITY_MULTIPLIER, getRarityLabel } from "../rarity";
 import NotificationModal from "../components/NotificationModal";
 
-function Shop({ character, refreshCharacter }) {
+function Shop({ character, refreshCharacter, username, accessToken }) {
   const [preview, setPreview] = useState(null);
   const [shopItems, setShopItems] = useState([]);
   const [equipped, setEquipped] = useState({});
@@ -37,7 +37,7 @@ function Shop({ character, refreshCharacter }) {
     } catch (err) {
       console.error("Failed to load equipment", err);
     }
-  }, [character]);
+  }, [character, username, accessToken]);
 
   useEffect(() => {
     refreshCharacter();
@@ -65,7 +65,7 @@ function Shop({ character, refreshCharacter }) {
     const loadPie = async () => {
       if (!character) return;
       try {
-        const data = await getPlayer(character.owner);
+        const data = await getPlayer(username, accessToken);
         setPie(data.pie);
       } catch (err) {
         console.error("Failed to load pie", err);

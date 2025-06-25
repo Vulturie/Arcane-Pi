@@ -11,6 +11,8 @@ const arenaRoutes = require("./routes/arenaRoutes");
 const devStatsRoutes = require("./routes/devStats");
 const logRoutes = require("./routes/logRoutes");
 const piPriceRoutes = require("./routes/piPriceRoutes");
+const piPaymentRoutes = require("./routes/piPaymentRoutes");
+const authRoutes = require("./routes/authRoutes");
 const PiPrice = require("./models/PiPrice");
 const { fetchPiPriceUSD } = require("./services/piPriceService");
 
@@ -40,6 +42,7 @@ app.get("/", (req, res) => {
 });
 
 const PORT = process.env.PORT || 4000;
+app.use("/auth", authRoutes);
 app.use("/player", playerRoutes);
 app.use("/api", characterRoutes);
 app.use("/items", itemRoutes);
@@ -47,6 +50,7 @@ app.use("/arena", arenaRoutes);
 app.use("/dev", devStatsRoutes);
 app.use("/api", logRoutes);
 app.use("/api", piPriceRoutes);
+app.use("/api/pi", piPaymentRoutes);
 
 async function updatePiPrice() {
   try {

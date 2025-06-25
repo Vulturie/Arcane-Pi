@@ -1,9 +1,11 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { getPiPrice, addPie, getPlayer } from "../services/playerService";
+import { getPiPrice, getPlayer } from "../services/playerService";
+import Pi from "../piSdk";
+import { API_BASE_URL } from "../config";
 import NotificationModal from "../components/NotificationModal";
 
-function PieShop({ username }) {
+function PieShop({ username, accessToken }) {
   const navigate = useNavigate();
   const [priceUSD, setPriceUSD] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -13,12 +15,12 @@ function PieShop({ username }) {
 
   const loadPlayer = useCallback(async () => {
     try {
-      const data = await getPlayer(username);
+      const data = await getPlayer(username, accessToken);
       setPie(data.pie);
     } catch (err) {
       console.error("Failed to load player", err);
     }
-  }, [username]);
+  }, [username, accessToken]);
 
   const fetchPrice = useCallback(async () => {
     setLoading(true);
@@ -51,24 +53,46 @@ function PieShop({ username }) {
     return pi.toFixed(4);
   };
 
-  const handleBuy = async (pack) => {
-    if (!priceUSD) return;
+  const handleBuy = (pack) => {
+    if (!priceUSD || !window.Pi || !window.Pi.createPayment) return;
     const totalUSD = pack.amount / 100;
-    const pi = totalUSD / priceUSD;
-    setNotificationMessage(`You purchased ${pack.amount} Pie for ${pi.toFixed(4)} \u03C0`);
-    setShowNotification(true);
-    try {
-      await addPie(
-        username,
-        pack.amount,
-        pi,
-        `Buy ${pack.amount}`,
-        null
-      );
-      loadPlayer();
-    } catch (err) {
-      console.error(err);
-    }
+    const piAmount = parseFloat((totalUSD / priceUSD).toFixed(4));
+    Pi.createPayment(
+      {
+        amount: piAmount,
+        memo: `Buy ${pack.amount} Pie`,
+        metadata: { type: "buy_pie", amount: pack.amount },
+      },
+      {
+        onReadyForServerApproval: async (paymentId) => {
+          await fetch(`${API_BASE_URL}/api/pi/approve`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
+            body: JSON.stringify({ paymentId }),
+          });
+        },
+        onReadyForServerCompletion: async (paymentId, txid) => {
+          const res = await fetch(`${API_BASE_URL}/api/pi/complete`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
+            body: JSON.stringify({ paymentId, txid, username, metadata: { type: "buy_pie", amount: pack.amount } }),
+          });
+          if (res.ok) {
+            setNotificationMessage(`You purchased ${pack.amount} Pie`);
+            setShowNotification(true);
+            loadPlayer();
+          } else {
+            console.error("Payment completion failed");
+          }
+        },
+        onCancel: (paymentId) => {
+          console.log("Payment cancelled", paymentId);
+        },
+        onError: (error) => {
+          console.error("Payment error", error);
+        },
+      }
+    );
   };
 
   return (

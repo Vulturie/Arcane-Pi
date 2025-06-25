@@ -12,7 +12,7 @@ import {
 import NotificationModal from "../components/NotificationModal";
 import ConfirmationModal from "../components/ConfirmationModal";
 
-function Tavern({ character, refreshCharacter, spendEnergy }) {
+function Tavern({ character, refreshCharacter, spendEnergy, username, accessToken }) {
   const navigate = useNavigate();
 
   const [activeQuest, setActiveQuest] = useState(null);
@@ -201,7 +201,7 @@ function Tavern({ character, refreshCharacter, spendEnergy }) {
   useEffect(() => {
     const loadPie = async () => {
       try {
-        const data = await getPlayer(character.owner);
+        const data = await getPlayer(username, accessToken);
         setPie(data.pie);
       } catch (err) {
         console.error("Failed to load pie", err);
@@ -212,7 +212,7 @@ function Tavern({ character, refreshCharacter, spendEnergy }) {
       if (document.visibilityState === 'visible') loadPie();
     }, 10000);
     return () => clearInterval(pInterval);
-  }, [character.owner]);
+  }, [username, accessToken]);
 
   useEffect(() => {
     if (!activeQuest) return;

@@ -402,17 +402,22 @@ export const challengeArenaOpponent = async (id, opponentId) => {
   return data;
 };
 
-export const getPlayer = async (username, opts = {}) => {
+export const getPlayer = async (username, accessToken, opts = {}) => {
   const key = `player_${username}`;
   if (opts.forceRefresh) invalidateCache(key);
-  return fetchWithCache(key, `${API_BASE_URL}/player/${username}`, undefined, 5000);
+  return fetchWithCache(
+    key,
+    `${API_BASE_URL}/player/${username}`,
+    { headers: { Authorization: `Bearer ${accessToken}` } },
+    5000
+  );
 };
 
-export const addPie = async (username, amount, piAmount, buyOption, txId) => {
+export const addPie = async (username, amount, piAmount, buyOption, txId, paymentId, accessToken) => {
   const res = await fetch(`${API_BASE_URL}/player/${username}/pie/add`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ amount, piAmount, buyOption, tx_id: txId }),
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify({ amount, piAmount, buyOption, tx_id: txId, payment_id: paymentId, metadata: { type: buyOption, amount } }),
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Failed to add pie");

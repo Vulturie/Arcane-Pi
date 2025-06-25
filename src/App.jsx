@@ -108,7 +108,7 @@ function App() {
       <Routes>
         <Route
           path="/tavern"
-          element={<Tavern character={activeChar} refreshCharacter={refreshActiveCharacter} spendEnergy={spendEnergy} />}
+          element={<Tavern character={activeChar} refreshCharacter={refreshActiveCharacter} spendEnergy={spendEnergy} username={username} accessToken={accessToken} />}
         />
         <Route
           path="/character"
@@ -134,7 +134,7 @@ function App() {
         />
         <Route
           path="/shop"
-          element={<Shop character={activeChar} refreshCharacter={refreshActiveCharacter} />}
+          element={<Shop character={activeChar} refreshCharacter={refreshActiveCharacter} username={username} accessToken={accessToken} />}
         />
         <Route
           path="/arena"
@@ -150,10 +150,10 @@ function App() {
         />
         <Route
           path="/spirit-grove"
-          element={<SpiritGrove character={activeChar} refreshCharacter={refreshActiveCharacter} />}
+          element={<SpiritGrove character={activeChar} refreshCharacter={refreshActiveCharacter} username={username} accessToken={accessToken} />}
         />
         <Route path="/settings" element={<SettingsPage />} />
-        <Route path="/pie-shop" element={<PieShop username={username} />} />
+        <Route path="/pie-shop" element={<PieShop username={username} accessToken={accessToken} />} />
         <Route
           path="/character-select"
           element={
@@ -169,7 +169,7 @@ function App() {
         />
         <Route
           path="/"
-          element={<GameHub character={activeChar} refreshCharacter={refreshActiveCharacter} username={username} />}
+          element={<GameHub character={activeChar} refreshCharacter={refreshActiveCharacter} username={username} accessToken={accessToken} />}
         />
         <Route path="/dev/dashboard" element={<DevDashboard />} />
       </Routes>

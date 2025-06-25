@@ -22,4 +22,10 @@
   "display": "standalone",
   "theme_color": "#000000",
   "background_color": "#ffffff"
+  ,"protocol_handlers": [
+  {
+    "protocol": "pi",
+    "url": "https://arcane-pi.onrender.com/%s"
+  }
+]
 }

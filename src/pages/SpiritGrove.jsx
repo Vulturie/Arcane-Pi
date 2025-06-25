@@ -5,7 +5,7 @@ import PETS from "../petData";
 import ConfirmationModal from "../components/ConfirmationModal";
 import NotificationModal from "../components/NotificationModal";
 
-function SpiritGrove({ character, refreshCharacter }) {
+function SpiritGrove({ character, refreshCharacter, username, accessToken }) {
   const navigate = useNavigate();
   const [pie, setPie] = useState(0);
   const [selected, setSelected] = useState(null);
@@ -16,14 +16,14 @@ function SpiritGrove({ character, refreshCharacter }) {
   useEffect(() => {
     const loadPie = async () => {
       try {
-        const data = await getPlayer(character.owner);
+        const data = await getPlayer(username, accessToken);
         setPie(data.pie);
       } catch (err) {
         console.error("Failed to load pie", err);
       }
     };
     if (character) loadPie();
-  }, [character]);
+  }, [character, username, accessToken]);
 
   const closeModal = () => setSelected(null);
 
