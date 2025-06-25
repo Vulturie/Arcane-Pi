@@ -11,6 +11,7 @@ const { XP_GAIN_MULTIPLIER, GOLD_SCALING } = require("../utils/balanceConfig");
 const { getRewardForLevel, getEnemyForLevel } = require("../data/tower");
 const { logStat } = require("../utils/statsLogger");
 const { flagCheat } = require("../utils/cheatDetector");
+const { logPieSpend } = require("../utils/pieSpendingLogger");
 const {
   getRarityByPlayerLevel,
   calculateRarityDistribution,
@@ -342,6 +343,7 @@ router.post("/characters/:id/tavern/buyEnergy", loadCharacter, async (req, res) 
       playerId: char._id,
       pieSpent: COST,
     });
+    await logPieSpend(char.owner, COST, "buy_energy");
 
     res.json({ energy: char.energy, pie: player.pie });
   } catch (err) {
@@ -690,6 +692,7 @@ router.post("/characters/:id/tavern/skip", loadCharacter, async (req, res) => {
       playerId: char._id,
       pieSpent: 10,
     });
+    await logPieSpend(char.owner, 10, "skip_quest");
 
     res.json({ character: char, questResult: char.pendingQuestResult, pie: player.pie });
   } catch (err) {
@@ -821,6 +824,9 @@ router.post("/characters/:id/pet/buy", loadCharacter, async (req, res) => {
   char.pet = { id: pet.id, expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) };
   await char.save();
   if (player) await player.save();
+  if (player) {
+    await logPieSpend(char.owner, pet.cost, "buy_pet");
+  }
 
   res.json({ pet: char.pet, gold: char.gold, pie: player ? player.pie : undefined });
 });
@@ -873,6 +879,7 @@ router.post("/characters/:id/shop/refresh", loadCharacter, async (req, res) => {
       playerId: char._id,
       pieSpent: 10,
     });
+    await logPieSpend(char.owner, 10, "refresh_shop");
 
     res.json({
       shopPool: char.shopPool,
@@ -1051,6 +1058,7 @@ router.post("/characters/:id/tower/addWins", loadCharacter, async (req, res) => 
       playerId: char._id,
       pieSpent: 10,
     });
+    await logPieSpend(char.owner, 10, "buy_tower_wins");
 
     return res.json({
       victoriesRemaining: 10 + char.extraTowerWins - char.dailyTowerVictories,

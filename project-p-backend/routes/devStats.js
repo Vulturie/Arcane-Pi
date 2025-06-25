@@ -4,6 +4,7 @@ const { StatsLog } = require('../utils/statsLogger');
 const Character = require('../models/Character');
 const CheatFlag = require('../models/CheatFlag');
 const PlayerActivityLog = require('../models/PlayerActivityLog');
+const PieSpendingLog = require('../models/PieSpendingLog');
 
 function auth(req, res, next) {
   if (req.query.token !== process.env.DEV_TOKEN) {
@@ -110,6 +111,24 @@ router.get('/daily-active', auth, async (req, res) => {
     ]);
 
     res.json(stats);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+router.get('/pie-spending', auth, async (req, res) => {
+  const { username, from, to } = req.query;
+  const filter = {};
+  if (username) filter.username = username;
+  if (from || to) {
+    filter.timestamp = {};
+    if (from) filter.timestamp.$gte = new Date(from);
+    if (to) filter.timestamp.$lte = new Date(to);
+  }
+  try {
+    const logs = await PieSpendingLog.find(filter).sort({ timestamp: -1 }).lean();
+    res.json(logs);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server error' });

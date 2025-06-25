@@ -5,6 +5,7 @@ const Character = require("../models/Character");
 const PiRevenueLog = require("../models/PiRevenueLog");
 const RevenueSnapshot = require("../models/RevenueSnapshot");
 const PlayerActivityLog = require("../models/PlayerActivityLog");
+const { validatePieBalance } = require("../utils/pieSpendingLogger");
 const { generateEnemy } = require("../utils/enemyGenerator");
 const { getPlayerStats, simulateCombat } = require("../utils/combat");
 const ITEMS = require("../data/items");
@@ -627,6 +628,7 @@ router.post("/:username/pie/add", async (req, res) => {
       }
     }
 
+    await validatePieBalance(username);
     res.json({ pie: player.pie });
   } catch (err) {
     console.error(err);
