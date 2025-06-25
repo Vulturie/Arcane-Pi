@@ -1,4 +1,5 @@
 import { API_BASE_URL } from "../config";
+import { fetchWithCache, invalidateCache } from "./cache";
 export const getXpForNextLevel = (level) => {
   return 100 + (level - 1) * 50;
 };
@@ -47,11 +48,15 @@ export const createCharacter = async (owner, name, className, gender) => {
     return data;
   };
 
-export const getCharacter = async (id) => {
-  const res = await fetch(`${API_BASE_URL}/api/characters/${id}`);
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || "Failed to load character");
-  return data;
+export const getCharacter = async (id, opts = {}) => {
+  const key = `character_${id}`;
+  if (opts.forceRefresh) invalidateCache(key);
+  return fetchWithCache(
+    key,
+    `${API_BASE_URL}/api/characters/${id}`,
+    undefined,
+    5000,
+  );
 };
 
 export const rewardPlayer = async (id, reward) => {
@@ -65,6 +70,7 @@ export const rewardPlayer = async (id, reward) => {
 
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Failed to complete quest");
+  invalidateCache(`character_${id}`);
   return data;
 };
 
@@ -79,6 +85,7 @@ export const updateEnergy = async (id, newEnergy) => {
 
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Failed to update energy");
+  invalidateCache(`character_${id}`);
   return data;
 };
 
@@ -88,15 +95,19 @@ export const buyEnergy = async (id) => {
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Failed to buy energy");
+  invalidateCache(`character_${id}`);
   return data;
 };
 
-export const getQuestStatus = async (id) => {
-  const res = await fetch(`${API_BASE_URL}/api/characters/${id}/quest/status`);
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || "Failed to get quest status");
-  return data;
-
+export const getQuestStatus = async (id, opts = {}) => {
+  const key = `quest_status_${id}`;
+  if (opts.forceRefresh) invalidateCache(key);
+  return fetchWithCache(
+    key,
+    `${API_BASE_URL}/api/characters/${id}/quest/status`,
+    undefined,
+    3000,
+  );
 };
 
 export const cancelQuest = async (id) => {
@@ -105,6 +116,8 @@ export const cancelQuest = async (id) => {
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Failed to cancel quest");
+  invalidateCache(`character_${id}`);
+  invalidateCache(`quest_status_${id}`);
   return data;
 };
 
@@ -114,6 +127,8 @@ export const skipQuest = async (id) => {
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Failed to skip quest");
+  invalidateCache(`character_${id}`);
+  invalidateCache(`quest_status_${id}`);
   return data;
 };
 
@@ -123,6 +138,8 @@ export const acknowledgeQuestResult = async (id) => {
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Failed to acknowledge quest result");
+  invalidateCache(`character_${id}`);
+  invalidateCache(`quest_status_${id}`);
   return data;
 };
 
@@ -134,6 +151,7 @@ export const setPlayerClass = async (id, className) => {
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Failed to set class");
+  invalidateCache(`character_${id}`);
   return data;
 };
 
@@ -145,6 +163,7 @@ export const setAccountClass = async (username, className) => {
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Failed to set class");
+  invalidateCache(`player_${username}`);
   return data;
 };
 
@@ -154,6 +173,7 @@ export const deleteCharacter = async (id) => {
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Failed to delete player");
+  invalidateCache(`character_${id}`);
   return data;
  };
 
@@ -382,11 +402,10 @@ export const challengeArenaOpponent = async (id, opponentId) => {
   return data;
 };
 
-export const getPlayer = async (username) => {
-  const res = await fetch(`${API_BASE_URL}/player/${username}`);
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || "Failed to load player");
-  return data;
+export const getPlayer = async (username, opts = {}) => {
+  const key = `player_${username}`;
+  if (opts.forceRefresh) invalidateCache(key);
+  return fetchWithCache(key, `${API_BASE_URL}/player/${username}`, undefined, 5000);
 };
 
 export const addPie = async (username, amount, piAmount, buyOption, txId) => {
@@ -397,6 +416,7 @@ export const addPie = async (username, amount, piAmount, buyOption, txId) => {
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Failed to add pie");
+  invalidateCache(`player_${username}`);
   return data;
 };
 

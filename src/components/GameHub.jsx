@@ -18,7 +18,11 @@ function GameHub({ character, refreshCharacter, username }) {
 
   useEffect(() => {
     const bgInterval = setInterval(() => setBackground(getBackground()), 60000);
-    const refreshInterval = setInterval(() => refreshCharacter(), 5000);
+    const refreshInterval = setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        refreshCharacter();
+      }
+    }, 10000);
     return () => {
       clearInterval(bgInterval);
       clearInterval(refreshInterval);
@@ -35,7 +39,9 @@ function GameHub({ character, refreshCharacter, username }) {
       }
     };
     loadPlayer();
-    const interval = setInterval(loadPlayer, 5000);
+    const interval = setInterval(() => {
+      if (document.visibilityState === 'visible') loadPlayer();
+    }, 10000);
     return () => clearInterval(interval);
   }, [username]);
 

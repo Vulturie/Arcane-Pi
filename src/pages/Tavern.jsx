@@ -183,7 +183,9 @@ function Tavern({ character, refreshCharacter, spendEnergy }) {
 
   useEffect(() => {
     checkQuestStatus();
-    const interval = setInterval(checkQuestStatus, 3000);
+    const interval = setInterval(() => {
+      if (document.visibilityState === 'visible') checkQuestStatus();
+    }, 5000);
     return () => clearInterval(interval);
   }, [character._id, checkQuestStatus]);
 
@@ -191,8 +193,8 @@ function Tavern({ character, refreshCharacter, spendEnergy }) {
   useEffect(() => {
     refreshCharacter();
     const interval = setInterval(() => {
-      refreshCharacter();
-    }, 5000); // match GameHub refresh rate
+      if (document.visibilityState === 'visible') refreshCharacter();
+    }, 10000); // match GameHub refresh rate
     return () => clearInterval(interval);
   }, [refreshCharacter]);
 
@@ -206,7 +208,9 @@ function Tavern({ character, refreshCharacter, spendEnergy }) {
       }
     };
     loadPie();
-    const pInterval = setInterval(loadPie, 5000);
+    const pInterval = setInterval(() => {
+      if (document.visibilityState === 'visible') loadPie();
+    }, 10000);
     return () => clearInterval(pInterval);
   }, [character.owner]);
 
