@@ -22,7 +22,7 @@ import SettingsPage from "./pages/SettingsPage";
 import LoadingScreenWrapper from "./components/LoadingScreenWrapper";
 
 function App() {
-  const { user } = useContext(UserContext);
+  const { user, accessToken } = useContext(UserContext);
   const username = user?.username || "";
 
   const [isInitializing, setIsInitializing] = useState(false);
