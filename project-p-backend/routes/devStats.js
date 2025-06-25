@@ -5,6 +5,7 @@ const Character = require('../models/Character');
 const CheatFlag = require('../models/CheatFlag');
 const PlayerActivityLog = require('../models/PlayerActivityLog');
 const PieSpendingLog = require('../models/PieSpendingLog');
+const backendVersion = require('../package.json').version;
 
 function auth(req, res, next) {
   if (req.query.token !== process.env.DEV_TOKEN) {
@@ -58,7 +59,7 @@ router.get('/dashboard', auth, async (req, res) => {
       { $project: { _id: 0, level: '$_id', avgXp: 1, avgGold: 1 } },
     ]);
 
-    res.json({ topQuests, failedEnemies, classWinRates, rewardInflation });
+    res.json({ topQuests, failedEnemies, classWinRates, rewardInflation, version: backendVersion });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server error' });

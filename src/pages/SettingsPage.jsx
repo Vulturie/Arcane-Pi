@@ -68,6 +68,10 @@ function SettingsPage() {
         </button>
       </div>
 
+      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-xs opacity-70">
+        App Version: {process.env.REACT_APP_VERSION}
+      </div>
+
       <ConfirmationModal
         message="Are you sure you want to clear the asset cache? This will reload app assets and may cause a refresh."
         visible={confirmClear}

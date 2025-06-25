@@ -13,6 +13,7 @@ const logRoutes = require("./routes/logRoutes");
 const piPriceRoutes = require("./routes/piPriceRoutes");
 const piPaymentRoutes = require("./routes/piPaymentRoutes");
 const authRoutes = require("./routes/authRoutes");
+const versionRoutes = require("./routes/version");
 const PiPrice = require("./models/PiPrice");
 const { fetchPiPriceUSD } = require("./services/piPriceService");
 
@@ -50,6 +51,7 @@ app.use("/arena", arenaRoutes);
 app.use("/dev", devStatsRoutes);
 app.use("/api", logRoutes);
 app.use("/api", piPriceRoutes);
+app.use("/api", versionRoutes);
 app.use("/api/pi", piPaymentRoutes);
 
 async function updatePiPrice() {
