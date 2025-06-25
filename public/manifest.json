@@ -25,7 +25,7 @@
   ,"protocol_handlers": [
   {
     "protocol": "pi",
-    "url": "https://arcane-pi.onrender.com/%s"
+    "url": "https://arcanepi.com/%s"
   }
 ]
 }
