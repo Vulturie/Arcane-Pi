@@ -31,7 +31,7 @@ function SettingsPage() {
       <img
         src="/assets/settings/back_button.png"
         alt="Back"
-        className="absolute top-4 right-4 w-10 h-10 cursor-pointer"
+        className="absolute top-4 left-4 w-20 h-10 cursor-pointer"
         onClick={() => navigate("/")}
       />
       <img
