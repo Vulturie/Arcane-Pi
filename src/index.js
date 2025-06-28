@@ -10,7 +10,6 @@ import Pi from './piSdk';
 if (Pi && Pi.init) {
   Pi.init({
     version: "2.0",
-    sandbox: process.env.NODE_ENV !== 'production',
   });
 }
 

@@ -18,7 +18,7 @@ Arcane Pi combines a classic RPG experience with the utility of the Pi Network. 
 - **Backend:** Node.js, Express, REST API
 - **Database:** MongoDB
 - **Deployment:** Render (HTTPS), GitHub
-- **Integration:** Pi Network SDK (sandbox/testnet)
+- **Integration:** Pi Network SDK (production/mainnet)
 
 ## 🧩 Game Features
 - Fully playable character creation and class system
