@@ -604,7 +604,7 @@ router.post("/:username/pie/add", async (req, res) => {
         });
 
         const cycle = new Date().toISOString().slice(0, 7);
-        const existing = await RevenueSnapshot.findOne({ cycle });
+        let snapshot = await RevenueSnapshot.findOne({ cycle });
         const updateBreakdown = (total) => ({
           player_rewards: total * 0.35,
           development: total * 0.30,
@@ -613,22 +613,31 @@ router.post("/:username/pie/add", async (req, res) => {
           ecosystem_reserve: total * 0.05,
         });
 
-        if (existing) {
-          const totalPi = existing.totalPi + piAmount;
-          existing.totalPi = totalPi;
-          existing.breakdown = updateBreakdown(totalPi);
-          existing.status = "ready";
-          await existing.save();
-        } else {
-          const totalPi = piAmount;
-          await RevenueSnapshot.create({
-            cycle,
-            totalPi,
-            breakdown: updateBreakdown(totalPi),
-            status: "ready",
-            createdAt: new Date(),
-          });
+        // Fallback to logs if snapshot missing totalPi
+        if (snapshot && (snapshot.totalPi === undefined || snapshot.totalPi === null)) {
+          const monthStart = new Date(`${cycle}-01T00:00:00Z`);
+          const nextMonth = new Date(monthStart);
+          nextMonth.setUTCMonth(nextMonth.getUTCMonth() + 1);
+          const [agg] = await PiRevenueLog.aggregate([
+            { $match: { timestamp: { $gte: monthStart, $lt: nextMonth } } },
+            { $group: { _id: null, total: { $sum: "$amount" } } },
+          ]);
+          const logsTotal = agg?.total || 0;
+          console.log(`Fetched ${logsTotal} Pi from logs`);
+          snapshot.totalPi = logsTotal;
         }
+
+        if (!snapshot) {
+          snapshot = new RevenueSnapshot({ cycle, totalPi: 0, status: "ready" });
+        }
+
+        const totalPi = (snapshot.totalPi || 0) + piAmount;
+        console.log(`Applying breakdown percentages`);
+        snapshot.totalPi = totalPi;
+        snapshot.breakdown = updateBreakdown(totalPi);
+        snapshot.status = "ready";
+        await snapshot.save();
+        console.log(`Snapshot saved`);
       } catch (logErr) {
         console.error("Failed to log Pi revenue", logErr);
       }

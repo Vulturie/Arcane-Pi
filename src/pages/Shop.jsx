@@ -37,7 +37,7 @@ function Shop({ character, refreshCharacter, username, accessToken }) {
     } catch (err) {
       console.error("Failed to load equipment", err);
     }
-  }, [character, username, accessToken]);
+  }, [character]);
 
   useEffect(() => {
     refreshCharacter();
@@ -72,7 +72,7 @@ function Shop({ character, refreshCharacter, username, accessToken }) {
       }
     };
     loadPie();
-  }, [character]);
+  }, [character, username, accessToken]);
 
   const handleBuy = async (item) => {
     try {
