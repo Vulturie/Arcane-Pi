@@ -1,0 +1,10 @@
+{
+  "headers": {
+    "/validation-key.txt": {
+      "cacheControl": "public,max-age=0"
+    }
+  },
+  "routes": {
+    "/validation-key.txt": "validation-key.txt"
+  }
+}
