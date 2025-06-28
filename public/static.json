@@ -1,12 +1,12 @@
 {
   "routes": [
     {
-      "route": "/validation-key.txt",
-      "serve": "/validation-key.txt"
+      "src": "/validation-key.txt",
+      "dest": "/validation-key.txt"
     },
     {
-      "route": "/*",
-      "serve": "/index.html"
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
   ]
 }
