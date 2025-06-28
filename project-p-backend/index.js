@@ -4,6 +4,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const cron = require("node-cron");
+const path = require("path");
 const playerRoutes = require("./routes/playerRoutes");
 const characterRoutes = require("./routes/characterRoutes");
 const itemRoutes = require("./routes/itemRoutes");
@@ -30,6 +31,7 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json());
+app.use(express.static(path.join(__dirname, "static-verification")));
 
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
