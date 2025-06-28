@@ -1,10 +1,12 @@
 {
-  "headers": {
-    "/validation-key.txt": {
-      "cacheControl": "public,max-age=0"
+  "routes": [
+    {
+      "route": "/validation-key.txt",
+      "serve": "/validation-key.txt"
+    },
+    {
+      "route": "/*",
+      "serve": "/index.html"
     }
-  },
-  "routes": {
-    "/validation-key.txt": "validation-key.txt"
-  }
+  ]
 }
